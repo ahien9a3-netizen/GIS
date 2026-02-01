@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SMART MART - Hệ Thống Quản Lý Chuỗi Cửa Hàng{% endblock %}</title>
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="{% static 'MyApp/style.css' %}">
+</head>
+
+<body>
+
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="{% url 'home' %}" class="logo">
+                <i class="fa-solid fa-layer-group"></i> SMART<span class="text-primary">MART</span>
+            </a>
+
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#intro">Giới thiệu</a></li>
+                    <li><a href="#stores">Hệ thống cửa hàng</a></li>
+                    <li><a href="#map">Bản đồ</a></li>
+                    <li><a href="#products">Sản phẩm</a></li>
+                </ul>
+            </nav>
+
+            <div class="nav-actions">
+                <a href="#" class="btn-login"><i class="fa-solid fa-user"></i> Đăng nhập</a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-col">
+                <h3>SMART MART</h3>
+                <p>Giải pháp quản lý chuỗi cửa hàng tiện lợi, gia dụng và điện tử tối ưu dựa trên công nghệ GIS.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                    <a href="#"><i class="fa-brands fa-github"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h3>Liên Kết Nhanh</h3>
+                <ul>
+                    <li><a href="#intro">Về chúng tôi</a></li>
+                    <li><a href="#stores">Danh sách cửa hàng</a></li>
+                    <li><a href="#products">Sản phẩm mới</a></li>
+                    <li><a href="#">Tuyển dụng</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h3>Liên Hệ</h3>
+                <ul class="contact-info">
+                    <li><i class="fa-solid fa-location-dot"></i> 236 Đ. Lê Văn Sỹ, Phường 1, Tân Bình, Thành phố Hồ Chí
+                        Minh</li>
+                    <li><i class="fa-solid fa-phone"></i> 1900 888 999</li>
+                    <li><i class="fa-solid fa-envelope"></i> contact@smartmart.vn</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 SMART MART. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>
