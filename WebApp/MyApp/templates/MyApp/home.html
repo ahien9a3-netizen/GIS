@@ -1,147 +1,382 @@
 {% extends 'MyApp/base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
 {% block content %}
 
-<section class="hero" id="intro">
-    <div class="container">
-        <h1>Hệ Thống Quản Lý Chuỗi Cửa Hàng<br><span class="text-primary">Tiện Lợi - Gia Dụng - Điện Tử</span></h1>
-        <p>Nền tảng quản lý tập trung với công nghệ GIS, tối ưu hóa vận hành cho mạng lưới cửa hàng rộng khắp.</p>
-        <div style="display: flex; justify-content: center; gap: 1rem;">
-            <a href="#stores" class="btn-cta">Tìm Cửa Hàng <i class="fa-solid fa-arrow-right"></i></a>
-            <a href="#products" class="btn-cta" style="background: white; color: var(--text);">Xem Sản Phẩm</a>
+<!-- Page Header -->
+<div class="page-header">
+    <h1>Hệ Thống Quản Lý Chuỗi Cửa Hàng Tiện Lợi, Gia Dụng Và Điện Tử</h1>
+    <p>Dashboard GIS - Giám sát và phân tích mạng lưới cửa hàng</p>
+</div>
+
+<!-- Stats Cards - DỮ LIỆU THỰC -->
+<div class="stats-grid">
+    <div class="stat-card stat-card-blue">
+        <div class="stat-icon">
+            <i class="fa-solid fa-store"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-label">Tổng số cửa hàng</div>
+            <div class="stat-value">{{ total_stores }}</div>
+            <div class="stat-change">Đang hoạt động trên toàn quốc</div>
         </div>
     </div>
-</section>
 
+    <div class="stat-card stat-card-green">
+        <div class="stat-icon">
+            <i class="fa-solid fa-warehouse"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-label">Kho hàng</div>
+            <div class="stat-value">{{ total_warehouses }}</div>
+            <div class="stat-change">Hệ thống phân phối</div>
+        </div>
+    </div>
 
-<div class="container" style="margin-top: -3rem; position: relative; z-index: 10;">
-    <div
-        style="background: white; border-radius: 16px; padding: 2rem; box-shadow: var(--shadow-lg); display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; text-align: center;">
-        <div>
-            <h3 style="font-size: 2.5rem; color: var(--primary); font-weight: 800;">50+</h3>
-            <p style="color: #64748b; font-weight: 500;">Chi Nhánh Cửa Hàng</p>
+    <div class="stat-card stat-card-cyan">
+        <div class="stat-icon">
+            <i class="fa-solid fa-box"></i>
         </div>
-        <div style="border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0;">
-            <h3 style="font-size: 2.5rem; color: var(--secondary); font-weight: 800;">10k+</h3>
-            <p style="color: #64748b; font-weight: 500;">Sản Phẩm Đa Dạng</p>
+        <div class="stat-content">
+            <div class="stat-label">Sản phẩm</div>
+            <div class="stat-value">{{ total_products }}</div>
+            <div class="stat-change">Danh mục sản phẩm</div>
         </div>
-        <div>
-            <h3 style="font-size: 2.5rem; color: var(--accent); font-weight: 800;">24/7</h3>
-            <p style="color: #64748b; font-weight: 500;">Dịch Vụ Hỗ Trợ</p>
+    </div>
+
+    <div class="stat-card stat-card-purple">
+        <div class="stat-icon">
+            <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-label">Tổng tồn kho</div>
+            <div class="stat-value">{{ total_inventory }}</div>
+            <div class="stat-change">Đơn vị sản phẩm</div>
+        </div>
+    </div>
+
+    <div class="stat-card stat-card-blue" style="background: rgba(59, 130, 246, 0.05);">
+        <div class="stat-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--primary);">
+            <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-label">Khách hàng</div>
+            <div class="stat-value">{{ total_customers }}</div>
+            <div class="stat-change">Thành viên hệ thống</div>
+        </div>
+    </div>
+
+    <div class="stat-card stat-card-green" style="background: rgba(16, 185, 129, 0.05);">
+        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--secondary);">
+            <i class="fa-solid fa-shopping-cart"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-label">Đơn hàng</div>
+            <div class="stat-value">{{ total_orders }}</div>
+            <div class="stat-change">Đã giao dịch</div>
         </div>
     </div>
 </div>
 
+<!-- MAIN DASHBOARD CONTENT -->
+<div class="dashboard-grid">
 
-<section id="stores">
-    <div class="container">
-        <h2 class="section-title">Hệ Thống Cửa Hàng</h2>
-        <div class="grid-3">
-
-            <div class="store-card">
-                <div class="store-icon"><i class="fa-solid fa-store"></i></div>
-                <h3>SMART Store - Hoàn Kiếm</h3>
-                <p><i class="fa-solid fa-map-pin"></i> 45 Tràng Tiền, Quận Hoàn Kiếm, Hà Nội</p>
-                <p><i class="fa-solid fa-phone"></i> 024 3939 6868</p>
-                <div style="margin-top: 1rem;">
-                    <span class="status-badge">Đang mở cửa</span>
+    <!-- LEFT COLUMN: MAP (Chiếm 65%) -->
+    <div class="dashboard-col-left">
+        <div class="map-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-map-location-dot"></i> Bản Đồ Cửa Hàng</h3>
+                <div class="map-actions">
+                    <small>Click nút 🔍 để phân tích vùng phục vụ</small>
                 </div>
             </div>
-
-            <div class="store-card">
-                <div class="store-icon"><i class="fa-solid fa-store"></i></div>
-                <h3>SMART Store - Quận 1</h3>
-                <p><i class="fa-solid fa-map-pin"></i> 102 Nguyễn Huệ, Quận 1, TP.HCM</p>
-                <p><i class="fa-solid fa-phone"></i> 028 3838 5555</p>
-                <div style="margin-top: 1rem;">
-                    <span class="status-badge">Đang mở cửa</span>
-                </div>
+            <div class="map-container-embedded">
+                <div id="map-display"></div>
             </div>
-
-            <div class="store-card">
-                <div class="store-icon"><i class="fa-solid fa-store"></i></div>
-                <h3>SMART Store - Hải Châu</h3>
-                <p><i class="fa-solid fa-map-pin"></i> 20 Lê Duẩn, Quận Hải Châu, Đà Nẵng</p>
-                <p><i class="fa-solid fa-phone"></i> 0236 3737 888</p>
-                <div style="margin-top: 1rem;">
-                    <span class="status-badge">Đang mở cửa</span>
-                </div>
-            </div>
-        </div>
-        <div style="text-align: center; margin-top: 2.5rem;">
-            <a href="#" class="btn-login"
-                style="background: white; color: var(--primary) !important; border: 1px solid var(--primary);">Xem tất
-                cả cửa hàng</a>
-        </div>
-    </div>
-</section>
-
-
-<section id="map" class="map-section">
-    <div class="container">
-        <h2 class="section-title">Vị trí cửa hàng</h2>
-        <div class="map-placeholder">
-            <div class="map-content">
-                <i class="fa-solid fa-map-location-dot"></i>
-                <h3>GIS Interactive Map</h3>
-                <p>Hệ thống đang tải dữ liệu bản đồ...</p>
-                <button class="btn-login" style="margin-top: 1rem;">Kích hoạt định vị</button>
+            <!-- Map Tools / Guidance Compact -->
+            <div class="map-footer-tools">
+                <span class="tool-badge"><i class="fa-solid fa-location-dot"></i> Marker Cửa Hàng</span>
+                <span class="tool-badge"><i class="fa-solid fa-layer-group"></i> Heatmap Layer</span>
+                <span class="tool-badge"><i class="fa-solid fa-circle-nodes"></i> Vùng Phục Vụ 2km</span>
             </div>
         </div>
     </div>
-</section>
 
+    <!-- RIGHT COLUMN: STORES LIST & ALERTS (Chiếm 35%) -->
+    <div class="dashboard-col-right">
 
-<section id="products">
-    <div class="container">
-        <h2 class="section-title">Sản Phẩm Nổi Bật</h2>
-        <div class="grid-4">
-
-            <div class="product-card">
-                <div class="product-img">
-                    <i class="fa-solid fa-laptop-code"></i>
-                </div>
-                <div class="product-info">
-                    <div class="product-cat">Điện Tử</div>
-                    <h3 class="product-name">Laptop ProBook X1</h3>
-                    <div class="product-price">22.990.000 ₫</div>
-                </div>
+        <!-- Stores List -->
+        <div class="stores-card-compact">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-shop"></i> Danh Sách Cửa Hàng</h3>
             </div>
-
-            <div class="product-card">
-                <div class="product-img">
-                    <i class="fa-solid fa-blender"></i>
+            <div class="stores-list-scroll">
+                {% for store in stores_list %}
+                <div class="store-item-compact" data-lat="{{ store.lat }}" data-lng="{{ store.lon }}">
+                    <div class="store-icon-small">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <div class="store-info">
+                        <div class="store-name-small">{{ store.Ten }}</div>
+                        <div class="store-addr-small">{{ store.DiaChi }}</div>
+                    </div>
+                    <div class="store-status-dot status-active"></div>
                 </div>
-                <div class="product-info">
-                    <div class="product-cat">Gia Dụng</div>
-                    <h3 class="product-name">Máy Xay Đa Năng</h3>
-                    <div class="product-price">1.250.000 ₫</div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-img">
-                    <i class="fa-solid fa-tv"></i>
-                </div>
-                <div class="product-info">
-                    <div class="product-cat">Điện Máy</div>
-                    <h3 class="product-name">Smart TV 4K 55"</h3>
-                    <div class="product-price">15.500.000 ₫</div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <div class="product-img">
-                    <i class="fa-solid fa-basket-shopping"></i>
-                </div>
-                <div class="product-info">
-                    <div class="product-cat">Tiện Lợi</div>
-                    <h3 class="product-name">Combo Thực Phẩm</h3>
-                    <div class="product-price">350.000 ₫</div>
-                </div>
+                {% empty %}
+                <p class="no-data">Chưa có dữ liệu.</p>
+                {% endfor %}
             </div>
         </div>
+
+        <!-- Inventory Alert Short -->
+        <div class="inventory-card-compact" style="margin-top: 1.5rem;">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-triangle-exclamation"></i> Cảnh Báo Tồn Kho</h3>
+            </div>
+            <div class="inventory-list-compact">
+                {% for item in inventory_by_warehouse|slice:":3" %}
+                <div class="inv-item-compact">
+                    <span>{{ item.0 }}</span>
+                    <span class="inv-badge">{{ item.1 }} sp</span>
+                </div>
+                {% empty %}
+                <p class="no-data">Không có cảnh báo.</p>
+                {% endfor %}
+            </div>
+        </div>
+
     </div>
-</section>
+</div>
+
+<!-- HƯỚNG DẪN SỬ DỤNG -->
+<div class="guide-section">
+    <div class="guide-header">
+        <i class="fa-solid fa-circle-info"></i>
+        <h3>Hướng Dẫn Sử Dụng Công Cụ GIS</h3>
+    </div>
+    <div class="guide-grid">
+        <div class="guide-card">
+            <div class="guide-number">1</div>
+            <h4>Xem Thông Tin Cửa Hàng</h4>
+            <p>Click vào marker trên bản đồ để xem thông tin chi tiết: tên, địa chỉ, số điện thoại.</p>
+        </div>
+        <div class="guide-card">
+            <div class="guide-number">2</div>
+            <h4>Heatmap Phân Bố</h4>
+            <p>Mở layer control (góc phải), bật "Bản đồ nhiệt (Heatmap)" để xem mật độ phân bố.</p>
+        </div>
+        <div class="guide-card">
+            <div class="guide-number">3</div>
+            <h4>Phân Tích Vùng Phục Vụ</h4>
+            <p>Click nút "🔍 Phân tích vùng phục vụ", sau đó click vào bất kỳ điểm nào trên map để tìm cửa hàng gần nhất
+                trong bán kính 2km.</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
+
+<script>
+    // === INVENTORY CHART ===
+    const inventoryCtx = document.getElementById('inventoryChart');
+    if (inventoryCtx) {
+        const inventoryData = [
+            {% for item in inventory_by_warehouse %}
+    { label: '{{ item.0 }}', value: { { item.1 } } },
+    {% endfor %}
+            ];
+
+    new Chart(inventoryCtx, {
+        type: 'doughnut',
+        data: {
+            labels: inventoryData.map(d => d.label),
+            datasets: [{
+                data: inventoryData.map(d => d.value),
+                backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 15, font: { size: 12 } }
+                }
+            },
+            cutout: '65%'
+        }
+    });
+        }
+
+    // === LEAFLET MAP ===
+    document.addEventListener('DOMContentLoaded', function () {
+        var map = L.map('map-display').setView([10.7769, 106.7009], 12);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        var storesLayer = L.layerGroup().addTo(map);
+        var heatLayer = null;
+        var serviceLayer = L.layerGroup().addTo(map);
+
+        // Load stores GeoJSON
+        function loadStoreGeoJSON() {
+            fetch('/api/stores-geojson/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.features && data.features.length > 0) {
+                        L.geoJSON(data, {
+                            pointToLayer: function (feature, latlng) {
+                                return L.marker(latlng, {
+                                    icon: L.divIcon({
+                                        className: 'custom-marker',
+                                        html: '<div style="background: #3b82f6; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"><i class="fa-solid fa-store"></i></div>',
+                                        iconSize: [30, 30]
+                                    })
+                                });
+                            },
+                            onEachFeature: function (feature, layer) {
+                                if (feature.properties) {
+                                    var content = `
+                                            <div style='font-size: 14px; min-width: 200px;'>
+                                                <h4 style='margin: 0 0 8px; color: #3b82f6; font-size: 16px;'>${feature.properties.name}</h4>
+                                                <p style='margin: 4px 0;'><i class='fa-solid fa-map-pin'></i> ${feature.properties.address}</p>
+                                                <p style='margin: 4px 0;'><i class='fa-solid fa-phone'></i> ${feature.properties.phone}</p>
+                                                <p style='margin: 4px 0;'><strong>Trạng thái:</strong> <span style='color: #10b981'>${feature.properties.status}</span></p>
+                                            </div>
+                                        `;
+                                    layer.bindPopup(content);
+                                }
+                            }
+                        }).addTo(storesLayer);
+
+                        // Auto fit bounds to show all stores
+                        map.fitBounds(storesLayer.getBounds().pad(0.1));
+                    }
+                })
+                .catch(error => console.error('Lỗi tải GeoJSON:', error));
+        }
+        loadStoreGeoJSON();
+
+        // Load heatmap
+        function loadHeatmap() {
+            fetch('/api/stores-heatmap/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        heatLayer = L.heatLayer(data, {
+                            radius: 25,
+                            blur: 20,
+                            maxZoom: 17,
+                        });
+
+                        var overlays = {
+                            "Bản đồ nhiệt (Heatmap)": heatLayer
+                        };
+                        L.control.layers(null, overlays).addTo(map);
+                    }
+                })
+                .catch(error => console.error('Lỗi tải Heatmap:', error));
+        }
+        loadHeatmap();
+
+        // Service Area Analysis
+        var isAnalysisMode = false;
+
+        var infoControl = L.control({ position: 'topright' });
+        infoControl.onAdd = function (map) {
+            var div = L.DomUtil.create('div', 'info-control');
+            div.innerHTML = '<button id="btn-analysis" class="leaflet-analysis-btn"><i class="fa-solid fa-magnifying-glass-location"></i> Phân tích vùng phục vụ</button>';
+            div.firstChild.onmousedown = div.firstChild.ondblclick = L.DomEvent.stopPropagation;
+            return div;
+        };
+        infoControl.addTo(map);
+
+        document.getElementById('btn-analysis').onclick = function (e) {
+            L.DomEvent.stop(e);
+            isAnalysisMode = !isAnalysisMode;
+            this.style.background = isAnalysisMode ? '#ef4444' : '#3b82f6';
+            this.innerHTML = isAnalysisMode ? '<i class="fa-solid fa-xmark"></i> Hủy phân tích' : '<i class="fa-solid fa-magnifying-glass-location"></i> Phân tích vùng phục vụ';
+
+            map.getContainer().style.cursor = isAnalysisMode ? 'crosshair' : '';
+            if (!isAnalysisMode) serviceLayer.clearLayers();
+        };
+
+        map.on('click', function (e) {
+            if (!isAnalysisMode) return;
+
+            var lat = e.latlng.lat;
+            var lng = e.latlng.lng;
+            var radius = 2;
+
+            serviceLayer.clearLayers();
+
+            L.circle([lat, lng], {
+                color: '#ef4444',
+                fillColor: '#ef4444',
+                fillOpacity: 0.1,
+                radius: radius * 1000
+            }).addTo(serviceLayer);
+
+            fetch(`/api/service-area/?lat=${lat}&lng=${lng}&radius=${radius}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.stores && data.stores.features.length > 0) {
+                        var highlightedStores = L.geoJSON(data.stores, {
+                            pointToLayer: function (feature, latlng) {
+                                return L.circleMarker(latlng, {
+                                    radius: 10,
+                                    fillColor: "#ff7800",
+                                    color: "#fff",
+                                    weight: 2,
+                                    opacity: 1,
+                                    fillOpacity: 0.9
+                                });
+                            },
+                            onEachFeature: function (feature, layer) {
+                                layer.bindPopup(`
+                                        <div style='font-size: 13px;'>
+                                            <strong>${feature.properties.name}</strong><br>
+                                            <span style='color: #10b981;'>✓ Trong vùng phục vụ</span><br>
+                                            Khoảng cách: <strong>${feature.properties.distance_km} km</strong>
+                                        </div>
+                                    `);
+                            }
+                        }).addTo(serviceLayer);
+
+                        map.fitBounds(highlightedStores.getBounds().pad(0.3));
+                    } else {
+                        alert("Không tìm thấy cửa hàng nào trong bán kính " + radius + "km.");
+                    }
+                })
+                .catch(err => console.error(err));
+        });
+
+        // Click vào store item trong list để zoom map
+        document.querySelectorAll('.store-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const lat = parseFloat(this.dataset.lat);
+                const lng = parseFloat(this.dataset.lng);
+                if (lat && lng) {
+                    map.setView([lat, lng], 15);
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

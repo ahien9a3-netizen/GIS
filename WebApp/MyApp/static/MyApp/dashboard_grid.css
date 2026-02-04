@@ -1,0 +1,172 @@
+/* ==================== DASHBOARD GRID LAYOUT (RETAILPRO STYLE) ==================== */
+.dashboard-grid {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    height: 600px;
+}
+
+.dashboard-col-left {
+    flex: 6.5;
+    /* Chiếm 65% */
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-col-right {
+    flex: 3.5;
+    /* Chiếm 35% */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Map Card Embedded */
+.map-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.map-container-embedded {
+    flex: 1;
+    position: relative;
+    min-height: 400px;
+}
+
+.map-footer-tools {
+    padding: 1rem;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.tool-badge {
+    font-size: 0.75rem;
+    background: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 99px;
+    border: 1px solid var(--gray-200);
+    color: var(--gray-600);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Compact Stores List (Right Side) */
+.stores-card-compact,
+.inventory-card-compact {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.stores-card-compact {
+    flex: 1;
+    /* Tự động dãn để chiếm không gian */
+}
+
+.stores-list-scroll {
+    overflow-y: auto;
+    flex: 1;
+    padding: 0.5rem 0;
+}
+
+.store-item-compact {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--gray-100);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.store-item-compact:hover {
+    background: var(--gray-50);
+}
+
+.store-icon-small {
+    width: 36px;
+    height: 36px;
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--primary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.store-name-small {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.store-addr-small {
+    font-size: 0.75rem;
+    color: var(--gray-500);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+.store-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: auto;
+}
+
+/* Compact Inventory List */
+.inventory-list-compact {
+    padding: 1rem;
+}
+
+.inv-item-compact {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+    border-bottom: 1px solid var(--gray-50);
+}
+
+.inv-badge {
+    background: var(--gray-100);
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.no-data {
+    padding: 1rem;
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 0.875rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .dashboard-grid {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .map-container-embedded {
+        height: 500px;
+    }
+
+    .stores-card-compact {
+        height: 400px;
+    }
+}

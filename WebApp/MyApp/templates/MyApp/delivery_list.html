@@ -1,0 +1,62 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>{{ page_title }}</h1>
+            <p>Quản lý vận chuyển và giao hàng</p>
+        </div>
+        <a href="{% url 'delivery_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
+            <i class="fa-solid fa-plus"></i> Tạo Vận đơn
+        </a>
+    </div>
+</div>
+
+<div class="chart-card" style="padding: 1rem;">
+    <table class="crud-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--gray-200);">
+                <th style="padding: 1rem;">Mã GH</th>
+                <th style="padding: 1rem;">Đơn hàng</th>
+                <th style="padding: 1rem;">Người giao</th>
+                <th style="padding: 1rem;">Trạng thái</th>
+                <th style="padding: 1rem;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in deliveries %}
+            <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 1rem; font-weight: 600;">{{ d.MaGH }}</td>
+                <td style="padding: 1rem;">{{ d.DonHang.MaDH }}</td>
+                <td style="padding: 1rem;">{{ d.NguoiGiao }} <br><small>{{ d.SdtNguoiGiao }}</small></td>
+                <td style="padding: 1rem;">
+                    <span
+                        class="order-status {% if d.TrangThai == 'Đã hoàn thành' %}status-success{% else %}status-processing{% endif %}">
+                        {{ d.TrangThai }}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a href="{% url 'delivery_edit' d.pk %}" style="color: var(--primary);"><i
+                                class="fa-solid fa-pen-to-square"></i></a>
+                        <form action="{% url 'delivery_delete' d.pk %}" method="post" style="display: inline;"
+                            onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
+                            {% csrf_token %}
+                            <button type="submit"
+                                style="background: none; border: none; color: var(--danger); cursor: pointer;"><i
+                                    class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding: 2rem; text-align: center; color: var(--gray-400);">Chưa có dữ liệu.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,69 +1,49 @@
-from django.urls import path
+from django.urls import path, reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from .models import CuaHang, SanPham, KhachHang, DonHang, GiaoHang, Kho
 from .views import (
-    home, store_geojson, store_heatmap, service_area, kho_geojson, inventory_stats,
-    CuaHangListView, CuaHangCreateView, CuaHangUpdateView, CuaHangDeleteView,
-    SanPhamListView, SanPhamCreateView, SanPhamUpdateView, SanPhamDeleteView,
-    KhachHangListView, KhachHangCreateView, KhachHangUpdateView, KhachHangDeleteView,
-    DonHangListView, DonHangCreateView, DonHangUpdateView, DonHangDeleteView,
-    GiaoHangListView, GiaoHangCreateView, GiaoHangUpdateView, GiaoHangDeleteView,
-    KhoListView, KhoCreateView, KhoUpdateView, KhoDeleteView,
-    NhanVienListView, NhanVienCreateView, NhanVienUpdateView, NhanVienDeleteView,
-    StockInListView, StockInCreateView, StockInUpdateView, StockInDeleteView
+    home, store_geojson, store_heatmap, service_area, kho_geojson, inventory_stats
 )
+
+app_name = 'MyApp'
 
 urlpatterns = [
     path('', home, name='home'),
+    
+    # API GIS
     path('api/stores-geojson/', store_geojson, name='store_geojson'),
     path('api/stores-heatmap/', store_heatmap, name='store_heatmap'),
     path('api/service-area/', service_area, name='service_area'),
     path('api/kho-geojson/', kho_geojson, name='kho_geojson'),
     path('api/inventory-stats/', inventory_stats, name='inventory_stats'),
 
-    # Cửa hàng
+    # Cửa hàng (Stores)
     path('stores/', CuaHangListView.as_view(), name='store_list'),
     path('stores/add/', CuaHangCreateView.as_view(), name='store_add'),
     path('stores/<str:pk>/edit/', CuaHangUpdateView.as_view(), name='store_edit'),
     path('stores/<str:pk>/delete/', CuaHangDeleteView.as_view(), name='store_delete'),
 
-    # Sản phẩm
+    # Sản phẩm (Products)
     path('products/', SanPhamListView.as_view(), name='product_list'),
     path('products/add/', SanPhamCreateView.as_view(), name='product_add'),
     path('products/<str:pk>/edit/', SanPhamUpdateView.as_view(), name='product_edit'),
     path('products/<str:pk>/delete/', SanPhamDeleteView.as_view(), name='product_delete'),
 
-    # Khách hàng
+    # Khách hàng (Customers)
     path('customers/', KhachHangListView.as_view(), name='customer_list'),
     path('customers/add/', KhachHangCreateView.as_view(), name='customer_add'),
     path('customers/<str:pk>/edit/', KhachHangUpdateView.as_view(), name='customer_edit'),
     path('customers/<str:pk>/delete/', KhachHangDeleteView.as_view(), name='customer_delete'),
 
-    # Đơn hàng
+    # Đơn hàng (Orders)
     path('orders/', DonHangListView.as_view(), name='order_list'),
     path('orders/add/', DonHangCreateView.as_view(), name='order_add'),
     path('orders/<str:pk>/edit/', DonHangUpdateView.as_view(), name='order_edit'),
     path('orders/<str:pk>/delete/', DonHangDeleteView.as_view(), name='order_delete'),
 
-    # Giao hàng
+    # Giao hàng (Delivery)
     path('delivery/', GiaoHangListView.as_view(), name='delivery_list'),
     path('delivery/add/', GiaoHangCreateView.as_view(), name='delivery_add'),
     path('delivery/<str:pk>/edit/', GiaoHangUpdateView.as_view(), name='delivery_edit'),
     path('delivery/<str:pk>/delete/', GiaoHangDeleteView.as_view(), name='delivery_delete'),
-
-    # Kho hàng
-    path('warehouses/', KhoListView.as_view(), name='kho_list'),
-    path('warehouses/add/', KhoCreateView.as_view(), name='kho_add'),
-    path('warehouses/<str:pk>/edit/', KhoUpdateView.as_view(), name='kho_edit'),
-    path('warehouses/<str:pk>/delete/', KhoDeleteView.as_view(), name='kho_delete'),
-
-    # Nhân viên
-    path('employees/', NhanVienListView.as_view(), name='nhanvien_list'),
-    path('employees/add/', NhanVienCreateView.as_view(), name='nhanvien_add'),
-    path('employees/<str:pk>/edit/', NhanVienUpdateView.as_view(), name='nhanvien_edit'),
-    path('employees/<str:pk>/delete/', NhanVienDeleteView.as_view(), name='nhanvien_delete'),
-
-    # Nhập kho
-    path('stock-in/', StockInListView.as_view(), name='stock_in_list'),
-    path('stock-in/add/', StockInCreateView.as_view(), name='stock_in_add'),
-    path('stock-in/<str:pk>/edit/', StockInUpdateView.as_view(), name='stock_in_edit'),
-    path('stock-in/<str:pk>/delete/', StockInDeleteView.as_view(), name='stock_in_delete'),
 ]

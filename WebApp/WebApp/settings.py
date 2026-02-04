@@ -10,11 +10,12 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -27,7 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',  # Required for GeoDjango
     'MyApp',
 ]
 
@@ -75,10 +76,30 @@ WSGI_APPLICATION = 'WebApp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Switch to PostGIS Engine
+        'NAME': 'webapp',
+        'USER': 'postgres',
+        'PASSWORD': '123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
+
+# Windows GDAL Configuration (Auto-fixed by locating 'geo_tool' conda env)
+if os.name == 'nt':
+    # Path to the discovered libraries in 'geo_tool' environment
+    VENV_BASE = r"C:\Users\Admin\anaconda3\envs\geo_tool\Library"
+    VENV_BIN = os.path.join(VENV_BASE, "bin")
+    
+    # Add bin folder to PATH so dependent DLLs can be found
+    os.environ['PATH'] = VENV_BIN + os.pathsep + os.environ['PATH']
+    
+    # Set explicit paths for GeoDjango
+    GDAL_LIBRARY_PATH = os.path.join(VENV_BIN, 'gdal.dll')
+    GEOS_LIBRARY_PATH = os.path.join(VENV_BIN, 'geos_c.dll')
+    
+    # Optional: Set PROJ path if needed
+    os.environ['PROJ_LIB'] = os.path.join(VENV_BASE, 'share', 'proj')
 
 
 # Password validation

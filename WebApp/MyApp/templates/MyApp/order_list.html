@@ -1,0 +1,64 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>{{ page_title }}</h1>
+            <p>Quản lý đơn hàng</p>
+        </div>
+        <a href="{% url 'order_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
+            <i class="fa-solid fa-plus"></i> Tạo Đơn hàng
+        </a>
+    </div>
+</div>
+
+<div class="chart-card" style="padding: 1rem;">
+    <table class="crud-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--gray-200);">
+                <th style="padding: 1rem;">Mã ĐH</th>
+                <th style="padding: 1rem;">Khách hàng</th>
+                <th style="padding: 1rem;">Ngày tạo</th>
+                <th style="padding: 1rem;">Tổng tiền</th>
+                <th style="padding: 1rem;">Trạng thái</th>
+                <th style="padding: 1rem;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in orders %}
+            <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 1rem; font-weight: 600;">{{ o.MaDH }}</td>
+                <td style="padding: 1rem;">{{ o.KhachHang.Ten }}</td>
+                <td style="padding: 1rem;">{{ o.NgayTao|date:"d/m/Y H:i" }}</td>
+                <td style="padding: 1rem; font-weight: 600;">{{ o.TongTien }} VNĐ</td>
+                <td style="padding: 1rem;">
+                    <span
+                        class="order-status {% if o.TrangThai == 'da_hoan_thanh' %}status-success{% elif o.TrangThai == 'dang_giao' %}status-processing{% else %}status-pending{% endif %}">
+                        {{ o.get_TrangThai_display }}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a href="{% url 'order_edit' o.pk %}" style="color: var(--primary);"><i
+                                class="fa-solid fa-pen-to-square"></i></a>
+                        <form action="{% url 'order_delete' o.pk %}" method="post" style="display: inline;"
+                            onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
+                            {% csrf_token %}
+                            <button type="submit"
+                                style="background: none; border: none; color: var(--danger); cursor: pointer;"><i
+                                    class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="padding: 2rem; text-align: center; color: var(--gray-400);">Chưa có dữ liệu.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
