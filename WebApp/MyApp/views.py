@@ -1,24 +1,29 @@
 from django.shortcuts import render
+from .models import CuaHang, Kho, SanPham, HangTonKho
 
-from django.http import HttpResponse
+def dashboard(request):
+    context = {
+        'tong_cua_hang': CuaHang.objects.count(),
+        'tong_kho': Kho.objects.count(),
+        'tong_san_pham': SanPham.objects.count(),
+        'tong_ton_kho': HangTonKho.objects.aggregate(
+            total=models.Sum('SoLuong')
+        )['total'] or 0,
+    }
+    return render(request, 'myapp/dashboard.html', context)
+from django.core.serializers import serialize
 
-def index(request):
-    return HttpResponse("Hello GIS WebApp 🚀")
+def cuahang(request):
+    data = serialize(
+        'geojson',
+        CuaHang.objects.exclude(geom__isnull=True),
+        geometry_field='geom',
+        fields=('Ten', 'DiaChi')
+    )
+    return render(request, 'myapp/cuahang.html', {
+        'geojson': data
+    })
 
-def home(request):
-    return render(request, 'home.html')
-
-def product_list(request):
-    products = [
-        {'ten': 'Tivi Samsung', 'so_luong': 10},
-        {'ten': 'Tủ lạnh LG', 'so_luong': 5},
-    ]
-    return render(request, 'products/list.html', {'products': products})
-
-def warehouse_list(request):
-    warehouses = [
-        {'ten': 'Kho Hà Nội', 'dia_chi': 'HN'},
-        {'ten': 'Kho TP.HCM', 'dia_chi': 'HCM'},
-    ]
-    return render(request, 'warehouse/list.html', {'warehouses': warehouses})
-
+def kho(request):
+    data = Kho.objects.all()
+    return render(request, 'myapp/kho.html', {'data': data})

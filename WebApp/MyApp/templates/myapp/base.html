@@ -1,0 +1,38 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>SMART MART</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+    <!-- Leaflet GIS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+</head>
+<body>
+
+<div class="d-flex">
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h4 class="logo">SMART MART</h4>
+        <ul>
+            <li><a href="{% url 'dashboard' %}">Tổng quan</a></li>
+            <li><a href="{% url 'cuahang' %}">Cửa hàng</a></li>
+            <li><a href="{% url 'kho' %}">Kho hàng</a></li>
+            <li><a href="{% url 'sanpham' %}">Sản phẩm</a></li>
+            <li><a href="{% url 'nhapkho' %}">Nhập kho</a></li>
+        </ul>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main-content p-4 w-100">
+        {% block content %}{% endblock %}
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</body>
+</html>
