@@ -5,7 +5,7 @@ class SanPham(models.Model):
     MaSP = models.CharField(max_length=20, primary_key=True, db_column='masp')
     Ten = models.CharField(max_length=255, db_column='ten')
     Image = models.CharField(max_length=20, blank=True, null=True, db_column='image')
-    DanhMuc = models.CharField(max_length=100, blank=True, null=True, db_column='danhmuc')
+    DanhMuc = models.ForeignKey('DanhMuc', on_delete=models.SET_NULL, blank=True, null=True, db_column='danhmuc')
     MieuTa = models.TextField(blank=True, null=True, db_column='mieuta')
     TrangThai = models.CharField(max_length=50, blank=True, null=True, db_column='trangthai')
 
@@ -40,9 +40,15 @@ class Kho(models.Model):
 
 # ==================== CỬA HÀNG ====================
 class CuaHang(models.Model):
+    LOAI_CHOICES = [
+        ('Tiện Lợi', 'Tiện Lợi'),
+        ('Gia Dụng', 'Gia Dụng'),
+        ('Điện Tử', 'Điện Tử'),
+    ]
+    
     MaCH = models.CharField(max_length=20, primary_key=True, db_column='mach')
     Ten = models.CharField(max_length=255, db_column='ten')
-    Loai = models.CharField(max_length=50, blank=True, null=True, db_column='loai')
+    Loai = models.CharField(max_length=50, choices=LOAI_CHOICES, db_column='loai')
     Icon = models.CharField(max_length=20, blank=True, null=True, db_column='icon')
     DiaChi = models.TextField(blank=True, null=True, db_column='diachi')
     SDT = models.CharField(max_length=20, blank=True, null=True, db_column='sdt')
@@ -61,11 +67,17 @@ class CuaHang(models.Model):
 
 # ==================== NHÂN VIÊN ====================
 class NhanVien(models.Model):
+    ROLE_CHOICES = [
+        ('Admin', 'Admin'),
+        ('Nhân Viên', 'Nhân Viên'),
+        ('Kế Toán', 'Kế Toán'),
+    ]
+    
     MaNV = models.CharField(max_length=20, primary_key=True, db_column='manv')
     Ten = models.CharField(max_length=255, db_column='ten')
     SDT = models.CharField(max_length=20, blank=True, null=True, db_column='sdt')
     MatKhau = models.TextField(db_column='matkhau')
-    Role = models.CharField(max_length=50, blank=True, null=True, db_column='role')
+    Role = models.CharField(max_length=50, choices=ROLE_CHOICES, db_column='role')
 
     class Meta:
         managed = False
@@ -106,7 +118,8 @@ class HangTonKho(models.Model):
     MaKho = models.ForeignKey(
         Kho,
         on_delete=models.CASCADE,
-        db_column='makho'
+        db_column='makho',
+        primary_key=True  # Đánh dấu giả để Django không báo lỗi
     )
     MaSP = models.ForeignKey(
         SanPham,
@@ -150,59 +163,21 @@ class NhapKhoChiTiet(models.Model):
         verbose_name_plural = "Chi tiết nhập kho"
 
 
-# ==================== KHÁCH HÀNG ====================
-class KhachHang(models.Model):
-    MaKH = models.CharField(max_length=20, primary_key=True)
-    Ten = models.CharField(max_length=255)
-    SDT = models.CharField(max_length=20, blank=True, null=True)
-    Email = models.EmailField(blank=True, null=True)
-    DiaChi = models.TextField(blank=True, null=True)
+# ==================== DANH MỤC ====================
+class DanhMuc(models.Model):
+    MaDM = models.CharField(max_length=20, primary_key=True, db_column='madm')
+    Ten = models.CharField(max_length=255, db_column='tendm')
+    MoTa = models.TextField(blank=True, null=True, db_column='mota')
 
     class Meta:
-        verbose_name = "Khách hàng"
-        verbose_name_plural = "Danh sách khách hàng"
+        managed = False
+        db_table = 'danhmuc'
+        verbose_name = "Danh mục"
+        verbose_name_plural = "Danh sách danh mục"
 
     def __str__(self):
-        return f"{self.MaKH} - {self.Ten}"
+        return f"{self.MaDM} - {self.Ten}"
 
-
-# ==================== ĐƠN HÀNG ====================
-class DonHang(models.Model):
-    STATUS_CHOICES = [
-        ('cho_xu_ly', 'Chờ xử lý'),
-        ('dang_giao', 'Đang giao'),
-        ('da_hoan_thanh', 'Đã hoàn thành'),
-        ('da_huy', 'Đã hủy'),
-    ]
-    MaDH = models.CharField(max_length=20, primary_key=True)
-    KhachHang = models.ForeignKey(KhachHang, on_delete=models.CASCADE)
-    NgayTao = models.DateTimeField(auto_now_add=True)
-    TongTien = models.DecimalField(max_digits=15, decimal_places=2, default=0)
-    TrangThai = models.CharField(max_length=20, choices=STATUS_CHOICES, default='cho_xu_ly')
-
-    class Meta:
-        verbose_name = "Đơn hàng"
-        verbose_name_plural = "Danh sách đơn hàng"
-
-    def __str__(self):
-        return self.MaDH
-
-
-# ==================== GIAO HÀNG ====================
-class GiaoHang(models.Model):
-    MaGH = models.CharField(max_length=20, primary_key=True)
-    DonHang = models.OneToOneField(DonHang, on_delete=models.CASCADE)
-    NguoiGiao = models.CharField(max_length=255)
-    SdtNguoiGiao = models.CharField(max_length=20)
-    NgayGiao = models.DateTimeField(blank=True, null=True)
-    TrangThai = models.CharField(max_length=50, default='Đang chuẩn bị')
-
-    class Meta:
-        verbose_name = "Giao hàng"
-        verbose_name_plural = "Danh sách giao hàng"
-
-    def __str__(self):
-        return self.MaGH
 
 
 # ==================== LEGACY: Store Model (compatibility) ====================

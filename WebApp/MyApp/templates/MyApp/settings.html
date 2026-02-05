@@ -1,0 +1,317 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .settings-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .settings-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .settings-header {
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--primary) 0%, #1d4ed8 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .profile-avatar-large {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .profile-info h2 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+
+    .settings-body {
+        padding: 2rem;
+    }
+
+    .settings-section {
+        margin-bottom: 2.5rem;
+    }
+
+    .settings-section h3 {
+        font-size: 1.1rem;
+        color: var(--dark);
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--gray-600);
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary);
+    }
+
+    .btn-save {
+        padding: 0.75rem 1.5rem;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-save:hover {
+        background: #2563eb;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .alert-success {
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    .alert-error {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    /* Switch toggle styles */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 40px;
+        height: 20px;
+    }
+
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 20px;
+    }
+
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+
+    input:checked+.slider {
+        background-color: var(--primary);
+    }
+
+    input:checked+.slider:before {
+        transform: translateX(20px);
+    }
+
+    .option-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--gray-50);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Cài đặt tài khoản</h1>
+    <p>Quản lý hồ sơ cá nhân và cấu hình hệ thống</p>
+</div>
+
+<div class="settings-container">
+    {% if success_msg %}
+    <div class="alert alert-success">
+        <i class="fa-solid fa-circle-check"></i>
+        {{ success_msg }}
+    </div>
+    {% endif %}
+
+    {% if error_msg %}
+    <div class="alert alert-error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        {{ error_msg }}
+    </div>
+    {% endif %}
+
+    <div class="settings-card">
+        <div class="settings-header">
+            <div class="profile-avatar-large">
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="profile-info">
+                <h2>{{ user.Ten }}</h2>
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem;">
+                    <span
+                        style="padding: 0.25rem 0.75rem; background: rgba(255,255,255,0.2); border-radius: 99px; font-size: 0.8rem; font-weight: 600;">
+                        {{ user.Role|default:"Nhân viên" }}
+                    </span>
+                    <span style="opacity: 0.8; font-size: 0.9rem;">ID: {{ user.MaNV }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-body">
+            <!-- Form 1: Cập nhật thông tin -->
+            <form method="post" class="settings-section">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_profile">
+                <h3><i class="fa-solid fa-user-pen"></i> Chỉnh sửa thông tin</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label>Họ và tên</label>
+                        <input type="text" name="ten" class="form-control" value="{{ user.Ten }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input type="text" name="sdt" class="form-control" value="{{ user.SDT }}" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-save">Lưu thay đổi</button>
+            </form>
+
+            <hr style="border: 0; border-top: 1px solid var(--gray-100); margin: 1rem 0 2rem;">
+
+            <!-- Form 2: Đổi mật khẩu -->
+            <form method="post" class="settings-section">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_password">
+                <h3><i class="fa-solid fa-key"></i> Đổi mật khẩu</h3>
+                <div class="form-group">
+                    <label>Mật khẩu hiện tại</label>
+                    <input type="password" name="old_password" class="form-control" required>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    <div class="form-group">
+                        <label>Mật khẩu mới</label>
+                        <input type="password" name="new_password" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Xác nhận mật khẩu mới</label>
+                        <input type="password" name="confirm_password" class="form-control" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-save">Cập nhật mật khẩu</button>
+            </form>
+
+            <hr style="border: 0; border-top: 1px solid var(--gray-100); margin: 1rem 0 2rem;">
+
+            <!-- Section 3: Tùy chọn UI -->
+            <div class="settings-section">
+                <h3><i class="fa-solid fa-desktop"></i> Giao diện & Thông báo</h3>
+                <div class="option-item">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.95rem;">Chế độ tối (Dark Mode)</div>
+                        <div style="font-size: 0.85rem; color: var(--gray-400);">Chuyển sang giao diện tối để bảo vệ mắt
+                        </div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="dark-mode-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="option-item">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.95rem;">Thông báo hệ thống</div>
+                        <div style="font-size: 0.85rem; color: var(--gray-400);">Nhận cảnh báo tồn kho và yêu cầu mới
+                        </div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Logic cho Dark Mode (Demo LocalStorage)
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+    // Kiểm tra trạng thái cũ
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        darkModeToggle.checked = true;
+        document.body.classList.add('dark-mode'); // Giả sử base.html có class này
+    }
+
+    darkModeToggle.addEventListener('change', () => {
+        if (darkModeToggle.checked) {
+            document.body.classList.add('dark-mode');
+            localStorage.setItem('darkMode', 'enabled');
+        } else {
+            document.body.classList.remove('dark-mode');
+            localStorage.setItem('darkMode', 'disabled');
+        }
+    });
+</script>
+{% endblock %}
