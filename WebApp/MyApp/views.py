@@ -170,14 +170,20 @@ def login_view(request):
         sdt = request.POST.get('sdt')
         matkhau = request.POST.get('matkhau')
         
-        try:
-            nv = NhanVien.objects.get(SDT=sdt, MatKhau=matkhau)
+        # Sử dụng raw SQL để tận dụng hàm crypt của pgcrypto đã cài đặt trong DB
+        nv_list = list(NhanVien.objects.raw(
+            "SELECT * FROM nhanvien WHERE sdt = %s AND matkhau = crypt(%s, matkhau)", 
+            [sdt, matkhau]
+        ))
+        
+        if nv_list:
+            nv = nv_list[0]
             # Lưu vào session
             request.session['user_id'] = nv.MaNV
             request.session['user_name'] = nv.Ten
             request.session['user_role'] = nv.Role
             return redirect('home')
-        except NhanVien.DoesNotExist:
+        else:
             error = "Số điện thoại hoặc mật khẩu không đúng!"
             
     return render(request, 'MyApp/login.html', {'error': error})
@@ -225,7 +231,16 @@ def settings_view(request):
             new_pass = request.POST.get('new_password')
             confirm_pass = request.POST.get('confirm_password')
             
-            if old_pass != user.MatKhau:
+            # Kiểm tra mật khẩu cũ bằng SQL crypt
+            from django.db import connection
+            is_correct = False
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT (matkhau = crypt(%s, matkhau)) FROM nhanvien WHERE manv = %s", [old_pass, user.MaNV])
+                row = cursor.fetchone()
+                if row:
+                    is_correct = row[0]
+
+            if not is_correct:
                 error_msg = "Mật khẩu hiện tại không chính xác!"
             elif new_pass != confirm_pass:
                 error_msg = "Mật khẩu mới không khớp nhau!"
