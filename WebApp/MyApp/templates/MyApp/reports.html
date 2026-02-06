@@ -1,0 +1,133 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .reports-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .report-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--gray-200);
+    }
+
+    .report-card h3 {
+        font-size: 1.125rem;
+        color: var(--dark);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border-bottom: 1px solid var(--gray-100);
+        padding-bottom: 0.75rem;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 300px;
+        width: 100%;
+    }
+
+    @media (max-width: 1024px) {
+        .reports-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Báo Cáo Thống Kê Hệ Thống</h1>
+    <p>Phân tích dữ liệu vận hành, nhân sự và hàng hóa theo thời gian thực</p>
+</div>
+
+<div class="reports-grid">
+    <div class="report-card">
+        <h3><i class="fa-solid fa-list"></i> Sản phẩm theo Danh mục</h3>
+        <div class="chart-container"><canvas id="categoryChart"></canvas></div>
+    </div>
+    <div class="report-card">
+        <h3><i class="fa-solid fa-boxes-stacked"></i> Tổng tồn kho theo Kho hàng</h3>
+        <div class="chart-container"><canvas id="inventoryChart"></canvas></div>
+    </div>
+    <div class="report-card">
+        <h3><i class="fa-solid fa-shop"></i> Trạng thái hoạt động Cửa hàng</h3>
+        <div class="chart-container"><canvas id="storeStatusChart"></canvas></div>
+    </div>
+    <div class="report-card">
+        <h3><i class="fa-solid fa-user-tie"></i> Phân bổ Nhân sự theo Vai trò</h3>
+        <div class="chart-container"><canvas id="employeeRoleChart"></canvas></div>
+    </div>
+</div>
+
+
+<div id="report-data" data-cat='{{ cat_json|safe }}' data-inv='{{ inv_json|safe }}' data-st='{{ st_json|safe }}'
+    data-em='{{ em_json|safe }}' style="display: none;"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dataWrap = document.getElementById('report-data');
+        if (!dataWrap) return;
+
+        const catData = JSON.parse(dataWrap.dataset.cat);
+        const invData = JSON.parse(dataWrap.dataset.inv);
+        const stData = JSON.parse(dataWrap.dataset.st);
+        const emData = JSON.parse(dataWrap.dataset.em);
+
+        const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
+
+        
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'bar',
+            data: {
+                labels: catData.labels,
+                datasets: [{ label: 'Số lượng', data: catData.values, backgroundColor: colors[0] }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        
+        new Chart(document.getElementById('inventoryChart'), {
+            type: 'pie',
+            data: {
+                labels: invData.labels,
+                datasets: [{ data: invData.values, backgroundColor: colors }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        
+        new Chart(document.getElementById('storeStatusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: stData.labels,
+                datasets: [{ data: stData.values, backgroundColor: [colors[1], colors[2], colors[3]] }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        
+        new Chart(document.getElementById('employeeRoleChart'), {
+            type: 'bar',
+            data: {
+                labels: emData.labels,
+                datasets: [{ label: 'Nhân viên', data: emData.values, backgroundColor: colors[4] }]
+            },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+    });
+</script>
+{% endblock %}

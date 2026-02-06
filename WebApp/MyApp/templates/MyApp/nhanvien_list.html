@@ -29,7 +29,12 @@
             {% for nv in employees %}
             <tr style="border-bottom: 1px solid var(--gray-100);">
                 <td style="padding: 1rem; font-weight: 600;">{{ nv.MaNV }}</td>
-                <td style="padding: 1rem;">{{ nv.Ten }}</td>
+                <td style="padding: 1rem;">
+                    {{ nv.Ten }}
+                    {% if nv.MaNV == current_user_id %}
+                    <strong style="color: var(--primary);">(Bạn)</strong>
+                    {% endif %}
+                </td>
                 <td style="padding: 1rem;">{{ nv.SDT }}</td>
                 <td style="padding: 1rem;">
                     <span class="order-status status-processing">
@@ -40,6 +45,8 @@
                     <div style="display: flex; gap: 0.5rem;">
                         <a href="{% url 'nhanvien_edit' nv.pk %}" style="color: var(--primary);"><i
                                 class="fa-solid fa-user-pen"></i></a>
+
+                        {% if nv.MaNV != current_user_id %}
                         <form action="{% url 'nhanvien_delete' nv.pk %}" method="post" style="display: inline;"
                             onsubmit="return confirm('Xóa nhân viên này?')">
                             {% csrf_token %}
@@ -47,6 +54,7 @@
                                 style="background: none; border: none; color: var(--danger); cursor: pointer;"><i
                                     class="fa-solid fa-user-minus"></i></button>
                         </form>
+                        {% endif %}
                     </div>
                 </td>
             </tr>

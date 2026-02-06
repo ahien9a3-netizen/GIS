@@ -6,6 +6,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SMART MART - Hệ Thống Quản Lý Chuỗi Cửa Hàng{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'MyApp/favicon.png' %}">
+    <style>
+        .header-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .logout-link {
+            color: var(--gray-400);
+            transition: color 0.2s;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .logout-link:hover {
+            color: #ef4444;
+        }
+    </style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +44,7 @@
 
 <body class="dashboard-layout">
 
-    <!-- Sidebar -->
+    
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
@@ -51,62 +75,54 @@
                 <i class="fa-solid fa-box"></i>
                 <span>Sản phẩm</span>
             </a>
+            <a href="{% url 'danhmuc_list' %}"
+                class="sidebar-item {% if sidebar_active == 'categories' %}active{% endif %}">
+                <i class="fa-solid fa-list"></i>
+                <span>Danh mục</span>
+            </a>
+            {% if user_role == 'Admin' %}
             <a href="{% url 'nhanvien_list' %}"
                 class="sidebar-item {% if sidebar_active == 'employees' %}active{% endif %}">
                 <i class="fa-solid fa-user-tie"></i>
                 <span>Nhân viên</span>
             </a>
+            {% endif %}
+            {% if user_role == 'Admin' or user_role == 'Kế Toán' %}
             <a href="{% url 'stock_in_list' %}"
                 class="sidebar-item {% if sidebar_active == 'stock_in' %}active{% endif %}">
                 <i class="fa-solid fa-file-invoice"></i>
                 <span>Nhập kho</span>
             </a>
-            <a href="{% url 'order_list' %}" class="sidebar-item {% if sidebar_active == 'orders' %}active{% endif %}">
-                <i class="fa-solid fa-shopping-cart"></i>
-                <span>Đơn hàng</span>
+            {% endif %}
+            <a href="{% url 'inventory_list' %}"
+                class="sidebar-item {% if sidebar_active == 'inventory' %}active{% endif %}">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                <span>Tồn kho</span>
             </a>
-            <a href="{% url 'delivery_list' %}"
-                class="sidebar-item {% if sidebar_active == 'delivery' %}active{% endif %}">
-                <i class="fa-solid fa-truck"></i>
-                <span>Giao hàng</span>
-            </a>
-            <a href="{% url 'customer_list' %}"
-                class="sidebar-item {% if sidebar_active == 'customers' %}active{% endif %}">
-                <i class="fa-solid fa-users"></i>
-                <span>Khách hàng</span>
-            </a>
-            <a href="{% url 'home' %}#map-section" class="sidebar-item">
+            <a href="{% url 'gis_map' %}" class="sidebar-item {% if sidebar_active == 'gis_map' %}active{% endif %}">
                 <i class="fa-solid fa-map-location-dot"></i>
                 <span>Bản đồ GIS</span>
             </a>
-            <a href="#" class="sidebar-item">
+            {% if user_role == 'Admin' or user_role == 'Kế Toán' %}
+            <a href="{% url 'reports' %}" class="sidebar-item {% if sidebar_active == 'reports' %}active{% endif %}">
                 <i class="fa-solid fa-chart-bar"></i>
                 <span>Báo cáo</span>
             </a>
-            <a href="#" class="sidebar-item">
+            {% endif %}
+            <a href="{% url 'settings' %}" class="sidebar-item {% if sidebar_active == 'settings' %}active{% endif %}">
                 <i class="fa-solid fa-gear"></i>
                 <span>Cài đặt</span>
             </a>
         </nav>
 
-        <div class="sidebar-footer">
-            <div class="sidebar-stat">
-                <i class="fa-solid fa-arrow-trend-up"></i>
-                <div>
-                    <div class="sidebar-stat-label">Doanh thu hôm nay</div>
-                    <div class="sidebar-stat-value">+12.5% so với hôm qua</div>
-                </div>
-            </div>
-        </div>
     </aside>
 
-    <!-- Main Content -->
+    
     <div class="main-content">
-        <!-- Header -->
         <header class="dashboard-header">
             <div class="header-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Tìm kiếm sản phẩm, đơn hàng...">
+                <input type="text" placeholder="Tìm kiếm sản phẩm, cửa hàng...">
             </div>
             <div class="header-actions">
                 <button class="header-icon-btn">
@@ -117,18 +133,23 @@
                     <div class="header-user-avatar">
                         <i class="fa-solid fa-user"></i>
                     </div>
-                    <span>Admin</span>
+                    <div class="header-user-info">
+                        <span class="user-name">{{ user_name|default:"Admin" }}</span>
+                        <a href="{% url 'logout' %}" class="logout-link" title="Đăng xuất">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </header>
 
-        <!-- Page Content -->
+       
         <div class="page-content">
             {% block content %}
             {% endblock %}
         </div>
 
-        <!-- Footer -->
+        
         <footer class="dashboard-footer">
             <div class="footer-content">
                 <div class="footer-col">
@@ -169,7 +190,6 @@
     {% block extra_js %}{% endblock %}
 
     <script>
-        // Sidebar toggle
         document.querySelector('.sidebar-toggle')?.addEventListener('click', function () {
             document.querySelector('.sidebar').classList.toggle('collapsed');
         });

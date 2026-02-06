@@ -1,18 +1,23 @@
 from django.urls import path
+from .tool import store_geojson, store_heatmap, service_area, kho_geojson
 from .views import (
-    home, store_geojson, store_heatmap, service_area, kho_geojson, inventory_stats,
+    home, report_view, login_view, logout_view, settings_view, gis_map, inventory_stats,
     CuaHangListView, CuaHangCreateView, CuaHangUpdateView, CuaHangDeleteView,
     SanPhamListView, SanPhamCreateView, SanPhamUpdateView, SanPhamDeleteView,
-    KhachHangListView, KhachHangCreateView, KhachHangUpdateView, KhachHangDeleteView,
-    DonHangListView, DonHangCreateView, DonHangUpdateView, DonHangDeleteView,
-    GiaoHangListView, GiaoHangCreateView, GiaoHangUpdateView, GiaoHangDeleteView,
+    DanhMucListView, DanhMucCreateView, DanhMucUpdateView, DanhMucDeleteView,
     KhoListView, KhoCreateView, KhoUpdateView, KhoDeleteView,
     NhanVienListView, NhanVienCreateView, NhanVienUpdateView, NhanVienDeleteView,
-    StockInListView, StockInCreateView, StockInUpdateView, StockInDeleteView
+    StockInListView, StockInCreateView, StockInUpdateView, StockInDeleteView,
+    HangTonKhoListView, HangTonKhoCreateView, HangTonKhoUpdateView, HangTonKhoDeleteView
 )
 
 urlpatterns = [
     path('', home, name='home'),
+    path('gis-map/', gis_map, name='gis_map'),
+    path('reports/', report_view, name='reports'),
+    path('login/', login_view, name='login'),
+    path('logout/', logout_view, name='logout'),
+    path('settings/', settings_view, name='settings'),
     path('api/stores-geojson/', store_geojson, name='store_geojson'),
     path('api/stores-heatmap/', store_heatmap, name='store_heatmap'),
     path('api/service-area/', service_area, name='service_area'),
@@ -31,23 +36,12 @@ urlpatterns = [
     path('products/<str:pk>/edit/', SanPhamUpdateView.as_view(), name='product_edit'),
     path('products/<str:pk>/delete/', SanPhamDeleteView.as_view(), name='product_delete'),
 
-    # Khách hàng
-    path('customers/', KhachHangListView.as_view(), name='customer_list'),
-    path('customers/add/', KhachHangCreateView.as_view(), name='customer_add'),
-    path('customers/<str:pk>/edit/', KhachHangUpdateView.as_view(), name='customer_edit'),
-    path('customers/<str:pk>/delete/', KhachHangDeleteView.as_view(), name='customer_delete'),
+    # Danh mục
+    path('categories/', DanhMucListView.as_view(), name='danhmuc_list'),
+    path('categories/add/', DanhMucCreateView.as_view(), name='danhmuc_add'),
+    path('categories/<str:pk>/edit/', DanhMucUpdateView.as_view(), name='danhmuc_edit'),
+    path('categories/<str:pk>/delete/', DanhMucDeleteView.as_view(), name='danhmuc_delete'),
 
-    # Đơn hàng
-    path('orders/', DonHangListView.as_view(), name='order_list'),
-    path('orders/add/', DonHangCreateView.as_view(), name='order_add'),
-    path('orders/<str:pk>/edit/', DonHangUpdateView.as_view(), name='order_edit'),
-    path('orders/<str:pk>/delete/', DonHangDeleteView.as_view(), name='order_delete'),
-
-    # Giao hàng
-    path('delivery/', GiaoHangListView.as_view(), name='delivery_list'),
-    path('delivery/add/', GiaoHangCreateView.as_view(), name='delivery_add'),
-    path('delivery/<str:pk>/edit/', GiaoHangUpdateView.as_view(), name='delivery_edit'),
-    path('delivery/<str:pk>/delete/', GiaoHangDeleteView.as_view(), name='delivery_delete'),
 
     # Kho hàng
     path('warehouses/', KhoListView.as_view(), name='kho_list'),
@@ -66,4 +60,10 @@ urlpatterns = [
     path('stock-in/add/', StockInCreateView.as_view(), name='stock_in_add'),
     path('stock-in/<str:pk>/edit/', StockInUpdateView.as_view(), name='stock_in_edit'),
     path('stock-in/<str:pk>/delete/', StockInDeleteView.as_view(), name='stock_in_delete'),
+
+    # Tồn kho
+    path('inventory/', HangTonKhoListView.as_view(), name='inventory_list'),
+    path('inventory/add/', HangTonKhoCreateView.as_view(), name='inventory_add'),
+    path('inventory/<str:makho>/<str:masp>/edit/', HangTonKhoUpdateView.as_view(), name='inventory_edit'),
+    path('inventory/<str:makho>/<str:masp>/delete/', HangTonKhoDeleteView.as_view(), name='inventory_delete'),
 ]

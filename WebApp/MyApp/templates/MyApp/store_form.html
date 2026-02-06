@@ -1,6 +1,19 @@
 {% extends 'MyApp/base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #map-picker {
+        height: 350px;
+        border-radius: 8px;
+        border: 1px solid var(--gray-200);
+        margin-bottom: 0.5rem;
+        z-index: 1;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="page-header">
     <h1>{{ page_title }}</h1>
@@ -9,19 +22,29 @@
 
 <div class="chart-card" style="max-width: 800px; margin: 0 auto;">
     <div class="chart-header">
-        <h3><i class="fa-solid fa-edit"></i> Thông tin cửa hàng</h3>
+        <h3><i class="fa-solid fa-map-location-dot"></i> Thông tin cửa hàng</h3>
     </div>
     <div style="padding: 2rem;">
-        <form method="post">
+        <form method="post" id="store-form">
             {% csrf_token %}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                 {% for field in form %}
                 <div
                     style="display: flex; flex-direction: column; gap: 0.5rem; {% if field.name == 'DiaChi' or field.name == 'geom' %}grid-column: span 2;{% endif %}">
                     <label style="font-weight: 600; font-size: 0.875rem;">{{ field.label }}</label>
+
+                    {% if field.name == 'geom' %}
+                    <div id="map-picker"></div>
+                    <div style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 0.5rem;">
+                        Vị trí đã chọn (Lat, Lng): <strong id="coords-display">Chưa chọn</strong>
+                    </div>
+                    <div style="display: none;">{{ field }}</div>
+                    {% else %}
                     <div class="header-search" style="max-width: none;">
                         {{ field }}
                     </div>
+                    {% endif %}
+
                     {% if field.help_text %}
                     <small style="color: var(--gray-400)">{{ field.help_text }}</small>
                     {% endif %}
@@ -62,4 +85,52 @@
         background: white;
     }
 </style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var defaultLat = 10.7769;
+        var defaultLng = 106.7009;
+        var marker;
+
+        
+        var geomInput = document.querySelector('[name="geom"]');
+        var geomValue = geomInput.value;
+
+        if (geomValue && geomValue.includes('POINT')) {
+            var coords = geomValue.match(/POINT\s*\(([-\d.]+)\s+([-\d.]+)\)/);
+            if (coords) {
+                defaultLng = parseFloat(coords[1]);
+                defaultLat = parseFloat(coords[2]);
+            }
+        }
+
+        var map = L.map('map-picker').setView([defaultLat, defaultLng], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        if (geomValue) {
+            marker = L.marker([defaultLat, defaultLng]).addTo(map);
+            document.getElementById('coords-display').innerText = defaultLat + ', ' + defaultLng;
+        }
+
+        map.on('click', function (e) {
+            var lat = e.latlng.lat.toFixed(6);
+            var lng = e.latlng.lng.toFixed(6);
+
+            if (marker) {
+                marker.setLatLng(e.latlng);
+            } else {
+                marker = L.marker(e.latlng).addTo(map);
+            }
+
+            
+            geomInput.value = 'SRID=4326;POINT(' + lng + ' ' + lat + ')';
+            document.getElementById('coords-display').innerText = lat + ', ' + lng;
+        });
+    });
+</script>
 {% endblock %}
