@@ -1,19 +1,18 @@
+from django import forms
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from django.views.decorators.http import require_GET
-from django.contrib.gis.geos import Point
-from django.contrib.gis.measure import D
-from django.contrib.gis.db.models.functions import Distance
+
+
 from django.db.models import Count, Sum
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import SanPham, CuaHang, Kho, HangTonKho, NhanVien, YeuCauNhapKho, DanhMuc
 
-# ==================== MIXINS & HELPERS ====================
+
 class SidebarContextMixin:
     sidebar_active = ""
     page_title = ""
-    required_roles = [] # Danh sách các role được phép truy cập (trống = tất cả)
+    required_roles = [] 
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -36,7 +35,7 @@ class SidebarContextMixin:
             
         return super().dispatch(request, *args, **kwargs)
 
-# Decorator cho Function-Based Views
+
 def role_required(allowed_roles=[]):
     def decorator(view_func):
         def _wrapped_view(request, *args, **kwargs):
@@ -49,7 +48,7 @@ def role_required(allowed_roles=[]):
         return _wrapped_view
     return decorator
 
-# ==================== HOME & GIS ====================
+
 def home(request):
     """
     dashboard chính - Sử dụng ORM để lấy dữ liệu thống kê
@@ -73,7 +72,7 @@ def home(request):
         stores_list.append({
             'MaCH': store.MaCH,
             'Ten': store.Ten,
-            'Loai': store.Loai.strip() if store.Loai else "", # Đảm bảo không có khoảng trắng thừa
+            'Loai': store.Loai.strip() if store.Loai else "", 
             'DiaChi': store.DiaChi,
             'TrangThai': store.TrangThai,
             'lon': store.geom.x if store.geom else 0,
@@ -170,7 +169,7 @@ def login_view(request):
         sdt = request.POST.get('sdt')
         matkhau = request.POST.get('matkhau')
         
-        # Sử dụng raw SQL để tận dụng hàm crypt của pgcrypto đã cài đặt trong DB
+        
         nv_list = list(NhanVien.objects.raw(
             "SELECT * FROM nhanvien WHERE sdt = %s AND matkhau = crypt(%s, matkhau)", 
             [sdt, matkhau]
@@ -178,7 +177,7 @@ def login_view(request):
         
         if nv_list:
             nv = nv_list[0]
-            # Lưu vào session
+            
             request.session['user_id'] = nv.MaNV
             request.session['user_name'] = nv.Ten
             request.session['user_role'] = nv.Role
@@ -217,21 +216,21 @@ def settings_view(request):
     if request.method == 'POST':
         action = request.POST.get('action')
         
-        # 1. Cập nhật thông tin cơ bản
+        
         if action == 'update_profile':
             user.Ten = request.POST.get('ten')
             user.SDT = request.POST.get('sdt')
             user.save()
-            request.session['user_name'] = user.Ten # Cập nhật lại tên trên header
+            request.session['user_name'] = user.Ten 
             success_msg = "Cập nhật thông tin thành công!"
             
-        # 2. Đổi mật khẩu
+        
         elif action == 'change_password':
             old_pass = request.POST.get('old_password')
             new_pass = request.POST.get('new_password')
             confirm_pass = request.POST.get('confirm_password')
             
-            # Kiểm tra mật khẩu cũ bằng SQL crypt
+            
             from django.db import connection
             is_correct = False
             with connection.cursor() as cursor:
@@ -254,6 +253,7 @@ def settings_view(request):
         'page_title': 'Cài đặt tài khoản',
         'user': user,
         'user_name': user.Ten,
+        'user_role': request.session.get('user_role', ''),
         'success_msg': success_msg,
         'error_msg': error_msg
     }
@@ -273,82 +273,8 @@ def gis_map(request):
     }
     return render(request, 'MyApp/gis_map.html', context)
 
-# GIS APIs keep as is (same logic)
-def store_geojson(request):
-    if 'user_id' not in request.session:
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
-    stores = CuaHang.objects.all()
-    features = []
-    for store in stores:
-        if store.geom:
-            features.append({
-                "type": "Feature",
-                "properties": {
-                    "id": store.MaCH,
-                    "name": store.Ten,
-                    "address": store.DiaChi,
-                    "phone": store.SDT or 'N/A',
-                    "status": store.TrangThai,
-                    "type": store.Loai
-                },
-                "geometry": {
-                    "type": "Point",
-                    "coordinates": [store.geom.x, store.geom.y]
-                }
-            })
-    return JsonResponse({"type": "FeatureCollection", "features": features})
 
-def store_heatmap(request):
-    if 'user_id' not in request.session:
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
-    stores = CuaHang.objects.filter(geom__isnull=False).values_list('geom', flat=True)
-    warehouses = Kho.objects.filter(geom__isnull=False).values_list('geom', flat=True)
-    data = [[p.y, p.x] for p in stores] + [[p.y, p.x] for p in warehouses]
-    return JsonResponse(data, safe=False)
 
-@require_GET
-def service_area(request):
-    if 'user_id' not in request.session:
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
-    try:
-        center_lat = float(request.GET.get('lat'))
-        center_lng = float(request.GET.get('lng'))
-        radius_km = float(request.GET.get('radius', 2))
-    except (TypeError, ValueError):
-        return JsonResponse({'error': 'Tham số không hợp lệ'}, status=400)
-    
-    center_point = Point(center_lng, center_lat, srid=4326)
-    nearby_stores = CuaHang.objects.filter(
-        geom__distance_lte=(center_point, D(km=radius_km))
-    ).annotate(distance=Distance('geom', center_point)).order_by('distance')
-    
-    features = []
-    for store in nearby_stores:
-        if store.geom:
-            dist_val = store.distance.km if hasattr(store.distance, 'km') else 0
-            features.append({
-                "type": "Feature",
-                "properties": {
-                    "id": store.MaCH, "name": store.Ten, "address": store.DiaChi,
-                    "phone": store.SDT or 'N/A', "distance_km": round(dist_val, 2)
-                },
-                "geometry": {"type": "Point", "coordinates": [store.geom.x, store.geom.y]}
-            })
-    return JsonResponse({'center': [center_lat, center_lng], 'radius_km': radius_km, 'stores': {"type": "FeatureCollection", "features": features}})
-
-def kho_geojson(request):
-    if 'user_id' not in request.session:
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
-    kho_list = Kho.objects.all()
-    features = []
-    for wh in kho_list:
-        if wh.geom:
-            features.append({
-                "type": "Feature",
-                "properties": {"id": wh.MaKho, "name": wh.Ten, "address": wh.DiaChi, "type": wh.Loai},
-                "geometry": {"type": "Point", "coordinates": [wh.geom.x, wh.geom.y]}
-            })
-    return JsonResponse({"type": "FeatureCollection", "features": features})
 
 def inventory_stats(request):
     if 'user_id' not in request.session:
@@ -357,9 +283,9 @@ def inventory_stats(request):
     result = [{'product': item['MaSP__Ten'], 'warehouse': item['MaKho__Ten'], 'quantity': item['SoLuong']} for item in data]
     return JsonResponse({'inventory': result})
 
-# ==================== CRUD VIEWS ====================
 
-# --- CỬA HÀNG (STORES) ---
+
+#  CỬA HÀNG  
 class CuaHangListView(SidebarContextMixin, ListView):
     model = CuaHang
     template_name = 'MyApp/store_list.html'
@@ -387,7 +313,7 @@ class CuaHangDeleteView(SidebarContextMixin, DeleteView):
     model = CuaHang
     success_url = reverse_lazy('store_list')
 
-# --- SẢN PHẨM (PRODUCTS) ---
+#  SẢN PHẨM 
 class SanPhamListView(SidebarContextMixin, ListView):
     model = SanPham
     template_name = 'MyApp/product_list.html'
@@ -397,14 +323,14 @@ class SanPhamListView(SidebarContextMixin, ListView):
 
 class SanPhamCreateView(SidebarContextMixin, CreateView):
     model = SanPham
-    fields = ['MaSP', 'Ten', 'DanhMuc', 'MieuTa', 'TrangThai']
+    fields = ['MaSP', 'Ten', 'Image', 'DanhMuc', 'MieuTa', 'TrangThai']
     template_name = 'MyApp/product_form.html'
     success_url = reverse_lazy('product_list')
     sidebar_active = 'products'
 
 class SanPhamUpdateView(SidebarContextMixin, UpdateView):
     model = SanPham
-    fields = ['Ten', 'DanhMuc', 'MieuTa', 'TrangThai']
+    fields = ['Ten', 'Image', 'DanhMuc', 'MieuTa', 'TrangThai']
     template_name = 'MyApp/product_form.html'
     success_url = reverse_lazy('product_list')
     sidebar_active = 'products'
@@ -413,7 +339,7 @@ class SanPhamDeleteView(SidebarContextMixin, DeleteView):
     model = SanPham
     success_url = reverse_lazy('product_list')
 
-# --- DANH MỤC (CATEGORIES) ---
+#  DANH MỤC 
 class DanhMucListView(SidebarContextMixin, ListView):
     model = DanhMuc
     template_name = 'MyApp/danhmuc_list.html'
@@ -441,7 +367,7 @@ class DanhMucDeleteView(SidebarContextMixin, DeleteView):
     model = DanhMuc
     success_url = reverse_lazy('danhmuc_list')
 
-# --- TỒN KHO (INVENTORY) ---
+#  TỒN KHO
 class HangTonKhoListView(SidebarContextMixin, ListView):
     model = HangTonKho
     template_name = 'MyApp/inventory_list.html'
@@ -476,7 +402,7 @@ class HangTonKhoDeleteView(SidebarContextMixin, DeleteView):
         return get_object_or_404(HangTonKho, MaKho=self.kwargs['makho'], MaSP=self.kwargs['masp'])
 
 
-# --- KHO HÀNG (WAREHOUSES) ---
+#  KHO HÀNG
 class KhoListView(SidebarContextMixin, ListView):
     model = Kho
     template_name = 'MyApp/kho_list.html'
@@ -502,7 +428,7 @@ class KhoDeleteView(SidebarContextMixin, DeleteView):
     model = Kho
     success_url = reverse_lazy('kho_list')
 
-# --- NHÂN VIÊN (EMPLOYEES) ---
+#  NHÂN VIÊN 
 class NhanVienListView(SidebarContextMixin, ListView):
     model = NhanVien
     template_name = 'MyApp/nhanvien_list.html'
@@ -532,7 +458,7 @@ class NhanVienDeleteView(SidebarContextMixin, DeleteView):
     success_url = reverse_lazy('nhanvien_list')
     required_roles = ['Admin']
 
-# --- NHẬP KHO (STOCK IN) ---
+#  NHẬP KHO 
 class StockInListView(SidebarContextMixin, ListView):
     model = YeuCauNhapKho
     template_name = 'MyApp/stock_in_list.html'
@@ -549,6 +475,11 @@ class StockInCreateView(SidebarContextMixin, CreateView):
     sidebar_active = 'stock_in'
     required_roles = ['Admin', 'Kế Toán']
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['Ngay'].widget = forms.DateInput(attrs={'type': 'date'})
+        return form
+
 class StockInUpdateView(SidebarContextMixin, UpdateView):
     model = YeuCauNhapKho
     fields = ['Ngay', 'TrangThai', 'GhiChu', 'MaNV']
@@ -556,6 +487,11 @@ class StockInUpdateView(SidebarContextMixin, UpdateView):
     success_url = reverse_lazy('stock_in_list')
     sidebar_active = 'stock_in'
     required_roles = ['Admin', 'Kế Toán']
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['Ngay'].widget = forms.DateInput(attrs={'type': 'date'})
+        return form
 
 class StockInDeleteView(SidebarContextMixin, DeleteView):
     model = YeuCauNhapKho

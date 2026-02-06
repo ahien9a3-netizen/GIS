@@ -123,7 +123,7 @@
         border: 1px solid #fecaca;
     }
 
-    /* Switch toggle styles */
+    
     .switch {
         position: relative;
         display: inline-block;
@@ -218,7 +218,7 @@
         </div>
 
         <div class="settings-body">
-            <!-- Form 1: Cập nhật thông tin -->
+            
             <form method="post" class="settings-section">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="update_profile">
@@ -238,7 +238,7 @@
 
             <hr style="border: 0; border-top: 1px solid var(--gray-100); margin: 1rem 0 2rem;">
 
-            <!-- Form 2: Đổi mật khẩu -->
+            
             <form method="post" class="settings-section">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="change_password">
@@ -262,7 +262,7 @@
 
             <hr style="border: 0; border-top: 1px solid var(--gray-100); margin: 1rem 0 2rem;">
 
-            <!-- Section 3: Tùy chọn UI -->
+            
             <div class="settings-section">
                 <h3><i class="fa-solid fa-desktop"></i> Giao diện & Thông báo</h3>
                 <div class="option-item">
@@ -295,13 +295,13 @@
 
 {% block extra_js %}
 <script>
-    // Logic cho Dark Mode (Demo LocalStorage)
+    
     const darkModeToggle = document.getElementById('dark-mode-toggle');
 
-    // Kiểm tra trạng thái cũ
+    
     if (localStorage.getItem('darkMode') === 'enabled') {
         darkModeToggle.checked = true;
-        document.body.classList.add('dark-mode'); // Giả sử base.html có class này
+        document.body.classList.add('dark-mode'); 
     }
 
     darkModeToggle.addEventListener('change', () => {

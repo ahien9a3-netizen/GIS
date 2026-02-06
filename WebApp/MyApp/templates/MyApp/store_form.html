@@ -95,7 +95,7 @@
         var defaultLng = 106.7009;
         var marker;
 
-        // Lấy tọa độ hiện tại từ field 'geom' (WKT format: POINT (LNG LAT))
+        
         var geomInput = document.querySelector('[name="geom"]');
         var geomValue = geomInput.value;
 
@@ -127,7 +127,7 @@
                 marker = L.marker(e.latlng).addTo(map);
             }
 
-            // Cập nhật giá trị WKT cho Django
+            
             geomInput.value = 'SRID=4326;POINT(' + lng + ' ' + lat + ')';
             document.getElementById('coords-display').innerText = lat + ', ' + lng;
         });

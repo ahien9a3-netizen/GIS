@@ -1,6 +1,7 @@
 from django.urls import path
+from .tool import store_geojson, store_heatmap, service_area, kho_geojson
 from .views import (
-    home, report_view, login_view, logout_view, settings_view, gis_map, store_geojson, store_heatmap, service_area, kho_geojson, inventory_stats,
+    home, report_view, login_view, logout_view, settings_view, gis_map, inventory_stats,
     CuaHangListView, CuaHangCreateView, CuaHangUpdateView, CuaHangDeleteView,
     SanPhamListView, SanPhamCreateView, SanPhamUpdateView, SanPhamDeleteView,
     DanhMucListView, DanhMucCreateView, DanhMucUpdateView, DanhMucDeleteView,

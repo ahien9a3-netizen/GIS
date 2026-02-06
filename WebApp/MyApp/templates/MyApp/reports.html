@@ -70,7 +70,7 @@
     </div>
 </div>
 
-<!-- Trường ẩn chứa dữ liệu JSON để tránh lỗi cú pháp Django template -->
+
 <div id="report-data" data-cat='{{ cat_json|safe }}' data-inv='{{ inv_json|safe }}' data-st='{{ st_json|safe }}'
     data-em='{{ em_json|safe }}' style="display: none;"></div>
 {% endblock %}
@@ -89,7 +89,7 @@
 
         const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
 
-        // 1. Category Chart
+        
         new Chart(document.getElementById('categoryChart'), {
             type: 'bar',
             data: {
@@ -99,7 +99,7 @@
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
 
-        // 2. Inventory Chart
+        
         new Chart(document.getElementById('inventoryChart'), {
             type: 'pie',
             data: {
@@ -109,7 +109,7 @@
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // 3. Store Status Chart
+        
         new Chart(document.getElementById('storeStatusChart'), {
             type: 'doughnut',
             data: {
@@ -119,7 +119,7 @@
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        // 4. Employee Role Chart
+        
         new Chart(document.getElementById('employeeRoleChart'), {
             type: 'bar',
             data: {

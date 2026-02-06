@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.gis',  # Required for GeoDjango
+    'django.contrib.gis',  
     'MyApp',
 ]
 
@@ -76,7 +76,7 @@ WSGI_APPLICATION = 'WebApp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis', # Switch to PostGIS Engine
+        'ENGINE': 'django.contrib.gis.db.backends.postgis', 
         'NAME': 'webapp',
         'USER': 'postgres',
         'PASSWORD': '123',
@@ -85,7 +85,7 @@ DATABASES = {
     }
 }
 
-# Windows GDAL Configuration (Auto-fixed by locating 'geo_tool' conda env)
+# Windows GDAL Configuration 
 if os.name == 'nt':
     # Path to the discovered libraries in 'geo_tool' environment
     VENV_BASE = r"C:\Users\Admin\anaconda3\envs\geo_tool\Library"
@@ -137,3 +137,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Media files (User uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

@@ -1,13 +1,18 @@
 from django.contrib.gis.db import models
 
-# ==================== SẢN PHẨM ====================
+# SẢN PHẨM
 class SanPham(models.Model):
+    TRANG_THAI_CHOICES = [
+        ('Đang bán', 'Đang bán'),
+        ('Ngừng bán', 'Ngừng bán'),
+    ]
+
     MaSP = models.CharField(max_length=20, primary_key=True, db_column='masp')
     Ten = models.CharField(max_length=255, db_column='ten')
-    Image = models.CharField(max_length=20, blank=True, null=True, db_column='image')
+    Image = models.ImageField(upload_to='products/', blank=True, null=True, db_column='image')
     DanhMuc = models.ForeignKey('DanhMuc', on_delete=models.SET_NULL, blank=True, null=True, db_column='danhmuc')
     MieuTa = models.TextField(blank=True, null=True, db_column='mieuta')
-    TrangThai = models.CharField(max_length=50, blank=True, null=True, db_column='trangthai')
+    TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, db_column='trangthai')
 
     class Meta:
         managed = False
@@ -19,11 +24,16 @@ class SanPham(models.Model):
         return f"{self.MaSP} - {self.Ten}"
 
 
-# ==================== KHO ====================
+#  KHO 
 class Kho(models.Model):
+    KHO_LOAI_CHOICES = [
+        ('Kho Tổng', 'Kho Tổng'),
+        ('Kho Chi Nhánh', 'Kho Chi Nhánh'),
+    ]
+
     MaKho = models.CharField(max_length=20, primary_key=True, db_column='makho')
     Ten = models.CharField(max_length=255, db_column='ten')
-    Loai = models.CharField(max_length=50, blank=True, null=True, db_column='loai')
+    Loai = models.CharField(max_length=50, choices=KHO_LOAI_CHOICES, db_column='loai')
     DiaChi = models.TextField(blank=True, null=True, db_column='diachi')
     Icon = models.CharField(max_length=20, blank=True, null=True, db_column='icon')
     geom = models.PointField(srid=4326, db_column='geom')
@@ -38,12 +48,18 @@ class Kho(models.Model):
         return f"{self.MaKho} - {self.Ten}"
 
 
-# ==================== CỬA HÀNG ====================
+#  CỬA HÀNG 
 class CuaHang(models.Model):
     LOAI_CHOICES = [
         ('Tiện Lợi', 'Tiện Lợi'),
         ('Gia Dụng', 'Gia Dụng'),
         ('Điện Tử', 'Điện Tử'),
+    ]
+
+    TRANG_THAI_CHOICES = [
+        ('Hoạt động', 'Hoạt động'),
+        ('Tạm ngưng', 'Tạm ngưng'),
+        ('Vô hiệu hóa', 'Vô hiệu hóa'),
     ]
     
     MaCH = models.CharField(max_length=20, primary_key=True, db_column='mach')
@@ -52,7 +68,7 @@ class CuaHang(models.Model):
     Icon = models.CharField(max_length=20, blank=True, null=True, db_column='icon')
     DiaChi = models.TextField(blank=True, null=True, db_column='diachi')
     SDT = models.CharField(max_length=20, blank=True, null=True, db_column='sdt')
-    TrangThai = models.CharField(max_length=50, blank=True, null=True, db_column='trangthai')
+    TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, db_column='trangthai')
     geom = models.PointField(srid=4326, db_column='geom')
 
     class Meta:
@@ -65,7 +81,7 @@ class CuaHang(models.Model):
         return f"{self.MaCH} - {self.Ten}"
 
 
-# ==================== NHÂN VIÊN ====================
+#  NHÂN VIÊN 
 class NhanVien(models.Model):
     ROLE_CHOICES = [
         ('Admin', 'Admin'),
@@ -89,11 +105,16 @@ class NhanVien(models.Model):
         return f"{self.MaNV} - {self.Ten}"
 
 
-# ==================== YÊU CẦU NHẬP KHO ====================
+#  YÊU CẦU NHẬP KHO 
 class YeuCauNhapKho(models.Model):
+    TRANG_THAI_CHOICES = [
+        ('Chờ duyệt', 'Chờ duyệt'),
+        ('Đã duyệt', 'Đã duyệt'),
+    ]
+
     MaYC = models.CharField(max_length=20, primary_key=True, db_column='mayc')
     Ngay = models.DateField(db_column='ngay')
-    TrangThai = models.CharField(max_length=50, blank=True, null=True, db_column='trangthai')
+    TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, db_column='trangthai')
     GhiChu = models.TextField(blank=True, null=True, db_column='ghichu')
     MaNV = models.ForeignKey(
         NhanVien,
@@ -113,13 +134,13 @@ class YeuCauNhapKho(models.Model):
         return f"{self.MaYC} - {self.TrangThai}"
 
 
-# ==================== HÀNG TỒN KHO ====================
+#  HÀNG TỒN KHO 
 class HangTonKho(models.Model):
     MaKho = models.ForeignKey(
         Kho,
         on_delete=models.CASCADE,
         db_column='makho',
-        primary_key=True  # Đánh dấu giả để Django không báo lỗi
+        primary_key=True  
     )
     MaSP = models.ForeignKey(
         SanPham,
@@ -136,7 +157,7 @@ class HangTonKho(models.Model):
         verbose_name_plural = "Danh sách hàng tồn kho"
 
 
-# ==================== NHẬP KHO CHI TIẾT ====================
+#  NHẬP KHO CHI TIẾT 
 class NhapKhoChiTiet(models.Model):
     MaYC = models.ForeignKey(
         YeuCauNhapKho,
@@ -163,7 +184,7 @@ class NhapKhoChiTiet(models.Model):
         verbose_name_plural = "Chi tiết nhập kho"
 
 
-# ==================== DANH MỤC ====================
+#  DANH MỤC 
 class DanhMuc(models.Model):
     MaDM = models.CharField(max_length=20, primary_key=True, db_column='madm')
     Ten = models.CharField(max_length=255, db_column='tendm')
@@ -180,7 +201,6 @@ class DanhMuc(models.Model):
 
 
 
-# ==================== LEGACY: Store Model (compatibility) ====================
 class Store(models.Model):
     """
     Legacy model - kept for backward compatibility

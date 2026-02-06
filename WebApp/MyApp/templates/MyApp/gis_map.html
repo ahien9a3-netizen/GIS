@@ -57,7 +57,7 @@
         color: var(--primary);
     }
 
-    /* Marker Vị trí của tôi (Pulsing) */
+    
     .user-location-marker {
         width: 18px;
         height: 18px;
@@ -91,7 +91,7 @@
         }
     }
 
-    /* Style lại bảng chỉ đường Leaflet Routing Machine */
+   
     .leaflet-routing-container {
         background-color: white !important;
         padding: 10px !important;
@@ -178,7 +178,7 @@
 <div class="gis-map-container">
     <div id="full-gis-map"></div>
 
-    <!-- Các nút điều khiển nổi -->
+    
     <div class="map-overlay-controls">
         <button id="btn-heatmap" class="leaflet-analysis-btn" style="background: #7c3aed;">
             <i class="fa-solid fa-fire"></i> Mật độ cửa hàng
@@ -191,7 +191,7 @@
         </button>
     </div>
 
-    <!-- BẢNG CHÚ GIẢI (Legend) -->
+    
     <div
         style="position: absolute; bottom: 85px; right: 20px; z-index: 1000; background: white; padding: 12px; border-radius: 8px; box-shadow: var(--shadow-md); border: 1px solid #eee; font-size: 0.8rem; min-width: 140px;">
         <div
@@ -223,7 +223,7 @@
         </div>
     </div>
 
-    <!-- Nút định vị -->
+    
     <button id="btn-locate-user" class="btn-locate" title="Vị trí của tôi">
         <i class="fa-solid fa-crosshairs fa-lg"></i>
     </button>
@@ -247,7 +247,7 @@
         var serviceLayer = L.layerGroup().addTo(map);
         var heatLayer;
 
-        // Load Stores
+        
         fetch('/api/stores-geojson/')
             .then(res => res.json())
             .then(data => {
@@ -302,7 +302,7 @@
                 if (storesLayer.getLayers().length > 0) map.fitBounds(storesLayer.getBounds().pad(0.1));
             });
 
-        // Load Warehouses
+        
         fetch('/api/kho-geojson/')
             .then(res => res.json())
             .then(data => {
@@ -339,7 +339,7 @@
                 }).addTo(warehousesLayer);
             });
 
-        // Heatmap Logic
+        
         var isHeatmapActive = false;
         document.getElementById('btn-heatmap').onclick = function () {
             isHeatmapActive = !isHeatmapActive;
@@ -361,27 +361,45 @@
             }
         };
 
-        // Layer Control (Keep for flexibility)
+        
         L.control.layers(null, {
             "Cửa hàng": storesLayer,
             "Kho hàng": warehousesLayer
         }, { position: 'topleft' }).addTo(map);
 
-        // Analysis logic
+        
         var isAnalysisMode = false;
+
+        function resetStorePopups() {
+            storesLayer.eachLayer(function (layer) {
+                if (layer.eachLayer) {
+                    layer.eachLayer(function (marker) {
+                        if (marker._originalPopupContent) {
+                            marker.bindPopup(marker._originalPopupContent);
+                            delete marker._originalPopupContent;
+                        }
+                    });
+                }
+            });
+        }
+
         document.getElementById('btn-analysis').onclick = function () {
             isAnalysisMode = !isAnalysisMode;
             this.style.background = isAnalysisMode ? '#ef4444' : '#3b82f6';
             this.innerHTML = isAnalysisMode ? '<i class="fa-solid fa-xmark"></i> Hủy' : '<i class="fa-solid fa-magnifying-glass-location"></i> Phân tích';
             map.getContainer().style.cursor = isAnalysisMode ? 'crosshair' : '';
-            if (!isAnalysisMode) serviceLayer.clearLayers();
+            if (!isAnalysisMode) {
+                serviceLayer.clearLayers();
+                resetStorePopups();
+            }
         };
 
         map.on('click', function (e) {
             if (!isAnalysisMode) return;
             serviceLayer.clearLayers();
+            resetStorePopups();
 
-            // Vẽ vòng tròn bán kính 5km (5000m)
+            
             const radiusMeters = 5000;
             const circle = L.circle(e.latlng, {
                 radius: radiusMeters,
@@ -391,7 +409,7 @@
                 weight: 2
             }).addTo(serviceLayer);
 
-            // Hiện thông báo đang xử lý
+            
             circle.bindPopup("Đang phân tích vùng 5km...").openPopup();
 
             fetch(`/api/service-area/?lat=${e.latlng.lat}&lng=${e.latlng.lng}&radius=5`)
@@ -404,26 +422,53 @@
                     } else {
                         circle.setPopupContent(`Tìm thấy <strong>${count}</strong> cửa hàng trong bán kính 5km.`).openPopup();
 
-                        L.geoJSON(data.stores, {
-                            pointToLayer: (f, l) => L.circleMarker(l, {
-                                radius: 10,
-                                fillColor: '#ff7800',
-                                color: '#fff',
-                                weight: 3,
-                                fillOpacity: 0.9,
-                                zIndexOffset: 1000
-                            }),
-                            onEachFeature: (f, layer) => {
-                                layer.bindPopup(`
-                                    <div style="min-width: 150px;">
-                                        <strong style="color: #c2410c;">${f.properties.name}</strong><br>
-                                        <hr style="margin: 5px 0; border: 0; border-top: 1px solid #eee;">
-                                        <i class="fa-solid fa-location-dot"></i> Khoảng cách: <strong>${f.properties.distance_km} km</strong><br>
-                                        <small>${f.properties.address}</small>
-                                    </div>
-                                `);
+                        
+                        const distMap = {};
+                        data.stores.features.forEach(f => {
+                            distMap[f.properties.id] = f.properties.distance_km;
+                        });
+
+                        
+                        storesLayer.eachLayer(function (layer) {
+                            if (layer.eachLayer) {
+                                layer.eachLayer(function (marker) {
+                                    const props = marker.feature.properties;
+                                    const dist = distMap[props.id];
+
+                                    if (dist !== undefined) {
+                                        
+                                        if (!marker._originalPopupContent) {
+                                            marker._originalPopupContent = marker.getPopup().getContent();
+                                        }
+
+                                        
+                                        const newPopupHtml = `
+                                            <div class="popup-info-card">
+                                                <div class="popup-header">
+                                                    <span class="popup-title" style="color: #c2410c;">${props.name}</span>
+                                                    <span class="popup-badge" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">TRONG VÙNG PHỤC VỤ</span>
+                                                </div>
+                                                <div class="popup-body">
+                                                    <div class="popup-row">
+                                                        <i class="fa-solid fa-location-dot" style="color: #c2410c;"></i>
+                                                        <span>Khoảng cách: <strong>${dist} km</strong></span>
+                                                    </div>
+                                                    <div class="popup-row">
+                                                        <i class="fa-solid fa-map-pin"></i>
+                                                        <span>${props.address}</span>
+                                                    </div>
+                                                    <div class="popup-row">
+                                                        <i class="fa-solid fa-phone"></i>
+                                                        <span>${props.phone}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
+                                        marker.bindPopup(newPopupHtml);
+                                    }
+                                });
                             }
-                        }).addTo(serviceLayer);
+                        });
                     }
                 })
                 .catch(err => {
@@ -431,7 +476,7 @@
                 });
         });
 
-        // Routing Logic
+       
         var isRouteMode = false;
         var routePoints = [];
         var routingControl;
@@ -473,11 +518,11 @@
                     createMarker: function () { return null; }
                 }).addTo(map);
 
-                routePoints = []; // Reset sau khi xong
+                routePoints = []; 
             }
         });
 
-        // Helper cho hiệu ứng mờ dần
+        
         L.Layer.prototype.fadeOut = function (duration) {
             var self = this;
             var opacity = 1;
@@ -494,7 +539,7 @@
             }, interval);
         };
 
-        // Định vị người dùng
+        
         var userMarker;
         document.getElementById('btn-locate-user').onclick = function () {
             if (!navigator.geolocation) {

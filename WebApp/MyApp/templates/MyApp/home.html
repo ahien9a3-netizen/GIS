@@ -4,7 +4,7 @@
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-    /* Tổng thể Map Card */
+    
     .map-card {
         background: white;
         border-radius: 12px;
@@ -27,7 +27,7 @@
         width: 100%;
     }
 
-    /* CHÚ DẪN NỔI TRÊN BẢN ĐỒ (Map Overlay Legend) */
+    
     .map-legend-overlay {
         position: absolute;
         top: 10px;
@@ -53,7 +53,7 @@
         color: var(--gray-700);
     }
 
-    /* Icon nhỏ trong chú dẫn */
+    
     .legend-icon-swatch {
         width: 26px;
         height: 26px;
@@ -67,7 +67,7 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    /* Nút định vị */
+    
     .btn-locate {
         position: absolute;
         bottom: 25px;
@@ -92,7 +92,7 @@
         color: var(--primary);
     }
 
-    /* Marker Vị trí của tôi (Pulsing) */
+    
     .user-location-marker {
         width: 18px;
         height: 18px;
@@ -126,13 +126,13 @@
         }
     }
 
-    /* Cấu trúc cột phải (Danh sách) */
+    
     .dashboard-col-right {
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
         height: 600px;
-        /* Khớp với chiều cao map bên trái */
+        
     }
 
     .compact-list-card {
@@ -150,7 +150,7 @@
         overflow-y: auto;
     }
 
-    /* Icon nhỏ trong danh sách (Sync với Map) */
+    
     .store-icon-small {
         width: 32px;
         height: 32px;
@@ -197,7 +197,7 @@
     <p>Giám sát trực tuyến hệ thống Cửa hàng và Kho vận</p>
 </div>
 
-<!-- Stats Cards -->
+
 <div class="stats-grid">
     <div class="stat-card stat-card-blue">
         <div class="stat-icon"><i class="fa-solid fa-store"></i></div>
@@ -230,13 +230,13 @@
 </div>
 
 <div class="dashboard-grid">
-    <!-- LEFT: MAP -->
+    
     <div class="dashboard-col-left">
         <div class="map-card">
             <div class="map-container">
                 <div id="map-display"></div>
 
-                <!-- CHÚ DẪN Nằm trong map -->
+                
                 <div class="map-legend-overlay">
                     <div class="legend-subtitle">Cửa hàng:</div>
                     <div class="legend-item">
@@ -267,7 +267,7 @@
                     </div>
                 </div>
 
-                <!-- Nút định vị -->
+                
                 <button id="btn-locate-user" class="btn-locate" title="Vị trí của tôi">
                     <i class="fa-solid fa-crosshairs"></i>
                 </button>
@@ -275,9 +275,9 @@
         </div>
     </div>
 
-    <!-- RIGHT: LISTS -->
+    
     <div class="dashboard-col-right">
-        <!-- Stores -->
+        
         <div class="compact-list-card">
             <div class="card-header">
                 <h3><i class="fa-solid fa-shop"></i> Danh Sách Cửa Hàng</h3>
@@ -314,7 +314,7 @@
             </div>
         </div>
 
-        <!-- Warehouses -->
+        
         <div class="compact-list-card">
             <div class="card-header">
                 <h3><i class="fa-solid fa-warehouse"></i> Danh Sách Kho Hàng</h3>
@@ -384,11 +384,11 @@
             });
         }
 
-        // Tải dữ liệu ban đầu
+        
         fetchData('/api/stores-geojson/', '#3b82f6', 'fa-store', true);
         fetchData('/api/kho-geojson/', '#ef4444', 'fa-warehouse', false);
 
-        // Định vị người dùng
+        
         var userMarker;
         document.getElementById('btn-locate-user').onclick = function () {
             if (!navigator.geolocation) {
@@ -408,7 +408,7 @@
             }, err => alert("Không thể định vị. Vui lòng cấp quyền!"));
         };
 
-        // Click list di chuyển map
+        
         document.querySelectorAll('.store-item-compact').forEach(item => {
             item.onclick = function () {
                 const lat = parseFloat(this.dataset.lat);
@@ -419,7 +419,7 @@
             };
         });
 
-        // Xử lý lỗi map lệch
+        
         setTimeout(() => map.invalidateSize(), 500);
     });
 </script>
