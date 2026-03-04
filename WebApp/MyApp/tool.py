@@ -5,11 +5,10 @@ from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import Distance
 from .models import CuaHang, Kho
 
-
-
 def store_geojson(request):
     if 'user_id' not in request.session:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
+    
     stores = CuaHang.objects.all()
     features = []
     for store in stores:
@@ -26,7 +25,7 @@ def store_geojson(request):
                 },
                 "geometry": {
                     "type": "Point",
-                    "coordinates": [store.geom.x, store.geom.y]
+                    "coordinates": [store.geom.x, store.geom.y] 
                 }
             })
     return JsonResponse({"type": "FeatureCollection", "features": features})
@@ -34,9 +33,12 @@ def store_geojson(request):
 def store_heatmap(request):
     if 'user_id' not in request.session:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
+    
     stores = CuaHang.objects.filter(geom__isnull=False).values_list('geom', flat=True)
     warehouses = Kho.objects.filter(geom__isnull=False).values_list('geom', flat=True)
+    
     data = [[p.y, p.x] for p in stores] + [[p.y, p.x] for p in warehouses]
+    
     return JsonResponse(data, safe=False)
 
 @require_GET
@@ -48,9 +50,10 @@ def service_area(request):
         center_lng = float(request.GET.get('lng'))
         radius_km = float(request.GET.get('radius', 2))
     except (TypeError, ValueError):
-        return JsonResponse({'error': 'Tham số không hợp lệ'}, status=400)
+        return JsonResponse({'error': 'Tham số tọa độ hoặc bán kính không hợp lệ'}, status=400)
     
     center_point = Point(center_lng, center_lat, srid=4326)
+    
     nearby_stores = CuaHang.objects.filter(
         geom__distance_lte=(center_point, D(km=radius_km))
     ).annotate(distance=Distance('geom', center_point)).order_by('distance')
@@ -59,15 +62,25 @@ def service_area(request):
     for store in nearby_stores:
         if store.geom:
             dist_val = store.distance.km if hasattr(store.distance, 'km') else 0
+            
             features.append({
                 "type": "Feature",
                 "properties": {
-                    "id": store.MaCH, "name": store.Ten, "address": store.DiaChi,
-                    "phone": store.SDT or 'N/A', "distance_km": round(dist_val, 2)
+                    "id": store.MaCH, 
+                    "name": store.Ten, 
+                    "address": store.DiaChi,
+                    "phone": store.SDT or 'N/A', 
+                    "distance_km": round(dist_val, 2) 
                 },
                 "geometry": {"type": "Point", "coordinates": [store.geom.x, store.geom.y]}
             })
-    return JsonResponse({'center': [center_lat, center_lng], 'radius_km': radius_km, 'stores': {"type": "FeatureCollection", "features": features}})
+            
+    return JsonResponse({
+        'center': [center_lat, center_lng], 
+        'radius_km': radius_km, 
+        'count': len(features),
+        'stores': {"type": "FeatureCollection", "features": features}
+    })
 
 def kho_geojson(request):
     if 'user_id' not in request.session:
