@@ -1,5 +1,5 @@
 from django.contrib.gis.db import models
-
+from .tool import tinh_khoang_cach_va_thoi_gian # Import hàm từ file tool.py
 # SẢN PHẨM
 class SanPham(models.Model):
     TRANG_THAI_CHOICES = [
@@ -199,7 +199,29 @@ class DanhMuc(models.Model):
     def __str__(self):
         return f"{self.MaDM} - {self.Ten}"
 
+#  PHÂN BỔ CUNG CẤP
+class PhanBoCungCap(models.Model):
+    cua_hang = models.ForeignKey('CuaHang', on_delete=models.CASCADE)
+    kho = models.ForeignKey('Kho', on_delete=models.CASCADE)
+    khoang_cach = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True) 
+    thoi_gian = models.IntegerField(null=True, blank=True)
+    uu_tien = models.IntegerField()
 
+    class Meta:
+        # Tạo khóa chính kết hợp để tránh lưu trùng lặp
+        unique_together = (('cua_hang', 'kho'),)
+    def save(self, *args, **kwargs):
+        # Nếu chưa có khoảng cách, hệ thống sẽ tự động tính
+        if not self.khoang_cach and self.cua_hang and self.kho:
+            
+            # Gọi hàm từ tool.py và lấy 2 kết quả
+            km, phut = tinh_khoang_cach_va_thoi_gian(self.cua_hang.geom, self.kho.geom)
+            
+            # Gán kết quả vào thuộc tính của model
+            self.khoang_cach = km
+            self.thoi_gian = phut
+
+        super().save(*args, **kwargs)
 
 class Store(models.Model):
     """
