@@ -88,7 +88,7 @@ DATABASES = {
 # Windows GDAL Configuration 
 if os.name == 'nt':
     # Path to the discovered libraries in 'geo_tool' environment
-    VENV_BASE = r"C:\Users\Admin\anaconda3\envs\geo_tool\Library"
+    VENV_BASE = r"C:\Users\Admin\anaconda3\envs\tktmdt\Library"
     VENV_BIN = os.path.join(VENV_BASE, "bin")
     
     # Add bin folder to PATH so dependent DLLs can be found

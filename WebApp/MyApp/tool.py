@@ -95,3 +95,19 @@ def kho_geojson(request):
                 "geometry": {"type": "Point", "coordinates": [wh.geom.x, wh.geom.y]}
             })
     return JsonResponse({"type": "FeatureCollection", "features": features})
+
+def save(self, *args, **kwargs):
+        # Nếu chưa có khoảng cách, chúng ta sẽ bắt đầu tính toán
+        if not self.khoang_cach and self.cua_hang and self.kho:
+            # Chuyển tọa độ sang hệ phẳng (SRID 3857) để tính khoảng cách bằng mét
+            diem_cua_hang = self.cua_hang.geom.transform(3857, clone=True)
+            diem_kho = self.kho.geom.transform(3857, clone=True)
+            
+            # Tính khoảng cách
+            khoang_cach_met = diem_cua_hang.distance(diem_kho)
+            
+            # Đổi từ mét ra kilomet và làm tròn 1 chữ số thập phân
+            self.khoang_cach = round(khoang_cach_met / 1000, 1)
+
+        # Gọi lại hàm save() gốc của Django để lưu dữ liệu xuống database
+        super().save(*args, **kwargs)
