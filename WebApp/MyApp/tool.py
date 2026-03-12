@@ -96,18 +96,33 @@ def kho_geojson(request):
             })
     return JsonResponse({"type": "FeatureCollection", "features": features})
 
-def save(self, *args, **kwargs):
-        # Nếu chưa có khoảng cách, chúng ta sẽ bắt đầu tính toán
-        if not self.khoang_cach and self.cua_hang and self.kho:
-            # Chuyển tọa độ sang hệ phẳng (SRID 3857) để tính khoảng cách bằng mét
-            diem_cua_hang = self.cua_hang.geom.transform(3857, clone=True)
-            diem_kho = self.kho.geom.transform(3857, clone=True)
-            
-            # Tính khoảng cách
-            khoang_cach_met = diem_cua_hang.distance(diem_kho)
-            
-            # Đổi từ mét ra kilomet và làm tròn 1 chữ số thập phân
-            self.khoang_cach = round(khoang_cach_met / 1000, 1)
+#def save(self, *args, **kwargs):
+#       # Nếu chưa có khoảng cách, chúng ta sẽ bắt đầu tính toán
+#       if not self.khoang_cach and self.cua_hang and self.kho:
+#           # Chuyển tọa độ sang hệ phẳng (SRID 3857) để tính khoảng cách bằng mét
+#           diem_cua_hang = self.cua_hang.geom.transform(3857, clone=True)
+#           diem_kho = self.kho.geom.transform(3857, clone=True)
+#           
+#           # Tính khoảng cách
+#           khoang_cach_met = diem_cua_hang.distance(diem_kho)
+#           
+#           # Đổi từ mét ra kilomet và làm tròn 1 chữ số thập phân
+#           self.khoang_cach = round(khoang_cach_met / 1000, 1)
+#
+#       # Gọi lại hàm save() gốc của Django để lưu dữ liệu xuống database
+#       super().save(*args, **kwargs)
 
-        # Gọi lại hàm save() gốc của Django để lưu dữ liệu xuống database
-        super().save(*args, **kwargs)
+def tinh_khoang_cach_va_thoi_gian(diem_cua_hang, diem_kho, van_toc_kmh=40):
+    # 1. Chuyển hệ tọa độ sang mét phẳng (SRID 3857)
+    diem_ch_met = diem_cua_hang.transform(3857, clone=True)
+    diem_kho_met = diem_kho.transform(3857, clone=True)
+
+    # 2. Tính khoảng cách (mét) rồi đổi ra km (làm tròn 1 chữ số thập phân)
+    khoang_cach_met = diem_ch_met.distance(diem_kho_met)
+    khoang_cach_km = round(khoang_cach_met / 1000, 1)
+
+    # 3. Tính thời gian ra phút và ép kiểu về số nguyên (int)
+    # Công thức: (km / (km/h)) * 60 = phút
+    thoi_gian_phut = int((khoang_cach_km / van_toc_kmh) * 60)
+
+    return khoang_cach_km, thoi_gian_phut
