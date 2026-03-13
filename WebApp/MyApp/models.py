@@ -1,5 +1,4 @@
 from django.contrib.gis.db import models
-from .tool import tinh_khoang_cach_va_thoi_gian # Import hàm từ file tool.py
 # SẢN PHẨM
 class SanPham(models.Model):
     TRANG_THAI_CHOICES = [
@@ -83,11 +82,13 @@ class CuaHang(models.Model):
 
 #  NHÂN VIÊN 
 class NhanVien(models.Model):
+    
     ROLE_CHOICES = [
         ('Admin', 'Admin'),
         ('Nhân Viên', 'Nhân Viên'),
         ('Kế Toán', 'Kế Toán'),
     ]
+    
     
     MaNV = models.CharField(max_length=20, primary_key=True, db_column='manv')
     Ten = models.CharField(max_length=255, db_column='ten')
@@ -211,6 +212,7 @@ class PhanBoCungCap(models.Model):
         # Tạo khóa chính kết hợp để tránh lưu trùng lặp
         unique_together = (('cua_hang', 'kho'),)
     def save(self, *args, **kwargs):
+        from .tool import tinh_khoang_cach_va_thoi_gian # Import hàm từ file tool.py
         # Nếu chưa có khoảng cách, hệ thống sẽ tự động tính
         if not self.khoang_cach and self.cua_hang and self.kho:
             
