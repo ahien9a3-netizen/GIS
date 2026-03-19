@@ -15,15 +15,37 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                {% for field in form %}
-                <div
-                    style="display: flex; flex-direction: column; gap: 0.5rem; {% if field.name == 'MieuTa' %}grid-column: span 2;{% endif %}">
-                    <label style="font-weight: 600; font-size: 0.875rem;">{{ field.label }}</label>
-                    <div>
-                        {{ field }}
-                    </div>
+                {% if form.MaSP %}
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label style="font-weight: 600; font-size: 0.875rem;">{{ form.MaSP.label }}</label>
+                    <div>{{ form.MaSP }}</div>
                 </div>
-                {% endfor %}
+                {% endif %}
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label style="font-weight: 600; font-size: 0.875rem;">{{ form.Ten.label }}</label>
+                    <div>{{ form.Ten }}</div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label style="font-weight: 600; font-size: 0.875rem;">{{ form.DanhMuc.label }}</label>
+                    <div>{{ form.DanhMuc }}</div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    <label style="font-weight: 600; font-size: 0.875rem;">{{ form.TrangThai.label }}</label>
+                    <div>{{ form.TrangThai }}</div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; grid-column: span 2;">
+                    <label style="font-weight: 600; font-size: 0.875rem;">{{ form.Image.label }}</label>
+                    <div class="custom-file-upload">{{ form.Image }}</div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; grid-column: span 2;">
+                    <label style="font-weight: 600; font-size: 0.875rem;">{{ form.MieuTa.label }}</label>
+                    <div>{{ form.MieuTa }}</div>
+                </div>
             </div>
 
             <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
@@ -36,7 +58,7 @@
 </div>
 
 <style>
-    input,
+    input:not([type="checkbox"]):not([type="file"]),
     select,
     textarea {
         width: 100%;
@@ -48,12 +70,59 @@
         transition: all 0.2s;
     }
 
+    input[type="file"] {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        margin-top: 0.5rem;
+    }
+
     input:focus,
     select:focus,
     textarea:focus {
         outline: none;
         border-color: var(--primary);
         background: white;
+    }
+
+    .custom-file-upload {
+        background: var(--gray-50);
+        border: 1px dashed var(--gray-300);
+        padding: 1rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        line-height: 1.8;
+    }
+
+    .custom-file-upload a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+        word-break: break-all;
+        background: white;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        border: 1px solid var(--gray-200);
+    }
+
+    .custom-file-upload label {
+        display: inline-flex;
+        align-items: center;
+        margin-left: 0.25rem;
+        cursor: pointer;
+        color: var(--danger);
+        font-weight: bold;
+    }
+    
+    .custom-file-upload input[type="checkbox"] {
+        margin-right: 0.25rem;
+        margin-left: 1rem;
+        cursor: pointer;
+        accent-color: var(--danger);
     }
 </style>
 {% endblock %}

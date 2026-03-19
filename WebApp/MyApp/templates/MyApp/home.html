@@ -4,7 +4,6 @@
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-    
     .map-card {
         background: white;
         border-radius: 12px;
@@ -27,7 +26,7 @@
         width: 100%;
     }
 
-    
+
     .map-legend-overlay {
         position: absolute;
         top: 10px;
@@ -53,7 +52,7 @@
         color: var(--gray-700);
     }
 
-    
+
     .legend-icon-swatch {
         width: 26px;
         height: 26px;
@@ -67,7 +66,7 @@
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
-    
+
     .btn-locate {
         position: absolute;
         bottom: 25px;
@@ -92,7 +91,7 @@
         color: var(--primary);
     }
 
-    
+
     .user-location-marker {
         width: 18px;
         height: 18px;
@@ -126,13 +125,13 @@
         }
     }
 
-    
+
     .dashboard-col-right {
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
         height: 600px;
-        
+
     }
 
     .compact-list-card {
@@ -150,7 +149,7 @@
         overflow-y: auto;
     }
 
-    
+
     .store-icon-small {
         width: 32px;
         height: 32px;
@@ -193,7 +192,7 @@
 
 {% block content %}
 <div class="page-header">
-    <h1>Bán Đồ Tổng Quan Mạng Lưới</h1>
+    <h1>Bản Đồ Tổng Quan Mạng Lưới</h1>
     <p>Giám sát trực tuyến hệ thống Cửa hàng và Kho vận</p>
 </div>
 
@@ -230,13 +229,13 @@
 </div>
 
 <div class="dashboard-grid">
-    
+
     <div class="dashboard-col-left">
         <div class="map-card">
             <div class="map-container">
                 <div id="map-display"></div>
 
-                
+
                 <div class="map-legend-overlay">
                     <div class="legend-subtitle">Cửa hàng:</div>
                     <div class="legend-item">
@@ -267,7 +266,7 @@
                     </div>
                 </div>
 
-                
+
                 <button id="btn-locate-user" class="btn-locate" title="Vị trí của tôi">
                     <i class="fa-solid fa-crosshairs"></i>
                 </button>
@@ -275,9 +274,9 @@
         </div>
     </div>
 
-    
+
     <div class="dashboard-col-right">
-        
+
         <div class="compact-list-card">
             <div class="card-header">
                 <h3><i class="fa-solid fa-shop"></i> Danh Sách Cửa Hàng</h3>
@@ -314,7 +313,7 @@
             </div>
         </div>
 
-        
+
         <div class="compact-list-card">
             <div class="card-header">
                 <h3><i class="fa-solid fa-warehouse"></i> Danh Sách Kho Hàng</h3>
@@ -384,11 +383,11 @@
             });
         }
 
-        
+
         fetchData('/api/stores-geojson/', '#3b82f6', 'fa-store', true);
         fetchData('/api/kho-geojson/', '#ef4444', 'fa-warehouse', false);
 
-        
+
         var userMarker;
         document.getElementById('btn-locate-user').onclick = function () {
             if (!navigator.geolocation) {
@@ -408,7 +407,7 @@
             }, err => alert("Không thể định vị. Vui lòng cấp quyền!"));
         };
 
-        
+
         document.querySelectorAll('.store-item-compact').forEach(item => {
             item.onclick = function () {
                 const lat = parseFloat(this.dataset.lat);
@@ -419,7 +418,7 @@
             };
         });
 
-        
+
         setTimeout(() => map.invalidateSize(), 500);
     });
 </script>

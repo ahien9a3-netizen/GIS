@@ -47,13 +47,9 @@
                                 class="fa-solid fa-user-pen"></i></a>
 
                         {% if nv.MaNV != current_user_id %}
-                        <form action="{% url 'nhanvien_delete' nv.pk %}" method="post" style="display: inline;"
-                            onsubmit="return confirm('Xóa nhân viên này?')">
-                            {% csrf_token %}
-                            <button type="submit"
-                                style="background: none; border: none; color: var(--danger); cursor: pointer;"><i
-                                    class="fa-solid fa-user-minus"></i></button>
-                        </form>
+                        <a href="{% url 'nhanvien_delete' nv.pk %}" style="color: var(--danger);" title="Xóa">
+                            <i class="fa-solid fa-user-minus"></i>
+                        </a>
                         {% endif %}
                     </div>
                 </td>

@@ -43,13 +43,9 @@
                     <div style="display: flex; gap: 0.5rem;">
                         <a href="{% url 'stock_in_edit' yc.pk %}" style="color: var(--primary);"><i
                                 class="fa-solid fa-file-pen"></i></a>
-                        <form action="{% url 'stock_in_delete' yc.pk %}" method="post" style="display: inline;"
-                            onsubmit="return confirm('Hủy yêu cầu này?')">
-                            {% csrf_token %}
-                            <button type="submit"
-                                style="background: none; border: none; color: var(--danger); cursor: pointer;"><i
-                                    class="fa-solid fa-file-circle-xmark"></i></button>
-                        </form>
+                        <a href="{% url 'stock_in_delete' yc.pk %}" style="color: var(--danger);" title="Xóa">
+                            <i class="fa-solid fa-file-circle-xmark"></i>
+                        </a>
                     </div>
                 </td>
             </tr>

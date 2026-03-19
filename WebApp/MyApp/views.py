@@ -301,6 +301,17 @@ class CuaHangCreateView(SidebarContextMixin, CreateView):
     sidebar_active = 'stores'
     page_title = 'Thêm Cửa hàng mới'
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['MaCH'].label = 'Mã Cửa Hàng'
+        form.fields['Ten'].label = 'Tên Cửa Hàng'
+        form.fields['Loai'].label = 'Loại Cửa Hàng'
+        form.fields['DiaChi'].label = 'Địa Chỉ'
+        form.fields['SDT'].label = 'Số Điện Thoại'
+        form.fields['TrangThai'].label = 'Trạng Thái'
+        form.fields['geom'].label = 'Tọa Độ (Geom)'
+        return form
+
 class CuaHangUpdateView(SidebarContextMixin, UpdateView):
     model = CuaHang
     fields = ['Ten', 'Loai', 'DiaChi', 'SDT', 'TrangThai', 'geom']
@@ -309,9 +320,22 @@ class CuaHangUpdateView(SidebarContextMixin, UpdateView):
     sidebar_active = 'stores'
     page_title = 'Cập nhật Cửa hàng'
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['Ten'].label = 'Tên Cửa Hàng'
+        form.fields['Loai'].label = 'Loại Cửa Hàng'
+        form.fields['DiaChi'].label = 'Địa Chỉ'
+        form.fields['SDT'].label = 'Số Điện Thoại'
+        form.fields['TrangThai'].label = 'Trạng Thái'
+        form.fields['geom'].label = 'Tọa Độ (Geom)'
+        return form
+
 class CuaHangDeleteView(SidebarContextMixin, DeleteView):
     model = CuaHang
     success_url = reverse_lazy('store_list')
+    template_name = 'MyApp/confirm_delete.html'
+    sidebar_active = 'stores'
+    page_title = 'Xác nhận Xóa Cửa hàng'
 
 #  SẢN PHẨM 
 class SanPhamListView(SidebarContextMixin, ListView):
@@ -327,6 +351,20 @@ class SanPhamCreateView(SidebarContextMixin, CreateView):
     template_name = 'MyApp/product_form.html'
     success_url = reverse_lazy('product_list')
     sidebar_active = 'products'
+    page_title = 'Thêm Sản phẩm mới'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['MaSP'].label = 'Mã Sản Phẩm'
+        form.fields['Ten'].label = 'Tên Sản Phẩm'
+        form.fields['Image'].label = 'Hình Ảnh SP'
+        form.fields['Image'].widget.initial_text = 'Đang dùng'
+        form.fields['Image'].widget.input_text = 'Tải ảnh mới'
+        form.fields['Image'].widget.clear_checkbox_label = 'Xóa ảnh'
+        form.fields['DanhMuc'].label = 'Thuộc Danh Mục'
+        form.fields['MieuTa'].label = 'Mô Tả Chi Tiết'
+        form.fields['TrangThai'].label = 'Trạng Thái'
+        return form
 
 class SanPhamUpdateView(SidebarContextMixin, UpdateView):
     model = SanPham
@@ -334,10 +372,26 @@ class SanPhamUpdateView(SidebarContextMixin, UpdateView):
     template_name = 'MyApp/product_form.html'
     success_url = reverse_lazy('product_list')
     sidebar_active = 'products'
+    page_title = 'Cập nhật Sản phẩm'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['Ten'].label = 'Tên Sản Phẩm'
+        form.fields['Image'].label = 'Hình Ảnh SP'
+        form.fields['Image'].widget.initial_text = 'Đang dùng'
+        form.fields['Image'].widget.input_text = 'Tải ảnh mới'
+        form.fields['Image'].widget.clear_checkbox_label = 'Xóa ảnh'
+        form.fields['DanhMuc'].label = 'Thuộc Danh Mục'
+        form.fields['MieuTa'].label = 'Mô Tả Chi Tiết'
+        form.fields['TrangThai'].label = 'Trạng Thái'
+        return form
 
 class SanPhamDeleteView(SidebarContextMixin, DeleteView):
     model = SanPham
     success_url = reverse_lazy('product_list')
+    template_name = 'MyApp/confirm_delete.html'
+    sidebar_active = 'products'
+    page_title = 'Xác nhận Xóa Sản phẩm'
 
 #  DANH MỤC 
 class DanhMucListView(SidebarContextMixin, ListView):
@@ -355,6 +409,13 @@ class DanhMucCreateView(SidebarContextMixin, CreateView):
     sidebar_active = 'categories'
     page_title = 'Thêm Danh mục mới'
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['MaDM'].label = 'Mã Danh Mục'
+        form.fields['Ten'].label = 'Tên Danh Mục'
+        form.fields['MoTa'].label = 'Mô Tả'
+        return form
+
 class DanhMucUpdateView(SidebarContextMixin, UpdateView):
     model = DanhMuc
     fields = ['Ten', 'MoTa']
@@ -363,9 +424,18 @@ class DanhMucUpdateView(SidebarContextMixin, UpdateView):
     sidebar_active = 'categories'
     page_title = 'Cập nhật Danh mục'
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['Ten'].label = 'Tên Danh Mục'
+        form.fields['MoTa'].label = 'Mô Tả'
+        return form
+
 class DanhMucDeleteView(SidebarContextMixin, DeleteView):
     model = DanhMuc
     success_url = reverse_lazy('danhmuc_list')
+    template_name = 'MyApp/confirm_delete.html'
+    sidebar_active = 'categories'
+    page_title = 'Xác nhận Xóa Danh mục'
 
 #  TỒN KHO
 class HangTonKhoListView(SidebarContextMixin, ListView):
@@ -383,6 +453,13 @@ class HangTonKhoCreateView(SidebarContextMixin, CreateView):
     sidebar_active = 'inventory'
     page_title = 'Thêm mới Tồn kho'
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['MaKho'].label = 'Kho Lưu Trữ'
+        form.fields['MaSP'].label = 'Sản Phẩm'
+        form.fields['SoLuong'].label = 'Số Lượng Tồn'
+        return form
+
 class HangTonKhoUpdateView(SidebarContextMixin, UpdateView):
     model = HangTonKho
     fields = ['SoLuong']
@@ -391,12 +468,20 @@ class HangTonKhoUpdateView(SidebarContextMixin, UpdateView):
     sidebar_active = 'inventory'
     page_title = 'Điều chỉnh Tồn kho'
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['SoLuong'].label = 'Số Lượng Tồn'
+        return form
+
     def get_object(self, queryset=None):
         return get_object_or_404(HangTonKho, MaKho=self.kwargs['makho'], MaSP=self.kwargs['masp'])
 
 class HangTonKhoDeleteView(SidebarContextMixin, DeleteView):
     model = HangTonKho
     success_url = reverse_lazy('inventory_list')
+    template_name = 'MyApp/confirm_delete.html'
+    sidebar_active = 'inventory'
+    page_title = 'Xác nhận Xóa Tồn kho'
 
     def get_object(self, queryset=None):
         return get_object_or_404(HangTonKho, MaKho=self.kwargs['makho'], MaSP=self.kwargs['masp'])
@@ -416,6 +501,16 @@ class KhoCreateView(SidebarContextMixin, CreateView):
     template_name = 'MyApp/kho_form.html'
     success_url = reverse_lazy('kho_list')
     sidebar_active = 'warehouses'
+    page_title = 'Thêm Kho hàng mới'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['MaKho'].label = 'Mã Kho'
+        form.fields['Ten'].label = 'Tên Kho Hàng'
+        form.fields['Loai'].label = 'Loại Kho'
+        form.fields['DiaChi'].label = 'Địa Chỉ'
+        form.fields['geom'].label = 'Tọa Độ (Geom)'
+        return form
 
 class KhoUpdateView(SidebarContextMixin, UpdateView):
     model = Kho
@@ -423,10 +518,22 @@ class KhoUpdateView(SidebarContextMixin, UpdateView):
     template_name = 'MyApp/kho_form.html'
     success_url = reverse_lazy('kho_list')
     sidebar_active = 'warehouses'
+    page_title = 'Cập nhật Kho hàng'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['Ten'].label = 'Tên Kho Hàng'
+        form.fields['Loai'].label = 'Loại Kho'
+        form.fields['DiaChi'].label = 'Địa Chỉ'
+        form.fields['geom'].label = 'Tọa Độ (Geom)'
+        return form
 
 class KhoDeleteView(SidebarContextMixin, DeleteView):
     model = Kho
     success_url = reverse_lazy('kho_list')
+    template_name = 'MyApp/confirm_delete.html'
+    sidebar_active = 'warehouses'
+    page_title = 'Xác nhận Xóa Kho hàng'
 
 #  NHÂN VIÊN 
 class NhanVienListView(SidebarContextMixin, ListView):
@@ -444,6 +551,16 @@ class NhanVienCreateView(SidebarContextMixin, CreateView):
     success_url = reverse_lazy('nhanvien_list')
     sidebar_active = 'employees'
     required_roles = ['Admin']
+    page_title = 'Thêm Nhân Viên mới'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['MaNV'].label = 'Mã Nhân Viên'
+        form.fields['Ten'].label = 'Họ Tên Nhân Viên'
+        form.fields['SDT'].label = 'Số Điện Thoại'
+        form.fields['Role'].label = 'Vai Trò (Chức vụ)'
+        form.fields['MatKhau'].label = 'Mật Khẩu'
+        return form
 
 class NhanVienUpdateView(SidebarContextMixin, UpdateView):
     model = NhanVien
@@ -452,11 +569,23 @@ class NhanVienUpdateView(SidebarContextMixin, UpdateView):
     success_url = reverse_lazy('nhanvien_list')
     sidebar_active = 'employees'
     required_roles = ['Admin']
+    page_title = 'Cập nhật Nhân Viên'
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['Ten'].label = 'Họ Tên Nhân Viên'
+        form.fields['SDT'].label = 'Số Điện Thoại'
+        form.fields['Role'].label = 'Vai Trò (Chức vụ)'
+        form.fields['MatKhau'].label = 'Mật Khẩu'
+        return form
 
 class NhanVienDeleteView(SidebarContextMixin, DeleteView):
     model = NhanVien
     success_url = reverse_lazy('nhanvien_list')
     required_roles = ['Admin']
+    template_name = 'MyApp/confirm_delete.html'
+    sidebar_active = 'employees'
+    page_title = 'Xác nhận Xóa Nhân viên'
 
 #  NHẬP KHO 
 class StockInListView(SidebarContextMixin, ListView):
@@ -474,10 +603,16 @@ class StockInCreateView(SidebarContextMixin, CreateView):
     success_url = reverse_lazy('stock_in_list')
     sidebar_active = 'stock_in'
     required_roles = ['Admin', 'Kế Toán']
+    page_title = 'Thêm Yêu Cầu Nhập Kho'
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
+        form.fields['MaYC'].label = 'Mã Yêu Cầu'
+        form.fields['Ngay'].label = 'Ngày Yêu Cầu'
         form.fields['Ngay'].widget = forms.DateInput(attrs={'type': 'date'})
+        form.fields['TrangThai'].label = 'Trạng Thái'
+        form.fields['GhiChu'].label = 'Ghi Chú Đơn Hàng'
+        form.fields['MaNV'].label = 'Nhân Viên Phụ Trách'
         return form
 
 class StockInUpdateView(SidebarContextMixin, UpdateView):
@@ -487,13 +622,21 @@ class StockInUpdateView(SidebarContextMixin, UpdateView):
     success_url = reverse_lazy('stock_in_list')
     sidebar_active = 'stock_in'
     required_roles = ['Admin', 'Kế Toán']
+    page_title = 'Cập nhật Yêu Cầu Nhập Kho'
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
+        form.fields['Ngay'].label = 'Ngày Yêu Cầu'
         form.fields['Ngay'].widget = forms.DateInput(attrs={'type': 'date'})
+        form.fields['TrangThai'].label = 'Trạng Thái'
+        form.fields['GhiChu'].label = 'Ghi Chú Đơn Hàng'
+        form.fields['MaNV'].label = 'Nhân Viên Phụ Trách'
         return form
 
 class StockInDeleteView(SidebarContextMixin, DeleteView):
     model = YeuCauNhapKho
     success_url = reverse_lazy('stock_in_list')
     required_roles = ['Admin', 'Kế Toán']
+    template_name = 'MyApp/confirm_delete.html'
+    sidebar_active = 'stock_in'
+    page_title = 'Xác nhận Xóa Yêu Cầu Nhập Kho'

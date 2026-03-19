@@ -45,13 +45,9 @@
                     <div style="display: flex; gap: 0.5rem;">
                         <a href="{% url 'store_edit' store.pk %}" style="color: var(--primary);"><i
                                 class="fa-solid fa-pen-to-square"></i></a>
-                        <form action="{% url 'store_delete' store.pk %}" method="post" style="display: inline;"
-                            onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
-                            {% csrf_token %}
-                            <button type="submit"
-                                style="background: none; border: none; color: var(--danger); cursor: pointer;"><i
-                                    class="fa-solid fa-trash"></i></button>
-                        </form>
+                        <a href="{% url 'store_delete' store.pk %}" style="color: var(--danger);" title="Xóa">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
                     </div>
                 </td>
             </tr>

@@ -34,10 +34,24 @@ def store_heatmap(request):
     if 'user_id' not in request.session:
         return JsonResponse({'error': 'Unauthorized'}, status=401)
     
-    stores = CuaHang.objects.filter(geom__isnull=False).values_list('geom', flat=True)
-    warehouses = Kho.objects.filter(geom__isnull=False).values_list('geom', flat=True)
-    
-    data = [[p.y, p.x] for p in stores] + [[p.y, p.x] for p in warehouses]
+    layer_type = request.GET.get('type', 'all')
+    data = []
+
+    if layer_type in ['all', 'TienLoi', 'GiaDung', 'DienTu']:
+        stores_query = CuaHang.objects.filter(geom__isnull=False)
+        if layer_type == 'TienLoi':
+            stores_query = stores_query.filter(Loai='Tiện Lợi')
+        elif layer_type == 'GiaDung':
+            stores_query = stores_query.filter(Loai='Gia Dụng')
+        elif layer_type == 'DienTu':
+            stores_query = stores_query.filter(Loai='Điện Tử')
+        
+        stores = stores_query.values_list('geom', flat=True)
+        data.extend([[p.y, p.x] for p in stores])
+
+    if layer_type in ['all', 'KhoHang']:
+        warehouses = Kho.objects.filter(geom__isnull=False).values_list('geom', flat=True)
+        data.extend([[p.y, p.x] for p in warehouses])
     
     return JsonResponse(data, safe=False)
 
@@ -70,6 +84,7 @@ def service_area(request):
                     "name": store.Ten, 
                     "address": store.DiaChi,
                     "phone": store.SDT or 'N/A', 
+                    "type": store.Loai,
                     "distance_km": round(dist_val, 2) 
                 },
                 "geometry": {"type": "Point", "coordinates": [store.geom.x, store.geom.y]}

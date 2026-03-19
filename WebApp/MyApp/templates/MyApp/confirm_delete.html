@@ -1,0 +1,28 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-header" style="text-align: center;">
+    <h1 style="color: var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i> Xác nhận Xóa</h1>
+    <p>Hành động này không thể hoàn tác!</p>
+</div>
+
+<div class="chart-card" style="max-width: 600px; margin: 2rem auto; padding: 2.5rem; text-align: center; border-top: 4px solid var(--danger);">
+    <h3 style="margin-bottom: 1.5rem; color: var(--gray-800);">Bạn có chắc chắn muốn xóa đối tượng này không?</h3>
+    <div style="background: var(--gray-50); padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; border: 1px dashed var(--gray-300);">
+        <strong style="font-size: 1.125rem; color: var(--danger);">{{ object }}</strong>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <button type="submit" class="leaflet-analysis-btn" style="background: var(--danger); width: auto; padding: 0.75rem 2rem;">
+                <i class="fa-solid fa-trash"></i> Đồng ý xóa
+            </button>
+            <a href="javascript:history.back()" class="leaflet-analysis-btn" style="background: var(--gray-400); width: auto; padding: 0.75rem 2rem; text-decoration: none;">
+                <i class="fa-solid fa-xmark"></i> Hủy thao tác
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

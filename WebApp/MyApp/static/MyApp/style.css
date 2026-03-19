@@ -217,6 +217,9 @@ ul {
     top: 50%;
     transform: translateY(-50%);
     color: var(--gray-400);
+    line-height: 1;
+    display: flex;
+    align-items: center;
 }
 
 .header-search input {
