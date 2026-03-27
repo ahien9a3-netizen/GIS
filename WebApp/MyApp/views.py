@@ -171,7 +171,7 @@ def login_view(request):
         
         
         nv_list = list(NhanVien.objects.raw(
-            "SELECT * FROM nhanvien WHERE sdt = %s AND matkhau = crypt(%s, matkhau)", 
+            "SELECT * FROM nhanvien WHERE sdt = %s AND matkhau = %s", 
             [sdt, matkhau]
         ))
         
@@ -234,7 +234,7 @@ def settings_view(request):
             from django.db import connection
             is_correct = False
             with connection.cursor() as cursor:
-                cursor.execute("SELECT (matkhau = crypt(%s, matkhau)) FROM nhanvien WHERE manv = %s", [old_pass, user.MaNV])
+                cursor.execute("SELECT (matkhau = %s) FROM nhanvien WHERE manv = %s", [old_pass, user.MaNV])
                 row = cursor.fetchone()
                 if row:
                     is_correct = row[0]

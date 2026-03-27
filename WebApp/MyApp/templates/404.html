@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Mất Dấu Tọa Độ</title>
+
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            width: 100vw;
+            background-color: #020617;
+            /* Sâu thẳm như không gian */
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            color: #f8fafc;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* -------------------------------------
+           RADAR ANIMATION SCENERY (Chuẩn GIS)
+           ------------------------------------- */
+        .radar-box {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            border: 2px solid rgba(16, 185, 129, 0.4);
+            background: rgba(16, 185, 129, 0.03);
+            box-shadow: 0 0 50px rgba(16, 185, 129, 0.2), inset 0 0 30px rgba(16, 185, 129, 0.1);
+            overflow: hidden;
+            margin-bottom: 2.5rem;
+        }
+
+        /* Vòng lặp radar bên trong */
+        .radar-box::before,
+        .radar-box::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px dashed rgba(16, 185, 129, 0.4);
+            border-radius: 50%;
+        }
+
+        .radar-box::before {
+            width: 190px;
+            height: 190px;
+        }
+
+        .radar-box::after {
+            width: 100px;
+            height: 100px;
+        }
+
+        /* Trục chéo */
+        .radar-cross {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: rgba(16, 185, 129, 0.3);
+        }
+
+        .radar-cross.vertical {
+            top: 0;
+            left: 50%;
+            width: 1px;
+            height: 100%;
+        }
+
+        /* Vệt quét Scanner */
+        .radar-sweep {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 50%;
+            background: conic-gradient(from 0deg, rgba(16, 185, 129, 0) 0%, rgba(16, 185, 129, 0.8) 100%);
+            transform-origin: 0% 100%;
+            animation: sweep 3s linear infinite;
+        }
+
+        @keyframes sweep {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Điểm báo đỏ (Không tìm thấy) */
+        .blip {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            top: 25%;
+            left: 70%;
+            box-shadow: 0 0 15px #ef4444, 0 0 25px #ef4444;
+            opacity: 0;
+            animation: blip 3s infinite linear;
+        }
+
+        @keyframes blip {
+
+            0%,
+            20% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            21% {
+                opacity: 1;
+                transform: scale(1.8);
+            }
+
+            35% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1);
+            }
+        }
+
+        /* -------------------------------------
+           TYPOGRAPHY (Đẳng cấp & Ánh sáng)
+           ------------------------------------- */
+        h1.glitch-text {
+            font-size: 8.5rem;
+            font-weight: 900;
+            line-height: 0.9;
+            margin: 0;
+            background: linear-gradient(to right, #10b981, #0ea5e9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+            letter-spacing: -3px;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-top: 10px;
+            margin-bottom: 1rem;
+            color: #f8fafc;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            max-width: 550px;
+            text-align: center;
+            line-height: 1.6;
+            margin-bottom: 3rem;
+            font-weight: 300;
+        }
+
+        /* -------------------------------------
+           GLASSMORPHISM BUTTON
+           ------------------------------------- */
+        .btn-home {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 50px;
+            color: #f8fafc;
+            text-decoration: none;
+            font-size: 1.15rem;
+            font-weight: 600;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-home::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-home:hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.25);
+            color: #10b981;
+        }
+
+        .btn-home:hover::before {
+            left: 100%;
+        }
+
+        .btn-home i {
+            font-size: 1.3rem;
+            transition: transform 0.3s;
+        }
+
+        .btn-home:hover i {
+            transform: rotate(-15deg) scale(1.1);
+        }
+
+        /* Fractal Noise Environment Overlay */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.15;
+            mix-blend-mode: screen;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Space/Noise background map effect -->
+    <svg class="stars" xmlns="http://www.w3.org/2000/svg">
+        <filter id="noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.6" numOctaves="3" stitchTiles="stitch" />
+            <feColorMatrix type="matrix" values="1 0 0 0 0, 0 1 0 0 0, 0 0 1 0 0, 0 0 0 0.8 0" />
+        </filter>
+        <rect width="100%" height="100%" fill="transparent" filter="url(#noise)" />
+    </svg>
+
+    <div class="container">
+        <!-- GIS Radar Scanner Animation -->
+        <div class="radar-box">
+            <div class="radar-cross"></div>
+            <div class="radar-cross vertical"></div>
+            <div class="radar-sweep"></div>
+            <!-- Failed Target Blip -->
+            <div class="blip"></div>
+        </div>
+
+        <h1 class="glitch-text">404</h1>
+        <h2>Mất Tín Hiệu Tọa Độ</h2>
+        <p>Mục tiêu bạn đang tìm kiếm nằm ngoài vùng phủ sóng của radar hoặc đã bị xóa khỏi bản đồ GIS.</p>
+
+        <a href="/" class="btn-home">
+            <i class="fa-solid fa-satellite-dish"></i>
+            Tái Thiết Lập Dữ Liệu
+        </a>
+    </div>
+
+</body>
+
+</html>

@@ -14,7 +14,7 @@ class SanPham(models.Model):
     TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, db_column='trangthai')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'sanpham'
         verbose_name = "Sản phẩm"
         verbose_name_plural = "Danh sách sản phẩm"
@@ -38,7 +38,7 @@ class Kho(models.Model):
     geom = models.PointField(srid=4326, db_column='geom')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'kho'
         verbose_name = "Kho"
         verbose_name_plural = "Danh sách kho"
@@ -71,7 +71,7 @@ class CuaHang(models.Model):
     geom = models.PointField(srid=4326, db_column='geom')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'cuahang'
         verbose_name = "Cửa hàng"
         verbose_name_plural = "Danh sách cửa hàng"
@@ -97,7 +97,7 @@ class NhanVien(models.Model):
     Role = models.CharField(max_length=50, choices=ROLE_CHOICES, db_column='role')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'nhanvien'
         verbose_name = "Nhân viên"
         verbose_name_plural = "Danh sách nhân viên"
@@ -126,7 +126,7 @@ class YeuCauNhapKho(models.Model):
     )
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'yeucaunhapkho'
         verbose_name = "Yêu cầu nhập kho"
         verbose_name_plural = "Danh sách yêu cầu nhập kho"
@@ -140,8 +140,7 @@ class HangTonKho(models.Model):
     MaKho = models.ForeignKey(
         Kho,
         on_delete=models.CASCADE,
-        db_column='makho',
-        primary_key=True  
+        db_column='makho'
     )
     MaSP = models.ForeignKey(
         SanPham,
@@ -151,7 +150,7 @@ class HangTonKho(models.Model):
     SoLuong = models.IntegerField(db_column='soluong')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'hangtonkho'
         unique_together = (('MaKho', 'MaSP'),)
         verbose_name = "Hàng tồn kho"
@@ -178,7 +177,7 @@ class NhapKhoChiTiet(models.Model):
     SoLuong = models.IntegerField(db_column='soluong')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'nhapkhochitiet'
         unique_together = (('MaYC', 'MaKho', 'MaSP'),)
         verbose_name = "Nhập kho chi tiết"
@@ -192,7 +191,7 @@ class DanhMuc(models.Model):
     MoTa = models.TextField(blank=True, null=True, db_column='mota')
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'danhmuc'
         verbose_name = "Danh mục"
         verbose_name_plural = "Danh sách danh mục"
@@ -209,17 +208,11 @@ class PhanBoCungCap(models.Model):
     uu_tien = models.IntegerField()
 
     class Meta:
-        # Tạo khóa chính kết hợp để tránh lưu trùng lặp
         unique_together = (('cua_hang', 'kho'),)
     def save(self, *args, **kwargs):
-        from .tool import tinh_khoang_cach_va_thoi_gian # Import hàm từ file tool.py
-        # Nếu chưa có khoảng cách, hệ thống sẽ tự động tính
+        from .tool import tinh_khoang_cach_va_thoi_gian 
         if not self.khoang_cach and self.cua_hang and self.kho:
-            
-            # Gọi hàm từ tool.py và lấy 2 kết quả
             km, phut = tinh_khoang_cach_va_thoi_gian(self.cua_hang.geom, self.kho.geom)
-            
-            # Gán kết quả vào thuộc tính của model
             self.khoang_cach = km
             self.thoi_gian = phut
 
