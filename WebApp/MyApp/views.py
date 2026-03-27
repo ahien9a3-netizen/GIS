@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import CuaHang, Kho, SanPham, HangTonKho
-
+# --- HÀM XỬ LÝ TRANG TỔNG QUAN (DASHBOARD) ---
 def dashboard(request):
     context = {
         'tong_cua_hang': CuaHang.objects.count(),
@@ -12,7 +12,7 @@ def dashboard(request):
     }
     return render(request, 'myapp/dashboard.html', context)
 from django.core.serializers import serialize
-
+# --- HÀM XỬ LÝ TRANG BẢN ĐỒ / DANH SÁCH CỬA HÀNG ---
 def cuahang(request):
     data = serialize(
         'geojson',
@@ -23,7 +23,7 @@ def cuahang(request):
     return render(request, 'myapp/cuahang.html', {
         'geojson': data
     })
-
+# --- HÀM XỬ LÝ TRANG DANH SÁCH KHO ---
 def kho(request):
     data = Kho.objects.all()
     return render(request, 'myapp/kho.html', {'data': data})
