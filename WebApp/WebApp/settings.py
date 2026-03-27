@@ -24,9 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-o@gfi&o2w*jkg+f@s*zkt@@9)j)8#gopvya&gr&mex2o^0b-z8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+# Cho phép gửi HTTP Referer Header để OpenStreetMap không bị chặn
+SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
 
 # Application definition
 
@@ -88,7 +91,7 @@ DATABASES = {
 # Windows GDAL Configuration 
 if os.name == 'nt':
     # Path to the discovered libraries in 'geo_tool' environment
-    VENV_BASE = r"C:\Users\Admin\anaconda3\envs\tktmdt\Library"
+    VENV_BASE = r"C:\Users\Admin\anaconda3\envs\geo_tool\Library"
     VENV_BIN = os.path.join(VENV_BASE, "bin")
     
     # Add bin folder to PATH so dependent DLLs can be found
