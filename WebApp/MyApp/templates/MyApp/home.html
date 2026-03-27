@@ -1,0 +1,426 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    
+    .map-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .map-container {
+        flex: 1;
+        position: relative;
+        background-color: #f8fafc;
+    }
+
+    #map-display {
+        height: 100%;
+        width: 100%;
+    }
+
+    
+    .map-legend-overlay {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 10px 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border: 1px solid var(--gray-200);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        backdrop-filter: blur(4px);
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--gray-700);
+    }
+
+    
+    .legend-icon-swatch {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.75rem;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    
+    .btn-locate {
+        position: absolute;
+        bottom: 25px;
+        right: 10px;
+        z-index: 1000;
+        background: white;
+        border: 1px solid var(--gray-300);
+        width: 38px;
+        height: 38px;
+        border-radius: 6px;
+        cursor: pointer;
+        color: var(--gray-700);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s;
+    }
+
+    .btn-locate:hover {
+        background: var(--gray-50);
+        color: var(--primary);
+    }
+
+    
+    .user-location-marker {
+        width: 18px;
+        height: 18px;
+        background: #10b981;
+        border: 3px solid white;
+        border-radius: 50%;
+        position: relative;
+    }
+
+    .user-location-marker::after {
+        content: '';
+        width: 40px;
+        height: 40px;
+        background: rgba(16, 185, 129, 0.3);
+        border-radius: 50%;
+        position: absolute;
+        top: -14px;
+        left: -14px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: scale(0.5);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(1.5);
+            opacity: 0;
+        }
+    }
+
+    
+    .dashboard-col-right {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        height: 600px;
+        
+    }
+
+    .compact-list-card {
+        flex: 1;
+        background: white;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .scroll-area {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    
+    .store-icon-small {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white !important;
+        font-size: 0.85rem;
+        flex-shrink: 0;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .store-item-compact {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 15px;
+        border-bottom: 1px solid var(--gray-100);
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .store-item-compact:hover {
+        background: var(--gray-50);
+        border-left: 3px solid var(--primary);
+    }
+
+    .legend-subtitle {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--gray-400);
+        margin-bottom: 5px;
+        font-weight: 700;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Bán Đồ Tổng Quan Mạng Lưới</h1>
+    <p>Giám sát trực tuyến hệ thống Cửa hàng và Kho vận</p>
+</div>
+
+
+<div class="stats-grid">
+    <div class="stat-card stat-card-blue">
+        <div class="stat-icon"><i class="fa-solid fa-store"></i></div>
+        <div class="stat-content">
+            <div class="stat-label">Cửa hàng</div>
+            <div class="stat-value">{{ total_stores }}</div>
+        </div>
+    </div>
+    <div class="stat-card stat-card-green">
+        <div class="stat-icon"><i class="fa-solid fa-warehouse"></i></div>
+        <div class="stat-content">
+            <div class="stat-label">Kho hàng</div>
+            <div class="stat-value">{{ total_warehouses }}</div>
+        </div>
+    </div>
+    <div class="stat-card stat-card-purple">
+        <div class="stat-icon"><i class="fa-solid fa-box"></i></div>
+        <div class="stat-content">
+            <div class="stat-label">Sản phẩm</div>
+            <div class="stat-value">{{ total_products }}</div>
+        </div>
+    </div>
+    <div class="stat-card stat-card-cyan">
+        <div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <div class="stat-content">
+            <div class="stat-label">Tồn kho</div>
+            <div class="stat-value">{{ total_inventory }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    
+    <div class="dashboard-col-left">
+        <div class="map-card">
+            <div class="map-container">
+                <div id="map-display"></div>
+
+                
+                <div class="map-legend-overlay">
+                    <div class="legend-subtitle">Cửa hàng:</div>
+                    <div class="legend-item">
+                        <div class="legend-icon-swatch" style="background: #3b82f6;"><i
+                                class="fa-solid fa-cart-shopping"></i></div>
+                        <span>Tiện Lợi</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-icon-swatch" style="background: #0d9488;"><i
+                                class="fa-solid fa-house-chimney"></i></div>
+                        <span>Gia Dụng</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-icon-swatch" style="background: #f59e0b;"><i class="fa-solid fa-bolt"></i>
+                        </div>
+                        <span>Điện Tử</span>
+                    </div>
+                    <div style="border-top: 1px solid #eee; margin: 5px 0;"></div>
+                    <div class="legend-item">
+                        <div class="legend-icon-swatch" style="background: #ef4444;"><i
+                                class="fa-solid fa-warehouse"></i></div>
+                        <span>Kho hàng</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-icon-swatch" style="background: #10b981;"><i class="fa-solid fa-user"></i>
+                        </div>
+                        <span>Vị trí của tôi</span>
+                    </div>
+                </div>
+
+                
+                <button id="btn-locate-user" class="btn-locate" title="Vị trí của tôi">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="dashboard-col-right">
+        
+        <div class="compact-list-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-shop"></i> Danh Sách Cửa Hàng</h3>
+            </div>
+            <div class="scroll-area">
+                {% for store in stores_list %}
+                <div class="store-item-compact" data-lat="{{ store.lat }}" data-lng="{{ store.lon }}">
+                    {% if store.Loai == 'Tiện Lợi' %}
+                    <div class="store-icon-small" style="background: #3b82f6;">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </div>
+                    {% elif store.Loai == 'Gia Dụng' %}
+                    <div class="store-icon-small" style="background: #0d9488;">
+                        <i class="fa-solid fa-house-chimney"></i>
+                    </div>
+                    {% elif store.Loai == 'Điện Tử' %}
+                    <div class="store-icon-small" style="background: #f59e0b;">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    {% else %}
+                    <div class="store-icon-small" style="background: #64748b;">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    {% endif %}
+                    <div class="store-info">
+                        <div class="store-name-small">{{ store.Ten }}</div>
+                        <div class="store-addr-small">{{ store.DiaChi }}</div>
+                    </div>
+                    <div class="store-status-dot" style="background: #10b981;"></div>
+                </div>
+                {% empty %}
+                <p class="no-data">Chưa có dữ liệu.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        
+        <div class="compact-list-card">
+            <div class="card-header">
+                <h3><i class="fa-solid fa-warehouse"></i> Danh Sách Kho Hàng</h3>
+            </div>
+            <div class="scroll-area">
+                {% for wh in warehouses_list %}
+                <div class="store-item-compact" data-lat="{{ wh.lat }}" data-lng="{{ wh.lon }}">
+                    <div class="store-icon-small" style="background: #ef4444;">
+                        <i class="fa-solid fa-warehouse"></i>
+                    </div>
+                    <div class="store-info">
+                        <div class="store-name-small">{{ wh.Ten }}</div>
+                        <div class="store-addr-small">{{ wh.DiaChi }}</div>
+                    </div>
+                    <div class="store-status-dot" style="background: #ef4444;"></div>
+                </div>
+                {% empty %}
+                <p class="no-data">Chưa có dữ liệu kho.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var map = L.map('map-display').setView([10.7769, 106.7009], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        var markersLayer = L.layerGroup().addTo(map);
+
+        function fetchData(url, defaultColor, defaultIcon, isStore = false) {
+            fetch(url).then(r => r.json()).then(data => {
+                if (data.features) {
+                    L.geoJSON(data, {
+                        pointToLayer: (f, l) => {
+                            let color = defaultColor;
+                            let icon = defaultIcon;
+
+                            if (isStore) {
+                                const type = f.properties.type;
+                                if (type === 'Tiện Lợi') { color = '#3b82f6'; icon = 'fa-cart-shopping'; }
+                                else if (type === 'Gia Dụng') { color = '#0d9488'; icon = 'fa-house-chimney'; }
+                                else if (type === 'Điện Tử') { color = '#f59e0b'; icon = 'fa-bolt'; }
+                            }
+
+                            return L.marker(l, {
+                                icon: L.divIcon({
+                                    className: 'custom-marker',
+                                    html: `<div style="background: ${color}; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"><i class="fa-solid ${icon}"></i></div>`,
+                                    iconSize: [30, 30], iconAnchor: [15, 15]
+                                })
+                            });
+                        },
+                        onEachFeature: (f, layer) => {
+                            const typeTag = f.properties.type ? `<br><span class="badge" style="background: #eee; color: #333; padding: 2px 5px; border-radius: 4px; font-size: 10px;">${f.properties.type}</span>` : '';
+                            layer.bindPopup(`<strong>${f.properties.name}</strong>${typeTag}<br>${f.properties.address}`);
+                        }
+                    }).addTo(markersLayer);
+                    if (markersLayer.getLayers().length > 0) map.fitBounds(markersLayer.getBounds().pad(0.1));
+                }
+            });
+        }
+
+        
+        fetchData('/api/stores-geojson/', '#3b82f6', 'fa-store', true);
+        fetchData('/api/kho-geojson/', '#ef4444', 'fa-warehouse', false);
+
+        
+        var userMarker;
+        document.getElementById('btn-locate-user').onclick = function () {
+            if (!navigator.geolocation) {
+                alert("Browser does not support geolocation");
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(pos => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                if (userMarker) userMarker.setLatLng([lat, lng]);
+                else {
+                    userMarker = L.marker([lat, lng], {
+                        icon: L.divIcon({ className: 'user-location-marker', iconSize: [18, 18], iconAnchor: [9, 9] })
+                    }).addTo(map);
+                }
+                map.setView([lat, lng], 15);
+            }, err => alert("Không thể định vị. Vui lòng cấp quyền!"));
+        };
+
+        
+        document.querySelectorAll('.store-item-compact').forEach(item => {
+            item.onclick = function () {
+                const lat = parseFloat(this.dataset.lat);
+                const lng = parseFloat(this.dataset.lng);
+                if (lat && lng && lat !== 0 && lng !== 0) {
+                    map.setView([lat, lng], 17);
+                }
+            };
+        });
+
+        
+        setTimeout(() => map.invalidateSize(), 500);
+    });
+</script>
+{% endblock %}

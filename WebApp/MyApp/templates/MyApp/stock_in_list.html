@@ -1,0 +1,65 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>{{ page_title }}</h1>
+            <p>Quản lý các yêu cầu nhập hàng vào kho</p>
+        </div>
+        <a href="{% url 'stock_in_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
+            <i class="fa-solid fa-file-circle-plus"></i> Tạo Yêu cầu mới
+        </a>
+    </div>
+</div>
+
+<div class="chart-card" style="padding: 1rem;">
+    <table class="crud-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--gray-200);">
+                <th style="padding: 1rem;">Mã YC</th>
+                <th style="padding: 1rem;">Ngày tạo</th>
+                <th style="padding: 1rem;">Nhân viên</th>
+                <th style="padding: 1rem;">Ghi chú</th>
+                <th style="padding: 1rem;">Trạng thái</th>
+                <th style="padding: 1rem;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for yc in requests %}
+            <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 1rem; font-weight: 600;">{{ yc.MaYC }}</td>
+                <td style="padding: 1rem;">{{ yc.Ngay|date:"d/m/Y" }}</td>
+                <td style="padding: 1rem;">{{ yc.MaNV.Ten }}</td>
+                <td style="padding: 1rem;">{{ yc.GhiChu|truncatechars:30 }}</td>
+                <td style="padding: 1rem;">
+                    <span
+                        class="order-status {% if yc.TrangThai == 'Đã hoàn thành' %}status-success{% elif yc.TrangThai == 'Đang xử lý' %}status-processing{% else %}status-pending{% endif %}">
+                        {{ yc.TrangThai }}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a href="{% url 'stock_in_edit' yc.pk %}" style="color: var(--primary);"><i
+                                class="fa-solid fa-file-pen"></i></a>
+                        <form action="{% url 'stock_in_delete' yc.pk %}" method="post" style="display: inline;"
+                            onsubmit="return confirm('Hủy yêu cầu này?')">
+                            {% csrf_token %}
+                            <button type="submit"
+                                style="background: none; border: none; color: var(--danger); cursor: pointer;"><i
+                                    class="fa-solid fa-file-circle-xmark"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="padding: 2rem; text-align: center; color: var(--gray-400);">Chưa có yêu cầu nhập
+                    kho nào.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>{{ page_title }}</h1>
+            <p>Quản lý đội ngũ nhân sự hệ thống</p>
+        </div>
+        <a href="{% url 'nhanvien_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
+            <i class="fa-solid fa-user-plus"></i> Thêm Nhân viên
+        </a>
+    </div>
+</div>
+
+<div class="chart-card" style="padding: 1rem;">
+    <table class="crud-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--gray-200);">
+                <th style="padding: 1rem;">Mã NV</th>
+                <th style="padding: 1rem;">Họ và Tên</th>
+                <th style="padding: 1rem;">Số điện thoại</th>
+                <th style="padding: 1rem;">Vai trò</th>
+                <th style="padding: 1rem;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for nv in employees %}
+            <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 1rem; font-weight: 600;">{{ nv.MaNV }}</td>
+                <td style="padding: 1rem;">
+                    {{ nv.Ten }}
+                    {% if nv.MaNV == current_user_id %}
+                    <strong style="color: var(--primary);">(Bạn)</strong>
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem;">{{ nv.SDT }}</td>
+                <td style="padding: 1rem;">
+                    <span class="order-status status-processing">
+                        {{ nv.Role }}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a href="{% url 'nhanvien_edit' nv.pk %}" style="color: var(--primary);"><i
+                                class="fa-solid fa-user-pen"></i></a>
+
+                        {% if nv.MaNV != current_user_id %}
+                        <form action="{% url 'nhanvien_delete' nv.pk %}" method="post" style="display: inline;"
+                            onsubmit="return confirm('Xóa nhân viên này?')">
+                            {% csrf_token %}
+                            <button type="submit"
+                                style="background: none; border: none; color: var(--danger); cursor: pointer;"><i
+                                    class="fa-solid fa-user-minus"></i></button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding: 2rem; text-align: center; color: var(--gray-400);">Chưa có nhân viên
+                    nào.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

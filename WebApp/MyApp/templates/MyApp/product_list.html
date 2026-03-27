@@ -1,0 +1,74 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-header">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h1>{{ page_title }}</h1>
+            <p>Quản lý danh mục sản phẩm</p>
+        </div>
+        <a href="{% url 'product_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
+            <i class="fa-solid fa-plus"></i> Thêm Sản phẩm
+        </a>
+    </div>
+</div>
+
+<div class="chart-card" style="padding: 1rem;">
+    <table class="crud-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--gray-200);">
+                <th style="padding: 1rem;">Mã SP</th>
+                <th style="padding: 1rem;">Hình ảnh</th>
+                <th style="padding: 1rem;">Tên</th>
+                <th style="padding: 1rem;">Danh mục</th>
+                <th style="padding: 1rem;">Trạng thái</th>
+                <th style="padding: 1rem;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in products %}
+            <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 1rem; font-weight: 600;">{{ p.MaSP }}</td>
+                <td style="padding: 1rem;">
+                    {% if p.Image %}
+                    <img src="{{ p.Image.url }}"
+                        style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid #eee;">
+                    {% else %}
+                    <div
+                        style="width: 40px; height: 40px; background: #f3f4f6; border-radius: 4px; display: flex; align-items: center; justify-content: center; color: #9ca3af;">
+                        <i class="fa-solid fa-image"></i>
+                    </div>
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem;">{{ p.Ten }}</td>
+                <td style="padding: 1rem;">{{ p.DanhMuc }}</td>
+                <td style="padding: 1rem;">
+                    <span
+                        class="store-status {% if p.TrangThai == 'Còn hàng' %}status-active{% else %}status-pending{% endif %}">
+                        {{ p.TrangThai }}
+                    </span>
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <a href="{% url 'product_edit' p.pk %}" style="color: var(--primary);"><i
+                                class="fa-solid fa-pen-to-square"></i></a>
+                        <form action="{% url 'product_delete' p.pk %}" method="post" style="display: inline;"
+                            onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
+                            {% csrf_token %}
+                            <button type="submit"
+                                style="background: none; border: none; color: var(--danger); cursor: pointer;"><i
+                                    class="fa-solid fa-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding: 2rem; text-align: center; color: var(--gray-400);">Chưa có dữ liệu.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
