@@ -1228,3 +1228,60 @@ ul {
         height: 400px;
     }
 }
+/* ==================== PAGINATION ==================== */
+.pagination-container {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    padding-bottom: 2rem;
+    width: 100%;
+}
+
+.pagination-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 0.75rem;
+    background: white;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    color: var(--gray-600);
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.pagination-link:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--gray-50);
+}
+
+.pagination-link.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.pagination-link.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    background: var(--gray-100);
+}
+
+.pagination-info {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin: 0 1rem;
+}
+
+@media (max-width: 640px) {
+    .pagination-info {
+        display: none;
+    }
+}

@@ -342,13 +342,31 @@
 {% endblock %}
 
 {% block content %}
-<div class="page-header">
+<div class="page-header" data-aos="fade-down">
     <h1>Bản đồ GIS Chuyên sâu</h1>
     <p>Phân tích mạng lưới cửa hàng và kho hàng trên nền tảng địa không gian</p>
 </div>
 
-<div class="gis-map-container">
+<div class="gis-map-container" data-aos="fade-up" data-aos-delay="200">
     <div id="full-gis-map"></div>
+
+    <!-- Modal Upload ảnh -->
+    <div id="image-upload-modal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+        <div class="chart-card" style="width:400px; padding:20px; position:relative; background:white; border-radius:8px;">
+            <button onclick="closeUploadModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
+            <h3 style="margin-bottom:15px;"><i class="fa-solid fa-images"></i> Cập nhật hình ảnh</h3>
+            <p id="upload-target-name" style="font-weight:600; color:var(--primary); margin-bottom:10px;"></p>
+            <form id="upload-images-form" enctype="multipart/form-data">
+                <input type="hidden" id="upload-target-id">
+                <input type="hidden" id="upload-target-type">
+                <div style="margin-bottom:15px;">
+                    <label for="image-files" style="display:block; margin-bottom:5px;">Chọn ảnh (có thể chọn nhiều):</label>
+                    <input type="file" id="image-files" name="images" multiple accept="image/*" style="width:100%; height:auto; padding:10px;">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; padding:10px; background:var(--primary); color:white; border:none; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-cloud-arrow-up"></i> Tải lên</button>
+            </form>
+        </div>
+    </div>
 
     
     <div class="map-overlay-controls">
@@ -550,25 +568,34 @@
                                 </div>
                                 
                                 <div class="store-products-slider">
-                                    <div class="info-label">Hình ảnh sản phẩm tiêu biểu</div>
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                        <div class="info-label" style="margin-bottom:0;">Hình ảnh nổi bật</div>
+                                        <button class="leaflet-analysis-btn" style="padding:4px 10px; font-size:0.75rem;" onclick="openUploadModal('${props.id}', 'store', '${props.name}')">
+                                            <i class="fa-solid fa-pen-to-square"></i> Sửa ảnh
+                                        </button>
+                                    </div>
                                     <div class="swiper swiper-main" id="swiper-main-id">
                                         <div class="swiper-wrapper">
-                                            <div class="swiper-slide"><img src="/media/products/coca.jpg" alt="Coca" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/bimbim.jpg" alt="Bim bim" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/banhmi.jpg" alt="Banh mi" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/kem.jpg" alt="Kem" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/migoi.jpg" alt="Mi goi" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/suatuoi.jpg" alt="Sua tuoi" /></div>
+                                            ${(props.hinhanh && props.hinhanh.length > 0) 
+                                                ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/' + img}" alt="Image" /></div>`).join('')
+                                                : `
+                                                <div class="swiper-slide"><img src="/media/products/coca.jpg" alt="Default" /></div>
+                                                <div class="swiper-slide"><img src="/media/products/bimbim.jpg" alt="Default" /></div>
+                                                <div class="swiper-slide"><img src="/media/products/banhmi.jpg" alt="Default" /></div>
+                                                `
+                                            }
                                         </div>
                                     </div>
                                     <div class="swiper swiper-thumbs" id="swiper-thumbs-id">
                                         <div class="swiper-wrapper">
-                                            <div class="swiper-slide"><img src="/media/products/coca.jpg" alt="Coca" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/bimbim.jpg" alt="Bim bim" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/banhmi.jpg" alt="Banh mi" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/kem.jpg" alt="Kem" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/migoi.jpg" alt="Mi goi" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/suatuoi.jpg" alt="Sua tuoi" /></div>
+                                            ${(props.hinhanh && props.hinhanh.length > 0) 
+                                                ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/' + img}" alt="Thumb" /></div>`).join('')
+                                                : `
+                                                <div class="swiper-slide"><img src="/media/products/coca.jpg" alt="DefaultThumb" /></div>
+                                                <div class="swiper-slide"><img src="/media/products/bimbim.jpg" alt="DefaultThumb" /></div>
+                                                <div class="swiper-slide"><img src="/media/products/banhmi.jpg" alt="DefaultThumb" /></div>
+                                                `
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -663,23 +690,34 @@
                                 </div>
                                 
                                 <div class="store-products-slider">
-                                    <div class="info-label">Sản phẩm tồn kho nổi bật</div>
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                        <div class="info-label" style="margin-bottom:0;">Hình ảnh nổi bật</div>
+                                        <button class="leaflet-analysis-btn" style="padding:4px 10px; font-size:0.75rem; background:#ef4444;" onclick="openUploadModal('${props.id}', 'warehouse', '${props.name}')">
+                                            <i class="fa-solid fa-pen-to-square"></i> Sửa ảnh
+                                        </button>
+                                    </div>
                                     <div class="swiper swiper-main" id="swiper-wh-main">
                                         <div class="swiper-wrapper">
-                                            <div class="swiper-slide"><img src="/media/products/suatuoi.jpg" alt="Sua tuoi" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/coca.jpg" alt="Coca" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/kem.jpg" alt="Kem" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/migoi.jpg" alt="Mi" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/bimbim.jpg" alt="Bimbim" /></div>
+                                            ${(props.hinhanh && props.hinhanh.length > 0) 
+                                                ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/' + img}" alt="WH Image" /></div>`).join('')
+                                                : `
+                                                <div class="swiper-slide"><img src="/media/products/suatuoi.jpg" alt="DefaultWH" /></div>
+                                                <div class="swiper-slide"><img src="/media/products/coca.jpg" alt="DefaultWH" /></div>
+                                                <div class="swiper-slide"><img src="/media/products/kem.jpg" alt="DefaultWH" /></div>
+                                                `
+                                            }
                                         </div>
                                     </div>
                                     <div class="swiper swiper-thumbs" id="swiper-wh-thumbs">
                                         <div class="swiper-wrapper">
-                                            <div class="swiper-slide"><img src="/media/products/suatuoi.jpg" alt="Sua tuoi" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/coca.jpg" alt="Coca" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/kem.jpg" alt="Kem" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/migoi.jpg" alt="Mi" /></div>
-                                            <div class="swiper-slide"><img src="/media/products/bimbim.jpg" alt="Bimbim" /></div>
+                                            ${(props.hinhanh && props.hinhanh.length > 0) 
+                                                ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/' + img}" alt="WH Thumb" /></div>`).join('')
+                                                : `
+                                                <div class="swiper-slide"><img src="/media/products/suatuoi.jpg" alt="DefaultWHThumb" /></div>
+                                                <div class="swiper-slide"><img src="/media/products/coca.jpg" alt="DefaultWHThumb" /></div>
+                                                <div class="swiper-slide"><img src="/media/products/kem.jpg" alt="DefaultWHThumb" /></div>
+                                                `
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -942,6 +980,53 @@
         });
 
         // (Đã gỡ bỏ tính năng tìm kiếm nội bộ, sử dụng geocoder)
+    });
+
+    // Modal Image Upload Logic
+    function openUploadModal(id, type, name) {
+        document.getElementById('upload-target-id').value = id;
+        document.getElementById('upload-target-type').value = type;
+        document.getElementById('upload-target-name').innerText = name;
+        document.getElementById('image-upload-modal').style.display = 'flex';
+    }
+
+    function closeUploadModal() {
+        document.getElementById('image-upload-modal').style.display = 'none';
+        document.getElementById('upload-images-form').reset();
+    }
+
+    // Attach submit event directly to the form
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('upload-images-form').onsubmit = function(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('id', document.getElementById('upload-target-id').value);
+            formData.append('type', document.getElementById('upload-target-type').value);
+            
+            const fileInput = document.getElementById('image-files');
+            for (let i = 0; i < fileInput.files.length; i++) {
+                formData.append('images', fileInput.files[i]);
+            }
+
+            // Using fetch to submit
+            fetch('/api/upload-gis-images/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    alert('Tải ảnh thành công!');
+                    location.reload(); 
+                } else {
+                    alert('Lỗi: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Đã xảy ra lỗi khi tải lên!');
+            });
+        };
     });
 </script>
 {% endblock %}

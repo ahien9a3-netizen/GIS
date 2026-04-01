@@ -1,7 +1,7 @@
 from django.urls import path
 from .tool import store_geojson, store_heatmap, service_area, kho_geojson
 from .views import (
-    home, report_view, login_view, logout_view, settings_view, gis_map, inventory_stats,
+    home, report_view, login_view, logout_view, settings_view, gis_map, inventory_stats, upload_gis_images,
     CuaHangListView, CuaHangCreateView, CuaHangUpdateView, CuaHangDeleteView,
     SanPhamListView, SanPhamCreateView, SanPhamUpdateView, SanPhamDeleteView,
     DanhMucListView, DanhMucCreateView, DanhMucUpdateView, DanhMucDeleteView,
@@ -23,6 +23,7 @@ urlpatterns = [
     path('api/service-area/', service_area, name='service_area'),
     path('api/kho-geojson/', kho_geojson, name='kho_geojson'),
     path('api/inventory-stats/', inventory_stats, name='inventory_stats'),
+    path('api/upload-gis-images/', upload_gis_images, name='upload_gis_images'),
 
     # Cửa hàng
     path('stores/', CuaHangListView.as_view(), name='store_list'),

@@ -1,4 +1,5 @@
 from django.contrib.gis.db import models
+from django.contrib.postgres.fields import ArrayField
 # SẢN PHẨM
 class SanPham(models.Model):
     TRANG_THAI_CHOICES = [
@@ -35,6 +36,7 @@ class Kho(models.Model):
     Loai = models.CharField(max_length=50, choices=KHO_LOAI_CHOICES, db_column='loai')
     DiaChi = models.TextField(blank=True, null=True, db_column='diachi')
     Icon = models.CharField(max_length=20, blank=True, null=True, db_column='icon')
+    hinhanh = ArrayField(models.CharField(max_length=255), blank=True, null=True, db_column='hinhanh')
     geom = models.PointField(srid=4326, db_column='geom')
 
     class Meta:
@@ -67,6 +69,7 @@ class CuaHang(models.Model):
     Icon = models.CharField(max_length=20, blank=True, null=True, db_column='icon')
     DiaChi = models.TextField(blank=True, null=True, db_column='diachi')
     SDT = models.CharField(max_length=20, blank=True, null=True, db_column='sdt')
+    hinhanh = ArrayField(models.CharField(max_length=255), blank=True, null=True, db_column='hinhanh')
     TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, db_column='trangthai')
     geom = models.PointField(srid=4326, db_column='geom')
 
