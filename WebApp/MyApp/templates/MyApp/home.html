@@ -193,34 +193,34 @@
 
 {% block content %}
 <div class="page-header">
-    <h1>Bán Đồ Tổng Quan Mạng Lưới</h1>
-    <p>Giám sát trực tuyến hệ thống Cửa hàng và Kho vận</p>
+    <h1 data-aos="fade-down">Bán Đồ Tổng Quan Mạng Lưới</h1>
+    <p data-aos="fade-down" data-aos-delay="100">Giám sát trực tuyến hệ thống Cửa hàng và Kho vận</p>
 </div>
 
 
 <div class="stats-grid">
-    <div class="stat-card stat-card-blue">
+    <div class="stat-card stat-card-blue" data-aos="fade-up" data-aos-delay="200">
         <div class="stat-icon"><i class="fa-solid fa-store"></i></div>
         <div class="stat-content">
             <div class="stat-label">Cửa hàng</div>
             <div class="stat-value">{{ total_stores }}</div>
         </div>
     </div>
-    <div class="stat-card stat-card-green">
+    <div class="stat-card stat-card-green" data-aos="fade-up" data-aos-delay="300">
         <div class="stat-icon"><i class="fa-solid fa-warehouse"></i></div>
         <div class="stat-content">
             <div class="stat-label">Kho hàng</div>
             <div class="stat-value">{{ total_warehouses }}</div>
         </div>
     </div>
-    <div class="stat-card stat-card-purple">
+    <div class="stat-card stat-card-purple" data-aos="fade-up" data-aos-delay="400">
         <div class="stat-icon"><i class="fa-solid fa-box"></i></div>
         <div class="stat-content">
             <div class="stat-label">Sản phẩm</div>
             <div class="stat-value">{{ total_products }}</div>
         </div>
     </div>
-    <div class="stat-card stat-card-cyan">
+    <div class="stat-card stat-card-cyan" data-aos="fade-up" data-aos-delay="500">
         <div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
         <div class="stat-content">
             <div class="stat-label">Tồn kho</div>
@@ -231,7 +231,7 @@
 
 <div class="dashboard-grid">
     
-    <div class="dashboard-col-left">
+    <div class="dashboard-col-left" data-aos="fade-right" data-aos-delay="600">
         <div class="map-card">
             <div class="map-container">
                 <div id="map-display"></div>
@@ -276,7 +276,7 @@
     </div>
 
     
-    <div class="dashboard-col-right">
+    <div class="dashboard-col-right" data-aos="fade-left" data-aos-delay="600">
         
         <div class="compact-list-card">
             <div class="card-header">

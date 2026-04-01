@@ -8,6 +8,7 @@
     <title>Đăng nhập | SMART MART</title>
     <link rel="icon" type="image/png" href="{% static 'MyApp/favicon.png' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <style>
         :root {
             --primary: #3b82f6;
@@ -148,7 +149,7 @@
 </head>
 
 <body>
-    <div class="login-container">
+    <div class="login-container" data-aos="zoom-in" data-aos-duration="1000">
         <div class="login-header">
             <div class="login-logo">
                 <i class="fa-solid fa-cart-shopping"></i>
@@ -189,6 +190,10 @@
             Liên hệ quản trị viên nếu bạn quên mật khẩu.
         </div>
     </div>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init();
+    </script>
 </body>
 
 </html>

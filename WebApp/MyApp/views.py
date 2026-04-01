@@ -1,6 +1,9 @@
 from django import forms
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.storage import FileSystemStorage
+import os
 
 
 from django.db.models import Count, Sum
@@ -292,6 +295,7 @@ class CuaHangListView(SidebarContextMixin, ListView):
     context_object_name = 'stores'
     sidebar_active = 'stores'
     page_title = 'Quản lý Cửa hàng'
+    paginate_by = 10
 
 class CuaHangCreateView(SidebarContextMixin, CreateView):
     model = CuaHang
@@ -320,6 +324,7 @@ class SanPhamListView(SidebarContextMixin, ListView):
     context_object_name = 'products'
     sidebar_active = 'products'
     page_title = 'Quản lý Sản phẩm'
+    paginate_by = 10
 
 class SanPhamCreateView(SidebarContextMixin, CreateView):
     model = SanPham
@@ -346,6 +351,7 @@ class DanhMucListView(SidebarContextMixin, ListView):
     context_object_name = 'categories'
     sidebar_active = 'categories'
     page_title = 'Quản lý Danh mục'
+    paginate_by = 10
 
 class DanhMucCreateView(SidebarContextMixin, CreateView):
     model = DanhMuc
@@ -374,6 +380,7 @@ class HangTonKhoListView(SidebarContextMixin, ListView):
     context_object_name = 'inventory'
     sidebar_active = 'inventory'
     page_title = 'Quản lý Tồn kho'
+    paginate_by = 10
 
 class HangTonKhoCreateView(SidebarContextMixin, CreateView):
     model = HangTonKho
@@ -409,6 +416,7 @@ class KhoListView(SidebarContextMixin, ListView):
     context_object_name = 'warehouses'
     sidebar_active = 'warehouses'
     page_title = 'Quản lý Kho hàng'
+    paginate_by = 10
 
 class KhoCreateView(SidebarContextMixin, CreateView):
     model = Kho
@@ -435,6 +443,7 @@ class NhanVienListView(SidebarContextMixin, ListView):
     context_object_name = 'employees'
     sidebar_active = 'employees'
     page_title = 'Quản lý Nhân viên'
+    paginate_by = 10
     required_roles = ['Admin']
 
 class NhanVienCreateView(SidebarContextMixin, CreateView):
@@ -465,6 +474,7 @@ class StockInListView(SidebarContextMixin, ListView):
     context_object_name = 'requests'
     sidebar_active = 'stock_in'
     page_title = 'Yêu cầu Nhập kho'
+    paginate_by = 10
     required_roles = ['Admin', 'Kế Toán']
 
 class StockInCreateView(SidebarContextMixin, CreateView):
@@ -497,3 +507,40 @@ class StockInDeleteView(SidebarContextMixin, DeleteView):
     model = YeuCauNhapKho
     success_url = reverse_lazy('stock_in_list')
     required_roles = ['Admin', 'Kế Toán']
+
+@csrf_exempt
+def upload_gis_images(request):
+    if request.method == 'POST':
+        target_id = request.POST.get('id')
+        target_type = request.POST.get('type') # 'store' hoặc 'warehouse'
+        files = request.FILES.getlist('images')
+        
+        if not target_id or not target_type:
+            return JsonResponse({'success': False, 'message': 'Thiếu ID hoặc Type'}, status=400)
+            
+        instance = None
+        upload_path = 'store/' if target_type == 'store' else 'warehouse/'
+        
+        if target_type == 'store':
+            instance = get_object_or_404(CuaHang, MaCH=target_id)
+        else:
+            instance = get_object_or_404(Kho, MaKho=target_id)
+            
+        fs = FileSystemStorage(location=os.path.join('media', upload_path))
+        
+        if instance.hinhanh is None:
+            instance.hinhanh = []
+            
+        new_paths = list(instance.hinhanh) # Clone array
+        
+        for f in files:
+            filename = fs.save(f.name, f)
+            # Lưu đường dẫn tương đối để frontend dễ truy cập
+            new_paths.append(f'{upload_path}{filename}')
+            
+        instance.hinhanh = new_paths
+        instance.save()
+        
+        return JsonResponse({'success': True, 'paths': new_paths})
+        
+    return JsonResponse({'success': False, 'message': 'Method not allowed'}, status=405)
