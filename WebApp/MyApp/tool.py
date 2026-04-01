@@ -21,7 +21,8 @@ def store_geojson(request):
                     "address": store.DiaChi,
                     "phone": store.SDT or 'N/A',
                     "status": store.TrangThai,
-                    "type": store.Loai
+                    "type": store.Loai,
+                    "hinhanh": store.hinhanh
                 },
                 "geometry": {
                     "type": "Point",
@@ -91,7 +92,7 @@ def kho_geojson(request):
         if wh.geom:
             features.append({
                 "type": "Feature",
-                "properties": {"id": wh.MaKho, "name": wh.Ten, "address": wh.DiaChi, "type": wh.Loai},
+                "properties": {"id": wh.MaKho, "name": wh.Ten, "address": wh.DiaChi, "type": wh.Loai, "hinhanh": wh.hinhanh},
                 "geometry": {"type": "Point", "coordinates": [wh.geom.x, wh.geom.y]}
             })
     return JsonResponse({"type": "FeatureCollection", "features": features})

@@ -3,6 +3,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 <style>
     #map-picker {
         height: 350px;
@@ -81,6 +82,7 @@
 
 {% block extra_js %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var defaultLat = 10.7769;
@@ -102,6 +104,30 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
+
+        // Thêm thanh tìm kiếm tọa độ (Geocoder)
+        L.Control.geocoder({
+            defaultMarkGeocode: false,
+            placeholder: "Tìm kiếm để ghim... (VD: Landmark 81)"
+        })
+            .on('markgeocode', function (e) {
+                var latlng = e.geocode.center;
+                var lat = latlng.lat.toFixed(6);
+                var lng = latlng.lng.toFixed(6);
+
+                map.setView(latlng, 16);
+
+                if (marker) {
+                    marker.setLatLng(latlng);
+                } else {
+                    marker = L.marker(latlng).addTo(map);
+                }
+                marker.bindPopup(e.geocode.name).openPopup();
+
+                geomInput.value = 'SRID=4326;POINT(' + lng + ' ' + lat + ')';
+                document.getElementById('coords-display').innerText = lat + ', ' + lng;
+            })
+            .addTo(map);
 
         if (geomValue) {
             marker = L.marker([defaultLat, defaultLng]).addTo(map);

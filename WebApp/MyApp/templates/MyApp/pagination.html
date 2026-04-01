@@ -1,0 +1,31 @@
+{% if is_paginated %}
+<div class="pagination-container" data-aos="fade-up">
+    {% if page_obj.has_previous %}
+    <a href="?page=1" class="pagination-link" title="Trang đầu">
+        <i class="fa-solid fa-angles-left"></i>
+    </a>
+    <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link" title="Trang trước">
+        <i class="fa-solid fa-chevron-left"></i>
+    </a>
+    {% else %}
+    <span class="pagination-link disabled"><i class="fa-solid fa-angles-left"></i></span>
+    <span class="pagination-link disabled"><i class="fa-solid fa-chevron-left"></i></span>
+    {% endif %}
+
+    <span class="pagination-info">
+        Trang <strong>{{ page_obj.number }}</strong> / {{ page_obj.paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}" class="pagination-link" title="Trang sau">
+        <i class="fa-solid fa-chevron-right"></i>
+    </a>
+    <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link" title="Trang cuối">
+        <i class="fa-solid fa-angles-right"></i>
+    </a>
+    {% else %}
+    <span class="pagination-link disabled"><i class="fa-solid fa-chevron-right"></i></span>
+    <span class="pagination-link disabled"><i class="fa-solid fa-angles-right"></i></span>
+    {% endif %}
+</div>
+{% endif %}
