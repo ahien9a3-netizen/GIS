@@ -1,5 +1,7 @@
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
+from django.core.exceptions import ValidationError
+from ckeditor.fields import RichTextField
 # SẢN PHẨM
 class SanPham(models.Model):
     TRANG_THAI_CHOICES = [
@@ -38,6 +40,7 @@ class Kho(models.Model):
     Icon = models.CharField(max_length=20, blank=True, null=True, db_column='icon')
     hinhanh = ArrayField(models.CharField(max_length=255), blank=True, null=True, db_column='hinhanh')
     geom = models.PointField(srid=4326, db_column='geom')
+    MoTa = RichTextField(blank=True, null=True, db_column='mota', verbose_name="Mô tả")
 
     class Meta:
         managed = True
@@ -47,6 +50,20 @@ class Kho(models.Model):
 
     def __str__(self):
         return f"{self.MaKho} - {self.Ten}"
+
+    def clean(self):
+        # Kiểm tra khoảng cách tối thiểu 2 mét (xấp xỉ 0.00002 độ)
+        min_dist = 0.00002
+        
+        # Kiểm tra với các kho khác
+        other_wh = Kho.objects.exclude(MaKho=self.MaKho).filter(geom__dwithin=(self.geom, min_dist))
+        if other_wh.exists():
+            raise ValidationError(f"Tọa độ này quá gần với kho '{other_wh.first().Ten}'. Vui lòng chọn vị trí khác (cách ít nhất 2m).")
+            
+        # Kiểm tra với các cửa hàng
+        nearby_stores = CuaHang.objects.filter(geom__dwithin=(self.geom, min_dist))
+        if nearby_stores.exists():
+            raise ValidationError(f"Tọa độ này quá gần với cửa hàng '{nearby_stores.first().Ten}'. Vui lòng chọn vị trí khác (cách ít nhất 2m).")
 
 
 #  CỬA HÀNG 
@@ -72,6 +89,7 @@ class CuaHang(models.Model):
     hinhanh = ArrayField(models.CharField(max_length=255), blank=True, null=True, db_column='hinhanh')
     TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, db_column='trangthai')
     geom = models.PointField(srid=4326, db_column='geom')
+    MoTa = RichTextField(blank=True, null=True, db_column='mota', verbose_name="Mô tả")
 
     class Meta:
         managed = True
@@ -81,6 +99,20 @@ class CuaHang(models.Model):
 
     def __str__(self):
         return f"{self.MaCH} - {self.Ten}"
+
+    def clean(self):
+        # Kiểm tra khoảng cách tối thiểu 2 mét (xấp xỉ 0.00002 độ)
+        min_dist = 0.00002
+        
+        # Kiểm tra với các cửa hàng khác
+        other_st = CuaHang.objects.exclude(MaCH=self.MaCH).filter(geom__dwithin=(self.geom, min_dist))
+        if other_st.exists():
+            raise ValidationError(f"Tọa độ này quá gần với cửa hàng '{other_st.first().Ten}'. Vui lòng chọn vị trí khác (cách ít nhất 2m).")
+            
+        # Kiểm tra với các kho hàng
+        nearby_wh = Kho.objects.filter(geom__dwithin=(self.geom, min_dist))
+        if nearby_wh.exists():
+            raise ValidationError(f"Tọa độ này quá gần với kho '{nearby_wh.first().Ten}'. Vui lòng chọn vị trí khác (cách ít nhất 2m).")
 
 
 #  NHÂN VIÊN 
@@ -96,6 +128,7 @@ class NhanVien(models.Model):
     MaNV = models.CharField(max_length=20, primary_key=True, db_column='manv')
     Ten = models.CharField(max_length=255, db_column='ten')
     SDT = models.CharField(max_length=20, blank=True, null=True, db_column='sdt')
+    Email = models.EmailField(max_length=255, blank=True, null=True, db_column='email')
     MatKhau = models.TextField(db_column='matkhau')
     Role = models.CharField(max_length=50, choices=ROLE_CHOICES, db_column='role')
 
@@ -191,7 +224,6 @@ class NhapKhoChiTiet(models.Model):
 class DanhMuc(models.Model):
     MaDM = models.CharField(max_length=20, primary_key=True, db_column='madm')
     Ten = models.CharField(max_length=255, db_column='tendm')
-    MoTa = models.TextField(blank=True, null=True, db_column='mota')
 
     class Meta:
         managed = True

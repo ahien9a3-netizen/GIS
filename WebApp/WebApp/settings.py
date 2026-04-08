@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.gis', 
     'django.contrib.postgres', 
     'MyApp',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'MyApp.middleware.CustomErrorMiddleware',
 ]
 
 ROOT_URLCONF = 'WebApp.urls'
@@ -145,3 +147,13 @@ STATIC_URL = 'static/'
 # Media files (User uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Email Config for Mailtrap
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = '7c13cd7cd67989'
+EMAIL_HOST_PASSWORD = '367022c4ce40e1'
+EMAIL_PORT = '2525'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'support@smartmart.com'
+

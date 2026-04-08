@@ -1,0 +1,426 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    :root {
+        --accent-warehouse: #10b981;
+        --accent-warehouse-soft: rgba(16, 185, 129, 0.1);
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.3);
+    }
+
+    .detail-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 1rem;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 2rem;
+        min-width: 0;
+    }
+
+    .main-grid > div {
+        min-width: 0;
+    }
+
+    @media (max-width: 1024px) {
+        .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Visual Side */
+    .gallery-card {
+        background: white;
+        border-radius: 30px;
+        padding: 1.5rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        border: 1px solid var(--gray-100);
+        height: min-content;
+    }
+
+    .swiper-main {
+        width: 100%;
+        max-width: 100%;
+        height: 450px;
+        border-radius: 20px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow-md);
+        background: #f8fafc;
+        position: relative;
+    }
+
+    .swiper-main img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .swiper-thumbs {
+        height: 90px;
+        width: 100%;
+    }
+
+    .swiper-thumbs .swiper-slide {
+        width: 120px !important;
+        height: 80px !important;
+        opacity: 0.4;
+        cursor: pointer;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        flex-shrink: 0;
+    }
+
+    .swiper-thumbs .swiper-slide-thumb-active {
+        opacity: 1;
+        border-color: var(--accent-warehouse);
+        transform: translateY(-2px);
+    }
+
+    .swiper-thumbs img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Info Side */
+    .info-pane {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .info-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 30px;
+        padding: 2.5rem;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.25rem;
+        background: #ecfdf5;
+        color: #10b981;
+        border-radius: 100px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+    }
+
+    .store-name {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        line-height: 1.1;
+    }
+
+    .store-type {
+        font-size: 1.25rem;
+        color: var(--accent-warehouse);
+        font-weight: 600;
+        margin-bottom: 2rem;
+        display: block;
+    }
+
+    .detail-list {
+        display: grid;
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        padding: 1.25rem;
+        background: rgba(255,255,255,0.5);
+        border-radius: 20px;
+        border: 1px solid var(--gray-50);
+        transition: all 0.2s;
+    }
+
+    .icon-box {
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: var(--accent-warehouse);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .text-box label {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--gray-400);
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .text-box p {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #334155;
+        margin: 0;
+    }
+
+    /* Map */
+    .map-card {
+        background: white;
+        border-radius: 30px;
+        overflow: hidden;
+        height: 250px;
+        position: relative;
+        box-shadow: var(--shadow-md);
+    }
+
+    #mini-map-wh { width: 100%; height: 100%; }
+
+    .map-overlay {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        z-index: 1000;
+    }
+
+    .btn-full-map {
+        background: #0ea5e9;
+        color: white;
+        padding: 0.75rem 1.25rem;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
+    }
+
+    .button-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-main {
+        padding: 1.1rem;
+        border-radius: 18px;
+        font-weight: 700;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s;
+    }
+
+    .btn-edit { background: var(--dark); color: white; }
+    .btn-back { background: white; color: var(--gray-600); border: 1.5px solid var(--gray-200); }
+
+    .empty-state {
+        height: 450px;
+        background: #f8fafc;
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-300);
+        border: 2px dashed #e2e8f0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <div class="main-grid">
+        
+        <div class="left-col" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="gallery-card">
+                {% if wh.hinhanh %}
+                    <div class="swiper swiper-main" id="main-gal-wh">
+                        <div class="swiper-wrapper">
+                            {% for img in wh.hinhanh %}
+                                <div class="swiper-slide">
+                                    <img src="{% if 'http' in img %}{{ img }}{% elif '/' in img %}/media/{{ img }}{% else %}/media/warehouse/{{ img }}{% endif %}" 
+                                         alt="{{ wh.Ten }}"
+                                         onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop';">
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                    {% if wh.hinhanh|length > 1 %}
+                    <div class="swiper swiper-thumbs" id="thumb-gal-wh">
+                        <div class="swiper-wrapper">
+                            {% for img in wh.hinhanh %}
+                                <div class="swiper-slide">
+                                    <img src="{% if 'http' in img %}{{ img }}{% elif '/' in img %}/media/{{ img }}{% else %}/media/warehouse/{{ img }}{% endif %}" 
+                                         alt="Thumb" 
+                                         style="width:100%; height:100%; object-fit:cover;"
+                                         onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop';">
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fa-solid fa-warehouse fa-5x" style="opacity: 0.1; margin-bottom: 2rem;"></i>
+                        <p style="font-weight: 700;">Chưa cập nhật hình ảnh</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="map-card">
+                <div id="mini-map-wh"></div>
+                <div class="map-overlay">
+                    <a href="{% url 'gis_map' %}?id={{ wh.MaKho }}&type=warehouse" class="btn-full-map">
+                        <i class="fa-solid fa-maximize"></i> Mở rộng bản đồ
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-pane">
+            <div class="info-card">
+                <div class="status-badge">
+                    <i class="fa-solid fa-warehouse"></i> {{ wh.Loai }}
+                </div>
+                
+                <h1 class="store-name">{{ wh.Ten }}</h1>
+                <span class="store-type">Hệ thống Logistic • ID #{{ wh.MaKho }}</span>
+
+                <div class="detail-list">
+                    <div class="detail-item">
+                        <div class="icon-box"><i class="fa-solid fa-map-location-dot"></i></div>
+                        <div class="text-box">
+                            <label>Địa điểm</label>
+                            <p>{{ wh.DiaChi|default:"Chưa có thông tin" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="icon-box" style="color: #6366f1; background: #eef2ff;"><i class="fa-solid fa-box-open"></i></div>
+                        <div class="text-box">
+                            <label>Quản lý tồn kho</label>
+                            <p>Tự động hóa toàn phần</p>
+                        </div>
+                    </div>
+
+                    {% if wh.geom %}
+                    <div class="detail-item">
+                        <div class="icon-box" style="color: #f59e0b; background: #fffbeb;"><i class="fa-solid fa-compass"></i></div>
+                        <div class="text-box">
+                            <label>Lat, Lng</label>
+                            <p style="font-family: monospace;">{{ wh.geom.y|floatformat:6 }}, {{ wh.geom.x|floatformat:6 }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="detail-item" style="align-items: flex-start;">
+                        <div class="icon-box" style="color: #ec4899; background: #fdf2f8;"><i class="fa-solid fa-circle-info"></i></div>
+                        <div class="text-box">
+                            <label>Thông tin mô tả</label>
+                            <p style="font-weight: 500; line-height: 1.6; color: #475569;">{{ wh.MoTa|default:"Chưa có thông tin mô tả cho kho hàng này."|safe }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <a href="{% url 'kho_list' %}" class="btn-main btn-back">
+                        <i class="fa-solid fa-chevron-left"></i> Quay lại
+                    </a>
+                    <a href="{% url 'kho_edit' wh.pk %}" class="btn-main btn-edit">
+                        <i class="fa-solid fa-sliders"></i> Chỉnh sửa
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('thumb-gal-wh')) {
+            const swiperThumbs = new Swiper('#thumb-gal-wh', {
+                spaceBetween: 10,
+                slidesPerView: 'auto',
+                freeMode: true,
+                watchSlidesProgress: true,
+            });
+
+            new Swiper('#main-gal-wh', {
+                loop: true,
+                observer: true,
+                observeParents: true,
+                watchOverflow: true,
+                spaceBetween: 10,
+                navigation: {
+                    nextEl: '.swiper-button-next',
+                    prevEl: '.swiper-button-prev',
+                },
+                autoplay: { delay: 5000, disableOnInteraction: false },
+                thumbs: { swiper: swiperThumbs },
+                grabCursor: true,
+                keyboard: { enabled: true },
+            });
+        }
+
+        {% if wh.geom %}
+        var lat = {{ wh.geom.y }};
+        var lng = {{ wh.geom.x }};
+        var map = L.map('mini-map-wh', {
+            zoomControl: false,
+            attributionControl: false,
+            scrollWheelZoom: false,
+            dragging: false
+        }).setView([lat, lng], 16);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; CartoDB'
+        }).addTo(map);
+
+        var customIcon = L.divIcon({
+            className: 'custom-div-icon',
+            html: "<div style='background-color:#10b981; width:20px; height:20px; border-radius:50%; border:4px solid white; box-shadow:0 0 10px rgba(0,0,0,0.3);'></div>",
+            iconSize: [20, 20],
+            iconAnchor: [10, 10]
+        });
+
+        L.marker([lat, lng], {icon: customIcon}).addTo(map);
+        {% endif %}
+    });
+</script>
+{% endblock %}

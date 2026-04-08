@@ -1285,3 +1285,156 @@ ul {
         display: none;
     }
 }
+
+/* ==================== RESPONSIVE ==================== */
+
+/* --- Tablet (max 1024px) --- */
+@media (max-width: 1024px) {
+    .charts-row {
+        grid-template-columns: 1fr;
+    }
+
+    .stores-inventory-row {
+        grid-template-columns: 1fr;
+    }
+
+    .map-orders-row {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 0.75rem 0.75rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* --- Mobile (max 768px) --- */
+@media (max-width: 768px) {
+
+    /* Sidebar thu gọn hoàn toàn, chỉ hiện icon */
+    .sidebar {
+        width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar-logo span,
+    .sidebar-item span {
+        display: none;
+    }
+
+    .sidebar-toggle {
+        display: none;
+    }
+
+    /* Nội dung dịch sang phải tương ứng */
+    .main-content {
+        margin-left: var(--sidebar-collapsed-width);
+    }
+
+    /* Header thu gọn */
+    .dashboard-header {
+        padding: 0 1rem;
+    }
+
+    .header-search {
+        max-width: 180px;
+    }
+
+    /* Page content giảm padding */
+    .page-content {
+        padding: 1rem;
+    }
+
+    /* Các card lưới thành 1 cột */
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .charts-row,
+    .stores-inventory-row,
+    .map-orders-row {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    /* Bảng cuộn ngang */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .data-table {
+        min-width: 600px;
+    }
+
+    /* Page header giảm cỡ chữ */
+    .page-header h1 {
+        font-size: 1.4rem;
+    }
+
+    /* Nút hành động xếp dọc */
+    .table-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    /* Footer đơn cột */
+    .footer-content {
+        grid-template-columns: 1fr !important;
+        gap: 1.5rem;
+    }
+
+    /* Bản đồ chiều cao giảm xuống vừa màn hình */
+    .map-main-container {
+        height: 350px;
+    }
+
+    .map-container {
+        height: 300px;
+    }
+}
+
+/* --- Mobile nhỏ (max 480px) --- */
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    /* Header search ẩn trên mobile nhỏ để tránh chật */
+    .header-search {
+        display: none;
+    }
+
+    .dashboard-header {
+        justify-content: flex-end;
+    }
+
+    .page-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .btn {
+        padding: 0.5rem 0.9rem;
+        font-size: 0.8rem;
+    }
+
+    /* Toolbar bảng wrap xuống dòng */
+    .toolbar {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+}

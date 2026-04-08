@@ -3,57 +3,236 @@
 
 {% block content %}
 <div class="page-header">
-    <h1>Yêu cầu Nhập kho</h1>
-    <p>Chi tiết lệnh nhập hàng</p>
+    <h1>{{ page_title }}</h1>
+    <p>Quản lý thông tin phiếu và danh sách hàng hóa đi kèm</p>
 </div>
 
-<div class="chart-card" style="max-width: 800px; margin: 0 auto;">
-    <div class="chart-header">
-        <h3><i class="fa-solid fa-file-invoice"></i> Thông tin phiếu nhập</h3>
-    </div>
-    <div style="padding: 2rem;">
-        <form method="post">
-            {% csrf_token %}
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
-                {% for field in form %}
-                <div
-                    style="display: flex; flex-direction: column; gap: 0.5rem; {% if field.name == 'GhiChu' %}grid-column: span 2;{% endif %}">
-                    <label style="font-weight: 600; font-size: 0.875rem;">{{ field.label }}</label>
-                    <div>
+<form method="post" id="stock-in-form">
+    {% csrf_token %}
+    
+    <div style="display: grid; grid-template-columns: 1fr; gap: 2rem;">
+        
+        <!-- PHẦN 1: THÔNG TIN PHIẾU -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fa-solid fa-file-invoice"></i> 1. Thông tin phiếu nhập</h3>
+            </div>
+            <div style="padding: 2rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                    {% for field in form %}
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; {% if field.name == 'GhiChu' %}grid-column: span 2;{% endif %}">
+                        <label style="font-weight: 600; font-size: 0.875rem;">
+                            {% if field.name == 'MaYC' %}Mã yêu cầu
+                            {% elif field.name == 'Ngay' %}Ngày tạo
+                            {% elif field.name == 'TrangThai' %}Trạng thái
+                            {% elif field.name == 'GhiChu' %}Ghi chú
+                            {% elif field.name == 'MaNV' %}Nhân viên thực hiện
+                            {% else %}{{ field.label }}{% endif %}
+                        </label>
                         {{ field }}
+                        {% if field.errors %}
+                        <div style="color: var(--danger); font-size: 0.75rem;">{{ field.errors }}</div>
+                        {% endif %}
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
+        </div>
 
-            <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
-                <a href="{% url 'stock_in_list' %}" class="leaflet-analysis-btn"
-                    style="background: var(--gray-400); text-decoration: none;">Hủy</a>
-                <button type="submit" class="leaflet-analysis-btn">Lưu phiếu nhập</button>
+        <!-- PHẦN 2: DANH SÁCH SẢN PHẨM (FORMSET) -->
+        <div class="chart-card">
+            <div style="padding: 1rem;">
+                {{ product_formset.management_form }}
+                <div style="margin-bottom: 1rem; display: flex; justify-content: flex-end;">
+                    <button type="button" id="add-item" class="btn-add-secondary">
+                        <i class="fa-solid fa-plus-circle"></i> Thêm sản phẩm mới
+                    </button>
+                </div>
+                <table class="data-table" id="product-table" style="width: 100%;">
+                    <thead>
+                        <tr style="text-align: left; background: var(--gray-50);">
+                            <th style="padding: 1rem;">Sản phẩm</th>
+                            <th style="padding: 1rem;">Kho nhập</th>
+                            <th style="padding: 1rem;">Số lượng</th>
+                            <th style="padding: 1rem; width: 50px;">Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="formset-container">
+                        {% for form_item in product_formset %}
+                        <tr class="formset-row" style="border-bottom: 1px solid var(--gray-100);">
+                            {% for hidden in form_item.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                            <td style="padding: 0.75rem;">{{ form_item.MaSP }}</td>
+                            <td style="padding: 0.75rem;">{{ form_item.MaKho }}</td>
+                            <td style="padding: 0.75rem;">{{ form_item.SoLuong }}</td>
+                            <td style="padding: 0.75rem; text-align: center;">
+                                {% if product_formset.can_delete %}
+                                    {{ form_item.DELETE }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <!-- Template cho dòng mới (để JS copy) -->
+                <div id="empty-form" style="display: none;">
+                    <tr class="formset-row" style="border-bottom: 1px solid var(--gray-100);">
+                        <td style="padding: 0.75rem;">{{ product_formset.empty_form.MaSP }}</td>
+                        <td style="padding: 0.75rem;">{{ product_formset.empty_form.MaKho }}</td>
+                        <td style="padding: 0.75rem;">{{ product_formset.empty_form.SoLuong }}</td>
+                        <td style="padding: 0.75rem; text-align: center;">
+                             <!-- Ô checkbox xóa ẩn -->
+                        </td>
+                    </tr>
+                </div>
             </div>
-        </form>
+        </div>
     </div>
-</div>
+
+    <!-- Nút điều hướng -->
+    <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end; padding-bottom: 3rem;">
+        <a href="{% url 'stock_in_list' %}" class="btn-cancel-custom" style="text-decoration: none;">
+            <i class="fa-solid fa-xmark"></i> Hủy bỏ
+        </a>
+        <button type="submit" class="btn-save-custom">
+            <div class="inner-btn">
+                <i class="fa-solid fa-floppy-disk"></i> 
+                <span>Lưu toàn bộ thông tin</span>
+            </div>
+            <div class="btn-shine"></div>
+        </button>
+    </div>
+</form>
 
 <style>
-    input,
-    select,
-    textarea {
+    /* Styling chung cho các nút mới */
+    .btn-add-secondary {
+        background: white;
+        color: var(--primary);
+        border: 2px solid var(--primary);
+        padding: 0.6rem 1.25rem;
+        border-radius: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .btn-add-secondary:hover {
+        background: var(--primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-cancel-custom {
+        padding: 0.85rem 1.75rem;
+        border-radius: 12px;
+        font-weight: 700;
+        color: #64748b;
+        border: 2px solid #e2e8f0;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.95rem;
+    }
+
+    .btn-cancel-custom:hover {
+        background: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #1e293b;
+        transform: translateY(-2px);
+    }
+
+    .btn-save-custom {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+        border: none;
+        padding: 0.85rem 2.5rem;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-save-custom:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.45);
+        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    }
+
+    .inner-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .btn-shine {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: all 0.6s;
+    }
+
+    .btn-save-custom:hover .btn-shine {
+        left: 100%;
+    }
+
+    input, select, textarea {
         width: 100%;
         padding: 0.75rem 1rem;
         border: 1px solid var(--gray-200);
         border-radius: 8px;
         font-size: 0.875rem;
-        background: var(--gray-50);
+        background: white;
         transition: all 0.2s;
     }
-
-    input:focus,
-    select:focus,
-    textarea:focus {
-        outline: none;
+    input:focus, select:focus, textarea:focus {
         border-color: var(--primary);
-        background: white;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        outline: none;
     }
+    .data-table th { font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase; }
+    
+    /* CSS cho checkbox DELETE của Django */
+    input[type="checkbox"] { width: auto; }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addButton = document.getElementById('add-item');
+        const container = document.getElementById('formset-container');
+        const totalForms = document.getElementById('id_nhapkhochitiet_set-TOTAL_FORMS');
+        const emptyFormHtml = document.getElementById('empty-form').innerHTML;
+
+        addButton.addEventListener('click', function() {
+            const formCount = parseInt(totalForms.value);
+            // Replace __prefix__ with the correct index
+            const newRowHtml = emptyFormHtml.replace(/__prefix__/g, formCount);
+            
+            // Create a temporary table body to hold the new row
+            const tbody = document.createElement('tbody');
+            tbody.innerHTML = newRowHtml;
+            const newRow = tbody.querySelector('tr');
+            
+            container.appendChild(newRow);
+            totalForms.value = formCount + 1;
+        });
+    });
+</script>
 {% endblock %}

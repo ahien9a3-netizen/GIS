@@ -2,6 +2,68 @@
 {% load static %}
 
 {% block content %}
+<style>
+    .filter-bar {
+        display: flex;
+        gap: 1rem;
+        background: white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex: 1;
+        min-width: 200px;
+    }
+    .filter-group label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+    .filter-input {
+        padding: 0.6rem 1rem;
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        font-size: 0.9rem;
+        outline: none;
+        transition: all 0.2s;
+    }
+    .filter-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .btn-filter {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-clear {
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border: none;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+    }
+</style>
+
 <div class="page-header">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <div>
@@ -13,6 +75,28 @@
         </a>
     </div>
 </div>
+
+<form method="get" class="filter-bar">
+    <div class="filter-group">
+        <label>Tìm kiếm</label>
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Tên, SDT hoặc mã..." class="filter-input">
+    </div>
+    <div class="filter-group">
+        <label>Chức vụ</label>
+        <select name="role" class="filter-input">
+            <option value="">-- Tất cả --</option>
+            {% for choice in role_choices %}
+            <option value="{{ choice }}" {% if request.GET.role == choice %}selected{% endif %}>{{ choice }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn-filter">
+        <i class="fa-solid fa-magnifying-glass"></i> Tìm
+    </button>
+    {% if request.GET.q or request.GET.role %}
+    <a href="{% url 'nhanvien_list' %}" class="btn-clear">Xóa lọc</a>
+    {% endif %}
+</form>
 
 <div class="chart-card" style="padding: 1rem;">
     <table class="crud-table" style="width: 100%; border-collapse: collapse;">
