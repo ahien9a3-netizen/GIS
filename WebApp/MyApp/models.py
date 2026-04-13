@@ -9,7 +9,7 @@ class SanPham(models.Model):
 
     MaSP = models.CharField(max_length=20, primary_key=True, db_column='masp')
     Ten = models.CharField(max_length=255, db_column='ten')
-    Image = models.ImageField(upload_to='products/', blank=True, null=True, db_column='image')
+    Image = models.ImageField(upload_to='products/',max_length=255, blank=True, null=True, db_column='image')
     DanhMuc = models.ForeignKey('DanhMuc', on_delete=models.SET_NULL, blank=True, null=True, db_column='danhmuc')
     MieuTa = models.TextField(blank=True, null=True, db_column='mieuta')
     TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, db_column='trangthai')
