@@ -17,7 +17,12 @@
             <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 {% for field in form %}
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                    <label style="font-weight: 600; font-size: 0.875rem;">{{ field.label }}</label>
+                    <label style="font-weight: 600; font-size: 0.875rem;">
+                        {% if field.name == 'MaKho' %}Chọn kho hàng
+                        {% elif field.name == 'MaSP' %}Chọn sản phẩm
+                        {% elif field.name == 'SoLuong' %}Số lượng tồn
+                        {% else %}{{ field.label }}{% endif %}
+                    </label>
                     <div class="custom-input-wrapper">
                         {{ field }}
                     </div>

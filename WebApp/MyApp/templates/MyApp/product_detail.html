@@ -1,0 +1,234 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .product-detail-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .image-section {
+        background: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem;
+        border-right: 1px solid #f1f5f9;
+        position: relative;
+    }
+
+    .product-image-large {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        transition: transform 0.3s;
+    }
+
+    .product-image-large:hover {
+        transform: scale(1.05);
+    }
+
+    .details-section {
+        padding: 3rem;
+    }
+
+    .category-tag {
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 1.5rem;
+        display: inline-block;
+    }
+
+    .data-row {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        padding: 1.25rem 0;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .label-text {
+        font-weight: 600;
+        color: var(--gray-400);
+        font-size: 0.875rem;
+        text-transform: uppercase;
+    }
+
+    .value-text {
+        color: #1e293b;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .desc-box {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #f8fafc;
+        border-radius: 12px;
+        border-left: 4px solid var(--primary);
+    }
+
+    .btn-action-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 3rem;
+    }
+</style>
+
+<div class="page-header" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+    <a href="{% url 'product_list' %}" class="btn-clear" style="padding: 0.5rem; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <h1 style="margin: 0;">Thông tin sản phẩm</h1>
+</div>
+
+<div class="product-detail-card">
+    <!-- Image -->
+    <div class="image-section">
+        {% if product.Image %}
+        <img src="/media/{{ product.Image }}" class="product-image-large" alt="{{ product.Ten }}">
+        {% else %}
+        <div style="font-size: 5rem; color: #cbd5e1;"><i class="fa-solid fa-box-open"></i></div>
+        {% endif %}
+        
+        <div style="position: absolute; bottom: 2rem; left: 2rem;">
+            <span class="badge" style="
+                {% if product.TrangThai == 'Đang bán' %}background: #dcfce7; color: #166534;
+                {% else %}background: #fee2e2; color: #991b1b;{% endif %}
+                padding: 0.5rem 1.25rem; border-radius: 12px; font-weight: 700; font-size: 0.85rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            ">
+                <i class="fa-solid fa-circle" style="font-size: 0.5rem; margin-right: 0.5rem;"></i>
+                {{ product.TrangThai }}
+            </span>
+        </div>
+    </div>
+
+    <!-- Details -->
+    <div class="details-section">
+        <span class="category-tag">{{ product.DanhMuc.Ten }}</span>
+        <h2 style="font-size: 2.25rem; font-weight: 900; color: #1e293b; margin: 0.5rem 0 2rem 0;">{{ product.Ten }}</h2>
+
+        <div class="data-row">
+            <span class="label-text">Mã sản phẩm</span>
+            <span class="value-text" style="color: var(--primary);">#{{ product.MaSP }}</span>
+        </div>
+
+        <div class="data-row">
+            <span class="label-text">Phân loại</span>
+            <span class="value-text">{{ product.DanhMuc.Ten }}</span>
+        </div>
+
+        <div class="desc-box">
+            <div style="font-size: 0.75rem; font-weight: 800; color: var(--gray-400); text-transform: uppercase; margin-bottom: 0.5rem;">Mô tả sản phẩm</div>
+            <p style="margin: 0; color: #475569; line-height: 1.7; font-weight: 500;">
+                {{ product.MieuTa|default:"Chưa có mô tả chi tiết cho sản phẩm này." }}
+            </p>
+        </div>
+
+        <div class="btn-action-group">
+            <a href="{% url 'product_edit' product.MaSP %}" class="btn-edit-detail">
+                <div class="inner-btn">
+                    <i class="fa-solid fa-pen-to-square"></i> 
+                    <span>Chỉnh sửa ngay</span>
+                </div>
+                <div class="btn-shine"></div>
+            </a>
+            
+            <form action="{% url 'product_delete' product.MaSP %}" method="post" onsubmit="return confirm('Xác nhận xóa sản phẩm này?')">
+                {% csrf_token %}
+                <button type="submit" class="btn-delete-detail">
+                    <i class="fa-solid fa-trash-can"></i> Xóa sản phẩm
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Nút Chỉnh sửa (Blue Gradient) */
+    .btn-edit-detail {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        color: white;
+        text-decoration: none;
+        padding: 0.85rem 2rem;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-edit-detail:hover {
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.45);
+        color: white;
+    }
+
+    /* Nút Xóa (Red Gradient) */
+    .btn-delete-detail {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        border: none;
+        padding: 0.85rem 2rem;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .btn-delete-detail:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.45);
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    }
+
+    .inner-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .btn-shine {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: all 0.6s;
+    }
+
+    .btn-edit-detail:hover .btn-shine {
+        left: 100%;
+    }
+</style>
+{% endblock %}

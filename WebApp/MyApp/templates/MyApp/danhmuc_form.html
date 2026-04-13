@@ -17,7 +17,11 @@
             <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
                 {% for field in form %}
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                    <label style="font-weight: 600; font-size: 0.875rem;">{{ field.label }}</label>
+                    <label style="font-weight: 600; font-size: 0.875rem;">
+                        {% if field.name == 'MaDM' %}Mã danh mục
+                        {% elif field.name == 'Ten' %}Tên danh mục
+                        {% else %}{{ field.label }}{% endif %}
+                    </label>
                     <div>
                         {{ field }}
                     </div>

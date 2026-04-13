@@ -1,0 +1,333 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    :root {
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.4);
+    }
+
+    .detail-container {
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header Styling */
+    .header-premium {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        padding: 2.5rem;
+        border-radius: 20px;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-premium::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .btn-back-glass {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: white;
+        width: 42px;
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        transition: all 0.3s;
+        backdrop-filter: blur(8px);
+    }
+
+    .btn-back-glass:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateX(-3px);
+        color: white;
+    }
+
+    /* Info Grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        padding: 1.5rem;
+        border-radius: 18px;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.3s;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    /* Status Timeline */
+    .timeline-container {
+        display: flex;
+        justify-content: space-between;
+        padding: 2rem 1rem;
+        position: relative;
+        max-width: 600px;
+        margin: 1rem 0 2rem 0;
+    }
+
+    .timeline-container::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gray-200);
+        z-index: 1;
+        transform: translateY(-50%);
+    }
+
+    .timeline-step {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: white;
+        border: 2px solid var(--gray-200);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2;
+        position: relative;
+        transition: all 0.3s;
+    }
+
+    .timeline-step.active { border-color: var(--primary); color: var(--primary); }
+    .timeline-step.completed { background: var(--primary); border-color: var(--primary); color: white; }
+
+    /* Modern Table */
+    .premium-table-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--gray-100);
+    }
+
+    .table-header-gradient {
+        background: #f8fafc;
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .product-list-table th {
+        background: white;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--gray-400);
+        letter-spacing: 0.05em;
+        padding: 1.25rem 2rem;
+    }
+
+    .product-row {
+        transition: background 0.2s;
+    }
+
+    .product-row:hover {
+        background: #f8fafc;
+    }
+
+    .qty-badge {
+        background: #eff6ff;
+        color: #2563eb;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        font-weight: 800;
+        font-size: 1.1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+</style>
+
+<div class="detail-container">
+    <!-- Premium Header -->
+    <div class="header-premium">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <a href="{% url 'stock_in_list' %}" class="btn-back-glass">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+                <div>
+                    <div style="text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; color: rgba(255,255,255,0.6); margin-bottom: 0.5rem;">Phiếu nhập hệ thống</div>
+                    <h1 style="margin: 0; font-size: 2.25rem; font-weight: 900;">{{ request_obj.MaYC }}</h1>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <a href="{% url 'stock_in_edit' request_obj.MaYC %}" class="btn-primary" style="background: white; color: #1e293b; border: none; padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 0.75rem;">
+                    <i class="fa-solid fa-pen-to-square"></i> Hiệu chỉnh nội dung
+                </a>
+            </div>
+        </div>
+        
+        <!-- Timeline -->
+        <div class="timeline-container">
+            <div class="timeline-step completed" title="Đã tạo"><i class="fa-solid fa-check"></i></div>
+            <div class="timeline-step {% if request_obj.TrangThai != 'Chờ duyệt' %}completed{% else %}active{% endif %}" title="Xử lý"><i class="fa-solid fa-clock"></i></div>
+            <div class="timeline-step {% if request_obj.TrangThai == 'Đã duyệt' %}completed{% endif %}" title="Hoàn tất"><i class="fa-solid fa-flag-checkered"></i></div>
+        </div>
+    </div>
+
+    <!-- Info Grid -->
+    <div class="info-grid">
+        <div class="glass-card">
+            <div class="icon-box" style="background: #e0f2fe; color: #0369a1;">
+                <i class="fa-solid fa-calendar-day"></i>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--gray-500); font-weight: 700; text-transform: uppercase;">Ngày yêu cầu</div>
+            <div style="font-size: 1.25rem; font-weight: 700; color: var(--gray-800); margin-top: 0.25rem;">{{ request_obj.Ngay|date:"d F, Y" }}</div>
+        </div>
+
+        <div class="glass-card">
+            <div class="icon-box" style="background: #fef3c7; color: #b45309;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--gray-500); font-weight: 700; text-transform: uppercase;">Trạng thái hiện tại</div>
+            <div style="margin-top: 0.5rem;">
+                <span class="badge" style="padding: 0.4rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.8rem;
+                    {% if request_obj.TrangThai == 'Đã duyệt' %}
+                        background: #dcfce7; color: #166534;
+                    {% else %}
+                        background: #fff7ed; color: #9a3412;
+                    {% endif %}
+                ">
+                    <i class="fa-solid fa-circle" style="font-size: 0.5rem; margin-right: 0.5rem;"></i>
+                    {{ request_obj.TrangThai | upper }}
+                </span>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <div class="icon-box" style="background: #ede9fe; color: #6d28d9;">
+                <i class="fa-solid fa-user-gear"></i>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--gray-500); font-weight: 700; text-transform: uppercase;">Nhân viên thụ lý</div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-top: 0.5rem;">
+                <div style="font-weight: 700; color: var(--gray-800);">{{ request_obj.MaNV.Ten }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Table Section -->
+    <div class="premium-table-card">
+        <div class="table-header-gradient">
+            <h2 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 1rem;">
+                <i class="fa-solid fa-list-check" style="color: var(--primary);"></i>
+                Danh mục hàng hóa chi tiết
+            </h2>
+            <div style="color: var(--gray-400); font-weight: 600; font-size: 0.875rem;">
+                Tổng cộng: <span style="color: var(--gray-700);">{{ details.count }}</span> mục
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="product-list-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Thông tin sản phẩm</th>
+                        <th>Kho hàng đích</th>
+                        <th style="text-align: right;">Số lượng nhập</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in details %}
+                    <tr class="product-row" style="border-bottom: 1px solid var(--gray-50);">
+                        <td style="padding: 1.25rem 2rem;">
+                            <div style="display: flex; align-items: center; gap: 1.25rem;">
+                                <div style="position: relative;">
+                                    {% if item.MaSP.Image %}
+                                    <img src="/media/{{ item.MaSP.Image }}" style="width: 56px; height: 56px; border-radius: 14px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                                    {% else %}
+                                    <div style="width: 56px; height: 56px; background: var(--gray-50); color: var(--gray-300); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                        <i class="fa-solid fa-box"></i>
+                                    </div>
+                                    {% endif %}
+                                    <span style="position: absolute; -10px; -5px; background: #1e293b; color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 6px; font-weight: 700;">
+                                        {{ forloop.counter }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <div style="font-weight: 800; color: #1e293b; font-size: 1rem;">{{ item.MaSP.Ten }}</div>
+                                    <div style="font-size: 0.75rem; color: var(--gray-400); font-weight: 600; text-transform: uppercase; margin-top: 0.25rem;">SKU: {{ item.MaSP.MaSP }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 1.25rem 2rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 10px; height: 10px; border-radius: 50%; background: #22c55e;"></div>
+                                <div style="font-weight: 600; color: #475569;">{{ item.MaKho.Ten }}</div>
+                            </div>
+                        </td>
+                        <td style="padding: 1.25rem 2rem; text-align: right;">
+                            <div class="qty-badge">
+                                {{ item.SoLuong }}
+                                <span style="font-size: 0.75rem; color: #60a5fa; font-weight: 600;">ĐƠN VỊ</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 5rem 0;">
+                            <div style="font-size: 3rem; color: #e2e8f0; margin-bottom: 1rem;"><i class="fa-solid fa-inbox"></i></div>
+                            <div style="color: var(--gray-400); font-weight: 600;">Không có dữ liệu chi tiết cho phiếu này</div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Notes Section -->
+    <div style="margin-top: 2rem;">
+        <div class="glass-card" style="border-left: 5px solid var(--primary);">
+            <div style="font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--gray-400); margin-bottom: 0.75rem;">Ghi chú đặc biệt</div>
+            <p style="margin: 0; color: var(--gray-600); line-height: 1.6; font-style: italic;">
+                "{{ request_obj.GhiChu|default:"Không có ghi chú bổ sung cho lệnh nhập này." }}"
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

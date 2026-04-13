@@ -1,15 +1,22 @@
 from django import forms
+from django.forms import ClearableFileInput
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import FileSystemStorage
+from django.core.mail import send_mail
+from django.conf import settings
 import os
+import random
 
 
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Q
 from django.urls import reverse_lazy
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from .models import SanPham, CuaHang, Kho, HangTonKho, NhanVien, YeuCauNhapKho, DanhMuc
+
+class MultipleFileInput(ClearableFileInput):
+    allow_multiple_selected = True
 
 
 class SidebarContextMixin:
@@ -34,7 +41,7 @@ class SidebarContextMixin:
         # 2. Kiểm tra phân quyền (Role)
         user_role = request.session.get('user_role')
         if self.required_roles and user_role not in self.required_roles:
-            return render(request, 'MyApp/403.html', {'message': 'Bạn không có quyền truy cập chức năng này!'}, status=403)
+            return render(request, '403.html', {'message': 'Bạn không có quyền truy cập chức năng này!'}, status=403)
             
         return super().dispatch(request, *args, **kwargs)
 
@@ -46,7 +53,7 @@ def role_required(allowed_roles=[]):
                 return redirect('login')
             user_role = request.session.get('user_role')
             if allowed_roles and user_role not in allowed_roles:
-                return render(request, 'MyApp/403.html', {'message': 'Bạn không có quyền thực hiện hành động này!'}, status=403)
+                return render(request, '403.html', {'message': 'Bạn không có quyền thực hiện hành động này!'}, status=403)
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     return decorator
@@ -200,6 +207,102 @@ def logout_view(request):
         del request.session['user_name']
     return redirect('login')
 
+def forgot_password_view(request):
+    """
+    Yêu cầu reset mật khẩu: Tạo OTP 6 số và lưu vào Session
+    """
+    error = None
+    success = None
+    if request.method == 'POST':
+        sdt = request.POST.get('sdt')
+        email_input = request.POST.get('email')
+        try:
+            nv = NhanVien.objects.get(SDT=sdt)
+            
+            # Kiểm tra Email nhập vào có khớp với Database không
+            db_email = getattr(nv, 'Email', None)
+            if not db_email or db_email.lower() != email_input.lower():
+                error = "Email không khớp với thông tin đã đăng ký cho số điện thoại này."
+            else:
+                # Tạo mã OTP 6 số ngẫu nhiên
+                otp = str(random.randint(100000, 999999))
+                
+                # Lưu OTP và MaNV vào Session
+                request.session['reset_otp'] = otp
+                request.session['reset_manv'] = nv.MaNV
+                request.session.set_expiry(600)
+                
+                # Gửi mã OTP
+                send_mail(
+                    'Mã xác thực đặt lại mật khẩu - SMART MART',
+                    f'Chào {nv.Ten},\n\nMã xác thực (OTP) của bạn là: {otp}\n\nMã này có hiệu lực trong 10 phút.',
+                    getattr(settings, 'DEFAULT_FROM_EMAIL', 'support@smartmart.com'),
+                    [db_email],
+                    fail_silently=False,
+                )
+                return redirect('verify_otp')
+        except NhanVien.DoesNotExist:
+            error = "Số điện thoại không tồn tại trong hệ thống."
+        except Exception as e:
+            error = f"Có lỗi xảy ra: {str(e)}"
+            
+    return render(request, 'MyApp/forgot_password.html', {'error': error, 'success': success})
+
+
+def verify_otp_view(request):
+    """
+    Trang nhập mã OTP từ email
+    """
+    error = None
+    if request.method == 'POST':
+        # Ghép các ô nhập otp lại (nếu dùng giao diện nhiều ô)
+        otp_input = request.POST.get('otp') 
+        if not otp_input:
+            # Hỗ trợ trường hợp giao diện tách từng ô
+            otp_input = "".join([request.POST.get(f'digit{i}', '') for i in range(1, 7)])
+
+        otp_session = request.session.get('reset_otp')
+        
+        if otp_session and otp_input == otp_session:
+            # Xác thực thành công, cho phép đổi mật khẩu
+            request.session['otp_verified'] = True
+            return redirect('reset_password')
+        else:
+            error = "Mã OTP không chính xác hoặc đã hết hạn."
+            
+    return render(request, 'MyApp/verify_otp.html', {'error': error})
+
+
+def reset_password_view(request):
+    """
+    Trang đặt mật khẩu mới (Chỉ cho phép sau khi đã Verify OTP thành công)
+    """
+    if not request.session.get('otp_verified'):
+        return redirect('forgot_password')
+        
+    ma_nv = request.session.get('reset_manv')
+    nv = get_object_or_404(NhanVien, MaNV=ma_nv)
+    error = None
+    
+    if request.method == 'POST':
+        new_pass = request.POST.get('new_password')
+        confirm_pass = request.POST.get('confirm_password')
+        
+        if new_pass != confirm_pass:
+            error = "Mật khẩu xác nhận không khớp."
+        else:
+            # Cập nhật thành công
+            nv.MatKhau = new_pass
+            nv.save()
+            # Xóa session reset
+            del request.session['reset_otp']
+            del request.session['reset_manv']
+            del request.session['otp_verified']
+            return render(request, 'MyApp/reset_password.html', {'success': 'Mật khẩu đã được đổi thành công.'})
+
+    return render(request, 'MyApp/reset_password.html', {'error': error})
+
+
 def settings_view(request):
     """
     Trang cài đặt và quản lý thông tin cá nhân/mật khẩu
@@ -295,23 +398,122 @@ class CuaHangListView(SidebarContextMixin, ListView):
     context_object_name = 'stores'
     sidebar_active = 'stores'
     page_title = 'Quản lý Cửa hàng'
-    paginate_by = 10
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        loai = self.request.GET.get('loai')
+        trang_thai = self.request.GET.get('trang_thai')
+
+        if q:
+            queryset = queryset.filter(
+                Q(Ten__icontains=q) | Q(DiaChi__icontains=q) | Q(MaCH__icontains=q)
+            )
+        if loai:
+            queryset = queryset.filter(Loai=loai)
+        if trang_thai:
+            queryset = queryset.filter(TrangThai=trang_thai)
+        return queryset.order_by('MaCH')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['loai_choices'] = CuaHang.objects.values_list('Loai', flat=True).distinct()
+        context['trang_thai_choices'] = CuaHang.objects.values_list('TrangThai', flat=True).distinct()
+        return context
 
 class CuaHangCreateView(SidebarContextMixin, CreateView):
     model = CuaHang
-    fields = ['MaCH', 'Ten', 'Loai', 'DiaChi', 'SDT', 'TrangThai', 'geom']
+    fields = ['MaCH', 'Ten', 'Loai', 'DiaChi', 'SDT', 'TrangThai', 'geom', 'MoTa']
     template_name = 'MyApp/store_form.html'
     success_url = reverse_lazy('store_list')
     sidebar_active = 'stores'
     page_title = 'Thêm Cửa hàng mới'
 
+    def get_form(self, form_class=None):
+        return super().get_form(form_class)
+
+    def form_valid(self, form):
+        files = self.request.FILES.getlist('hinhanh_upload')
+        fs = FileSystemStorage(location=os.path.join('media', 'store'))
+        
+        instance = form.save(commit=False)
+        # Keep existing images, standardize them, and add new ones
+        existing_paths = instance.hinhanh if instance.hinhanh else []
+        new_paths = []
+        for p in existing_paths:
+            if p and not p.startswith('http'):
+                # Đảm bảo đường dẫn luôn bắt đầu bằng 'store/'
+                p_clean = p.replace('store/', '').replace('warehouse/', '')
+                new_paths.append(f'store/{p_clean}')
+            else:
+                new_paths.append(p)
+        
+        for f in files:
+            filename = fs.save(f.name, f)
+            new_paths.append(f'store/{filename}')
+            
+        # Deduplicate while keeping order
+        instance.hinhanh = list(dict.fromkeys(new_paths))
+        instance.save()
+        self.object = instance
+        return redirect(self.get_success_url())
+
 class CuaHangUpdateView(SidebarContextMixin, UpdateView):
     model = CuaHang
-    fields = ['Ten', 'Loai', 'DiaChi', 'SDT', 'TrangThai', 'geom']
+    fields = ['Ten', 'Loai', 'DiaChi', 'SDT', 'TrangThai', 'geom', 'MoTa']
     template_name = 'MyApp/store_form.html'
     success_url = reverse_lazy('store_list')
     sidebar_active = 'stores'
     page_title = 'Cập nhật Cửa hàng'
+
+    def get_form(self, form_class=None):
+        return super().get_form(form_class)
+
+    def form_valid(self, form):
+        files = self.request.FILES.getlist('hinhanh_upload')
+        fs = FileSystemStorage(location=os.path.join('media', 'store'))
+        
+        instance = form.save(commit=False)
+        # Keep existing images, standardize them, and add new ones
+        existing_paths = instance.hinhanh if instance.hinhanh else []
+        new_paths = []
+        for p in existing_paths:
+            if p and not p.startswith('http'):
+                # Đảm bảo đường dẫn luôn bắt đầu bằng 'store/'
+                p_clean = p.replace('store/', '').replace('warehouse/', '')
+                new_paths.append(f'store/{p_clean}')
+            else:
+                new_paths.append(p)
+        
+        for f in files:
+            filename = fs.save(f.name, f)
+            new_paths.append(f'store/{filename}')
+            
+        # Deduplicate while keeping order
+        instance.hinhanh = list(dict.fromkeys(new_paths))
+        instance.save()
+        self.object = instance
+        return redirect(self.get_success_url())
+
+def store_detail_view(request, pk):
+    if 'user_id' not in request.session: return redirect('login')
+    store = get_object_or_404(CuaHang, MaCH=pk)
+    return render(request, 'MyApp/store_detail.html', {
+        'store': store,
+        'sidebar_active': 'stores',
+        'page_title': 'Chi tiết Cửa hàng',
+        'user_name': request.session.get('user_name', 'Khách'),
+        'user_role': request.session.get('user_role', '')
+    })
+
+def store_image_check_view(request, pk):
+    if 'user_id' not in request.session: return redirect('login')
+    store = get_object_or_404(CuaHang, MaCH=pk)
+    return render(request, 'MyApp/store_image_check.html', {
+        'store': store,
+        'sidebar_active': 'stores'
+    })
 
 class CuaHangDeleteView(SidebarContextMixin, DeleteView):
     model = CuaHang
@@ -324,7 +526,32 @@ class SanPhamListView(SidebarContextMixin, ListView):
     context_object_name = 'products'
     sidebar_active = 'products'
     page_title = 'Quản lý Sản phẩm'
-    paginate_by = 10
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        dm = self.request.GET.get('danhmuc')
+        
+        if q:
+            queryset = queryset.filter(
+                Q(Ten__icontains=q) | Q(MieuTa__icontains=q) | Q(MaSP__icontains=q)
+            )
+        if dm:
+            queryset = queryset.filter(DanhMuc_id=dm)
+        return queryset.order_by('MaSP')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['danhmuc_choices'] = DanhMuc.objects.all()
+        return context
+
+class SanPhamDetailView(SidebarContextMixin, DetailView):
+    model = SanPham
+    template_name = 'MyApp/product_detail.html'
+    context_object_name = 'product'
+    sidebar_active = 'products'
+    page_title = 'Chi tiết sản phẩm'
 
 class SanPhamCreateView(SidebarContextMixin, CreateView):
     model = SanPham
@@ -351,11 +578,20 @@ class DanhMucListView(SidebarContextMixin, ListView):
     context_object_name = 'categories'
     sidebar_active = 'categories'
     page_title = 'Quản lý Danh mục'
-    paginate_by = 10
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        if q:
+            queryset = queryset.filter(
+                Q(Ten__icontains=q) | Q(MaDM__icontains=q)
+            )
+        return queryset.order_by('MaDM')
 
 class DanhMucCreateView(SidebarContextMixin, CreateView):
     model = DanhMuc
-    fields = ['MaDM', 'Ten', 'MoTa']
+    fields = ['MaDM', 'Ten']
     template_name = 'MyApp/danhmuc_form.html'
     success_url = reverse_lazy('danhmuc_list')
     sidebar_active = 'categories'
@@ -363,7 +599,7 @@ class DanhMucCreateView(SidebarContextMixin, CreateView):
 
 class DanhMucUpdateView(SidebarContextMixin, UpdateView):
     model = DanhMuc
-    fields = ['Ten', 'MoTa']
+    fields = ['Ten']
     template_name = 'MyApp/danhmuc_form.html'
     success_url = reverse_lazy('danhmuc_list')
     sidebar_active = 'categories'
@@ -380,7 +616,25 @@ class HangTonKhoListView(SidebarContextMixin, ListView):
     context_object_name = 'inventory'
     sidebar_active = 'inventory'
     page_title = 'Quản lý Tồn kho'
-    paginate_by = 10
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        kho = self.request.GET.get('kho')
+        
+        if q:
+            queryset = queryset.filter(
+                Q(MaSP__Ten__icontains=q) | Q(MaSP__MaSP__icontains=q)
+            )
+        if kho:
+            queryset = queryset.filter(MaKho_id=kho)
+        return queryset.select_related('MaSP', 'MaKho').order_by('MaKho', 'MaSP')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['kho_choices'] = Kho.objects.all()
+        return context
 
 class HangTonKhoCreateView(SidebarContextMixin, CreateView):
     model = HangTonKho
@@ -410,27 +664,111 @@ class HangTonKhoDeleteView(SidebarContextMixin, DeleteView):
 
 
 #  KHO HÀNG
+#  KHO HÀNG
 class KhoListView(SidebarContextMixin, ListView):
     model = Kho
     template_name = 'MyApp/kho_list.html'
     context_object_name = 'warehouses'
     sidebar_active = 'warehouses'
     page_title = 'Quản lý Kho hàng'
-    paginate_by = 10
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        loai = self.request.GET.get('loai')
+
+        if q:
+            queryset = queryset.filter(
+                Q(Ten__icontains=q) | Q(DiaChi__icontains=q) | Q(MaKho__icontains=q)
+            )
+        if loai:
+            queryset = queryset.filter(Loai=loai)
+        return queryset.order_by('MaKho')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['loai_choices'] = Kho.objects.values_list('Loai', flat=True).distinct()
+        return context
 
 class KhoCreateView(SidebarContextMixin, CreateView):
     model = Kho
-    fields = ['MaKho', 'Ten', 'Loai', 'DiaChi', 'geom']
+    fields = ['MaKho', 'Ten', 'Loai', 'DiaChi', 'geom', 'MoTa']
     template_name = 'MyApp/kho_form.html'
     success_url = reverse_lazy('kho_list')
     sidebar_active = 'warehouses'
+    page_title = 'Thêm Kho mới'
+
+    def get_form(self, form_class=None):
+        return super().get_form(form_class)
+
+    def form_valid(self, form):
+        files = self.request.FILES.getlist('hinhanh_upload')
+        fs = FileSystemStorage(location=os.path.join('media', 'warehouse'))
+        
+        instance = form.save(commit=False)
+        # Keep existing images, standardize them, and add new ones
+        existing_paths = instance.hinhanh if instance.hinhanh else []
+        new_paths = []
+        for p in existing_paths:
+            if p and not p.startswith('http'):
+                p_clean = p.replace('store/', '').replace('warehouse/', '')
+                new_paths.append(f'warehouse/{p_clean}')
+            else:
+                new_paths.append(p)
+        
+        for f in files:
+            filename = fs.save(f.name, f)
+            new_paths.append(f'warehouse/{filename}')
+        instance.hinhanh = list(dict.fromkeys(new_paths))
+        instance.save()
+        self.object = instance
+        return redirect(self.get_success_url())
 
 class KhoUpdateView(SidebarContextMixin, UpdateView):
     model = Kho
-    fields = ['Ten', 'Loai', 'DiaChi', 'geom']
+    fields = ['Ten', 'Loai', 'DiaChi', 'geom', 'MoTa']
     template_name = 'MyApp/kho_form.html'
     success_url = reverse_lazy('kho_list')
     sidebar_active = 'warehouses'
+    page_title = 'Cập nhật Kho'
+
+    def get_form(self, form_class=None):
+        return super().get_form(form_class)
+
+    def form_valid(self, form):
+        files = self.request.FILES.getlist('hinhanh_upload')
+        fs = FileSystemStorage(location=os.path.join('media', 'warehouse'))
+        
+        instance = form.save(commit=False)
+        # Keep existing images, standardize them, and add new ones
+        existing_paths = instance.hinhanh if instance.hinhanh else []
+        new_paths = []
+        for p in existing_paths:
+            if p and not p.startswith('http'):
+                p_clean = p.replace('store/', '').replace('warehouse/', '')
+                new_paths.append(f'warehouse/{p_clean}')
+            else:
+                new_paths.append(p)
+        
+        for f in files:
+            filename = fs.save(f.name, f)
+            new_paths.append(f'warehouse/{filename}')
+        instance.hinhanh = list(dict.fromkeys(new_paths))
+        instance.save()
+        self.object = instance
+        return redirect(self.get_success_url())
+
+def kho_detail_view(request, pk):
+    if 'user_id' not in request.session: return redirect('login')
+    wh = get_object_or_404(Kho, MaKho=pk)
+    return render(request, 'MyApp/kho_detail.html', {
+        'wh': wh,
+        'sidebar_active': 'warehouses',
+        'page_title': 'Chi tiết Kho hàng',
+        'user_name': request.session.get('user_name', 'Khách'),
+        'user_role': request.session.get('user_role', '')
+    })
 
 class KhoDeleteView(SidebarContextMixin, DeleteView):
     model = Kho
@@ -443,8 +781,26 @@ class NhanVienListView(SidebarContextMixin, ListView):
     context_object_name = 'employees'
     sidebar_active = 'employees'
     page_title = 'Quản lý Nhân viên'
-    paginate_by = 10
+    paginate_by = 5
     required_roles = ['Admin']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        role = self.request.GET.get('role')
+        
+        if q:
+            queryset = queryset.filter(
+                Q(Ten__icontains=q) | Q(MaNV__icontains=q) | Q(SDT__icontains=q)
+            )
+        if role:
+            queryset = queryset.filter(Role=role)
+        return queryset.order_by('MaNV')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['role_choices'] = NhanVien.objects.values_list('Role', flat=True).distinct()
+        return context
 
 class NhanVienCreateView(SidebarContextMixin, CreateView):
     model = NhanVien
@@ -474,34 +830,140 @@ class StockInListView(SidebarContextMixin, ListView):
     context_object_name = 'requests'
     sidebar_active = 'stock_in'
     page_title = 'Yêu cầu Nhập kho'
-    paginate_by = 10
+    paginate_by = 5
     required_roles = ['Admin', 'Kế Toán']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        status = self.request.GET.get('status')
+        
+        if q:
+            queryset = queryset.filter(
+                Q(MaYC__icontains=q) | Q(GhiChu__icontains=q) | Q(MaNV__Ten__icontains=q)
+            )
+        if status:
+            queryset = queryset.filter(TrangThai=status)
+        return queryset.select_related('MaNV').order_by('-Ngay')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status_choices'] = YeuCauNhapKho.objects.values_list('TrangThai', flat=True).distinct()
+        return context
+
+class StockInDetailView(SidebarContextMixin, DetailView):
+    model = YeuCauNhapKho
+    template_name = 'MyApp/stock_in_detail.html'
+    context_object_name = 'request_obj'
+    sidebar_active = 'stock_in'
+    page_title = 'Chi tiết Yêu cầu Nhập kho'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Lấy danh sách sản phẩm chi tiết của phiếu này
+        from .models import NhapKhoChiTiet
+        context['details'] = NhapKhoChiTiet.objects.filter(MaYC=self.object).select_related('MaSP', 'MaKho')
+        return context
+
+from django.forms import inlineformset_factory
+from .models import YeuCauNhapKho, NhapKhoChiTiet
+
+# Tạo FormSet để quản lý danh sách sản phẩm bên trong phiếu nhập
+StockInDetailFormSet = inlineformset_factory(
+    YeuCauNhapKho, 
+    NhapKhoChiTiet,
+    fields=['MaSP', 'MaKho', 'SoLuong'],
+    extra=1, # Hiển thị 1 dòng trống để nhập
+    can_delete=True
+)
+
+from .forms import YeuCauNhapKhoForm
 
 class StockInCreateView(SidebarContextMixin, CreateView):
     model = YeuCauNhapKho
-    fields = ['MaYC', 'Ngay', 'TrangThai', 'GhiChu', 'MaNV']
+    form_class = YeuCauNhapKhoForm
     template_name = 'MyApp/stock_in_form.html'
     success_url = reverse_lazy('stock_in_list')
     sidebar_active = 'stock_in'
     required_roles = ['Admin', 'Kế Toán']
+    page_title = 'Tạo mới Phiếu nhập kho'
 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.fields['Ngay'].widget = forms.DateInput(attrs={'type': 'date'})
-        return form
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['product_formset'] = StockInDetailFormSet(self.request.POST)
+        else:
+            data['product_formset'] = StockInDetailFormSet()
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        product_formset = context['product_formset']
+        
+        if product_formset.is_valid():
+            self.object = form.save()
+            product_formset.instance = self.object
+            product_formset.save()
+            
+            # CẬP NHẬT TỒN KHO KHI TẠO MỚI PHIẾU ĐÃ DUYỆT LUÔN
+            if self.object.TrangThai == 'Đã duyệt':
+                from .models import HangTonKho, NhapKhoChiTiet
+                items = NhapKhoChiTiet.objects.filter(MaYC=self.object)
+                for item in items:
+                    inventory, created = HangTonKho.objects.get_or_create(
+                        MaKho=item.MaKho, MaSP=item.MaSP, defaults={'SoLuong': 0}
+                    )
+                    inventory.SoLuong += item.SoLuong
+                    inventory.save()
+                    
+            return redirect(self.success_url)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
 
 class StockInUpdateView(SidebarContextMixin, UpdateView):
     model = YeuCauNhapKho
-    fields = ['Ngay', 'TrangThai', 'GhiChu', 'MaNV']
+    form_class = YeuCauNhapKhoForm
     template_name = 'MyApp/stock_in_form.html'
     success_url = reverse_lazy('stock_in_list')
     sidebar_active = 'stock_in'
     required_roles = ['Admin', 'Kế Toán']
+    page_title = 'Chỉnh sửa Phiếu nhập kho'
 
-    def get_form(self, form_class=None):
-        form = super().get_form(form_class)
-        form.fields['Ngay'].widget = forms.DateInput(attrs={'type': 'date'})
-        return form
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['product_formset'] = StockInDetailFormSet(self.request.POST, instance=self.object)
+        else:
+            data['product_formset'] = StockInDetailFormSet(instance=self.object)
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        product_formset = context['product_formset']
+        
+        # Lưu trạng thái cũ trước khi update
+        old_status = self.get_object().TrangThai
+        
+        if product_formset.is_valid():
+            self.object = form.save()
+            product_formset.instance = self.object
+            product_formset.save()
+            
+            # LOGIC CẬP NHẬT TỒN KHO KHI CHUYỂN SANG ĐÃ DUYỆT
+            new_status = self.object.TrangThai
+            if old_status != 'Đã duyệt' and new_status == 'Đã duyệt':
+                from .models import HangTonKho, NhapKhoChiTiet
+                items = NhapKhoChiTiet.objects.filter(MaYC=self.object)
+                for item in items:
+                    inventory, created = HangTonKho.objects.get_or_create(
+                        MaKho=item.MaKho, MaSP=item.MaSP, defaults={'SoLuong': 0}
+                    )
+                    inventory.SoLuong += item.SoLuong
+                    inventory.save()
+                    
+            return redirect(self.success_url)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
 
 class StockInDeleteView(SidebarContextMixin, DeleteView):
     model = YeuCauNhapKho
@@ -544,3 +1006,34 @@ def upload_gis_images(request):
         return JsonResponse({'success': True, 'paths': new_paths})
         
     return JsonResponse({'success': False, 'message': 'Method not allowed'}, status=405)
+
+@csrf_exempt
+def delete_gis_image(request):
+    if request.method == 'POST':
+        import json
+        data = json.loads(request.body)
+        target_id = data.get('id')
+        target_type = data.get('type')
+        image_path = data.get('path')
+        
+        if not all([target_id, target_type, image_path]):
+            return JsonResponse({'success': False, 'message': 'Thiếu dữ liệu'}, status=400)
+            
+        if target_type == 'store':
+            instance = get_object_or_404(CuaHang, MaCH=target_id)
+        else:
+            instance = get_object_or_404(Kho, MaKho=target_id)
+            
+        if instance.hinhanh and image_path in instance.hinhanh:
+            new_paths = list(instance.hinhanh)
+            new_paths.remove(image_path)
+            instance.hinhanh = new_paths
+            instance.save()
+            return JsonResponse({'success': True})
+            
+        return JsonResponse({'success': False, 'message': 'Ảnh không tồn tại'}, status=404)
+        
+    return JsonResponse({'success': False}, status=405)
+
+def custom_404_view(request, custom_path=None):
+    return render(request, '404.html', status=404)

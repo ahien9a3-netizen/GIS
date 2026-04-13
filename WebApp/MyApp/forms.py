@@ -1,5 +1,10 @@
 from django import forms
+from .models import YeuCauNhapKho
 
-class YeuCauNhapKhoForm(forms.Form):
-    san_pham = forms.CharField(label="Sản phẩm")
-    so_luong = forms.IntegerField(label="Số lượng")
+class YeuCauNhapKhoForm(forms.ModelForm):
+    class Meta:
+        model = YeuCauNhapKho
+        fields = ['MaYC', 'Ngay', 'TrangThai', 'GhiChu', 'MaNV']
+        widgets = {
+            'Ngay': forms.DateInput(attrs={'type': 'date'}),
+        }

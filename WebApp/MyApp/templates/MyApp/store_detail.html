@@ -1,0 +1,498 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    :root {
+        --accent-color: #6366f1;
+        --accent-soft: rgba(99, 102, 241, 0.1);
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.3);
+    }
+
+    .detail-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 1rem;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 2rem;
+        min-width: 0;
+        /* Isolate grid internals */
+    }
+
+    .main-grid>div {
+        min-width: 0;
+        /* Fix for Swiper in Grid */
+    }
+
+    @media (max-width: 1024px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Left: Visual Gallery */
+    .gallery-card {
+        background: white;
+        border-radius: 30px;
+        padding: 1.5rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+        border: 1px solid var(--gray-100);
+        height: min-content;
+    }
+
+    .swiper-main {
+        width: 100%;
+        max-width: 100%;
+        height: 450px;
+        border-radius: 20px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        box-shadow: var(--shadow-md);
+        background: #f8fafc;
+        /* Simpler background */
+        position: relative;
+    }
+
+    .swiper-main img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .swiper-thumbs {
+        height: 90px;
+        width: 100%;
+    }
+
+    .swiper-thumbs .swiper-slide {
+        width: 120px !important;
+        height: 80px !important;
+        opacity: 0.4;
+        cursor: pointer;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        flex-shrink: 0;
+        /* Prevent flattening */
+    }
+
+    .swiper-thumbs .swiper-slide-thumb-active {
+        opacity: 1;
+        border-color: var(--accent-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .swiper-thumbs img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* Right: Details & Map */
+    .info-pane {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .info-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 30px;
+        padding: 2.5rem;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1.25rem;
+        background: #ecfdf5;
+        color: #10b981;
+        border-radius: 100px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-bottom: 1.5rem;
+    }
+
+    .status-inactive {
+        background: #fef2f2;
+        color: #ef4444;
+    }
+
+    .store-name {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+    }
+
+    .store-type {
+        font-size: 1.25rem;
+        color: var(--accent-color);
+        font-weight: 600;
+        margin-bottom: 2rem;
+        display: block;
+    }
+
+    .detail-list {
+        display: grid;
+        gap: 1.25rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        padding: 1.25rem;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 20px;
+        border: 1px solid var(--gray-50);
+        transition: all 0.2s;
+    }
+
+    .detail-item:hover {
+        background: white;
+        transform: translateX(5px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .icon-box {
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: var(--accent-color);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .text-box label {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--gray-400);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .text-box p {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #334155;
+        margin: 0;
+    }
+
+    /* Mini Map Card */
+    .map-card {
+        background: white;
+        border-radius: 30px;
+        overflow: hidden;
+        height: 250px;
+        position: relative;
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--gray-100);
+    }
+
+    #mini-map {
+        width: 100%;
+        height: 100%;
+        z-index: 10;
+    }
+
+    .map-overlay {
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+        z-index: 1000;
+    }
+
+    .btn-full-map {
+        background: #0ea5e9;
+        color: white;
+        padding: 0.75rem 1.25rem;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+
+    .btn-full-map:hover {
+        transform: translateY(-2px);
+        background: #0284c7;
+    }
+
+    /* Actions */
+    .button-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-main {
+        padding: 1.1rem;
+        border-radius: 18px;
+        font-weight: 700;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.3s;
+    }
+
+    .btn-edit {
+        background: var(--dark);
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #000;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-back {
+        background: white;
+        color: var(--gray-600);
+        border: 1.5px solid var(--gray-200);
+    }
+
+    .btn-back:hover {
+        background: var(--gray-50);
+        border-color: var(--gray-300);
+    }
+
+    .empty-state {
+        height: 450px;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-300);
+        border: 2px dashed #e2e8f0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <div class="main-grid">
+
+        <!-- VISUAL SIDE -->
+        <div class="left-col" style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div class="gallery-card">
+                {% if store.hinhanh %}
+                <div class="swiper swiper-main" id="main-gal">
+                    <div class="swiper-wrapper">
+                        {% for img in store.hinhanh %}
+                        <div class="swiper-slide">
+                            <img src="{% if 'http' in img %}{{ img }}{% elif '/' in img %}/media/{{ img }}{% else %}/media/store/{{ img }}{% endif %}"
+                                alt="{{ store.Ten }}"
+                                onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1000&auto=format&fit=crop';">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+                {% if store.hinhanh|length > 1 %}
+                <div class="swiper swiper-thumbs" id="thumb-gal">
+                    <div class="swiper-wrapper">
+                        {% for img in store.hinhanh %}
+                        <div class="swiper-slide">
+                            <img src="{% if 'http' in img %}{{ img }}{% elif '/' in img %}/media/{{ img }}{% else %}/media/store/{{ img }}{% endif %}"
+                                alt="Thumb"
+                                onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1000&auto=format&fit=crop';">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-camera-retro fa-5x" style="opacity: 0.1; margin-bottom: 2rem;"></i>
+                    <p style="font-weight: 700; font-size: 1.2rem;">Chưa cập nhật hình ảnh</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Mini Map Section -->
+            <div class="map-card">
+                <div id="mini-map"></div>
+                <div class="map-overlay">
+                    <a href="{% url 'gis_map' %}?id={{ store.MaCH }}&type=store" class="btn-full-map">
+                        <i class="fa-solid fa-maximize"></i> Mở rộng bản đồ
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- INFO SIDE -->
+        <div class="info-pane">
+            <div class="info-card">
+                <div class="status-badge {% if store.TrangThai != 'Đang hoạt động' %}status-inactive{% endif %}">
+                    <i
+                        class="fa-solid {% if store.TrangThai == 'Đang hoạt động' %}fa-circle-check{% else %}fa-circle-xmark{% endif %}"></i>
+                    {{ store.TrangThai }}
+                </div>
+
+                <h1 class="store-name">{{ store.Ten }}</h1>
+                <span class="store-type">{{ store.Loai }} • ID #{{ store.MaCH }}</span>
+
+                <div class="detail-list">
+                    <div class="detail-item">
+                        <div class="icon-box"><i class="fa-solid fa-map-pin"></i></div>
+                        <div class="text-box">
+                            <label>Địa điểm</label>
+                            <p>{{ store.DiaChi|default:"Chưa có địa chỉ chính xác" }}</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="icon-box" style="color: #10b981; background: #ecfdf5;"><i
+                                class="fa-solid fa-phone-volume"></i></div>
+                        <div class="text-box">
+                            <label>Liên hệ trực tuyến</label>
+                            <p>{{ store.SDT|default:"N/A" }}</p>
+                        </div>
+                    </div>
+
+                    {% if store.geom %}
+                    <div class="detail-item">
+                        <div class="icon-box" style="color: #f59e0b; background: #fffbeb;"><i
+                                class="fa-solid fa-location-crosshairs"></i></div>
+                        <div class="text-box">
+                            <label>Vị trí địa lý (Lat, Lng)</label>
+                            <p style="font-family: 'JetBrains Mono', monospace; font-size: 1rem;">{{ store.geom.y|floatformat:6 }}, {{ store.geom.x|floatformat:6 }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="detail-item" style="align-items: flex-start;">
+                        <div class="icon-box" style="color: #8b5cf6; background: #f5f3ff;"><i
+                                class="fa-solid fa-quote-left"></i></div>
+                        <div class="text-box">
+                            <label>Mô tả chi tiết</label>
+                            <p style="font-weight: 500; line-height: 1.6; color: #475569;">{{ store.MoTa|default:"Chưa có thông tin mô tả chi tiết cho cửa hàng này."|safe }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <a href="{% url 'store_list' %}" class="btn-main btn-back">
+                        <i class="fa-solid fa-chevron-left"></i> Quay lại
+                    </a>
+                    <a href="{% url 'store_edit' store.pk %}" class="btn-main btn-edit">
+                        <i class="fa-solid fa-sliders"></i> Chỉnh sửa
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // --- Gallery Logic ---
+        const thumbGal = document.getElementById('thumb-gal');
+        let swiperThumbs = null;
+
+        if (thumbGal) {
+            swiperThumbs = new Swiper('#thumb-gal', {
+                spaceBetween: 10,
+                slidesPerView: 'auto',
+                freeMode: true,
+                watchSlidesProgress: true,
+            });
+        }
+
+        const swiperMain = new Swiper('#main-gal', {
+            loop: true,
+            observer: true,
+            observeParents: true,
+            watchOverflow: true,
+            spaceBetween: 10,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            autoplay: { delay: 5000, disableOnInteraction: false },
+            thumbs: swiperThumbs ? { swiper: swiperThumbs } : null,
+            grabCursor: true,
+            keyboard: { enabled: true },
+        });
+
+        // --- Mini Map Logic ---
+        {% if store.geom %}
+        var lat = {{ store.geom.y }};
+        var lng = {{ store.geom.x }};
+        var map = L.map('mini-map', {
+            zoomControl: false,
+            attributionControl: false,
+            scrollWheelZoom: false,
+            dragging: false
+        }).setView([lat, lng], 16);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; CartoDB'
+    }).addTo(map);
+
+    var customIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: "<div style='background-color:var(--accent-color); width:20px; height:20px; border-radius:50%; border:4px solid white; box-shadow:0 0 10px rgba(0,0,0,0.3);'></div>",
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+    });
+
+    L.marker([lat, lng], { icon: customIcon }).addTo(map);
+    {% else %}
+    document.getElementById('mini-map').innerHTML = "<div style='height:100%; display:flex; align-items:center; justify-content:center; background:#f1f5f9; color:#94a3b8;'>Không có dữ liệu bản đồ</div>";
+    {% endif %}
+    });
+</script>
+{% endblock %}
