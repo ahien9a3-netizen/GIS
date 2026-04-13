@@ -31,6 +31,7 @@ class SidebarContextMixin:
         context['user_name'] = self.request.session.get('user_name', 'Khách')
         context['user_role'] = self.request.session.get('user_role', '')
         context['current_user_id'] = self.request.session.get('user_id', '')
+        context['is_admin_view'] = self.request.session.get('is_admin_view', False)
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -38,13 +39,19 @@ class SidebarContextMixin:
         if 'user_id' not in request.session:
             return redirect('login')
         
-        # 2. Kiểm tra phân quyền (Role)
+        # 2. Lấy role và trạng thái view hiện tại
         user_role = request.session.get('user_role')
-        if self.required_roles and user_role not in self.required_roles:
+        is_admin_view = request.session.get('is_admin_view', False)
+
+        # 3. Kiểm tra phân quyền (Role và View)
+        if self.required_roles and 'Admin' in self.required_roles:
+            # Nếu trang yêu cầu Admin, nhưng user không phải Admin HOẶC đang tắt view Admin
+            if user_role != 'Admin' or (user_role == 'Admin' and not is_admin_view):
+                return render(request, '403.html', {'message': 'Bạn không có quyền truy cập hoặc đang ở chế độ Nhân viên!'}, status=403)
+        elif self.required_roles and user_role not in self.required_roles:
             return render(request, '403.html', {'message': 'Bạn không có quyền truy cập chức năng này!'}, status=403)
             
         return super().dispatch(request, *args, **kwargs)
-
 
 def role_required(allowed_roles=[]):
     def decorator(view_func):
@@ -191,6 +198,8 @@ def login_view(request):
             request.session['user_id'] = nv.MaNV
             request.session['user_name'] = nv.Ten
             request.session['user_role'] = nv.Role
+            # Mặc định Admin đăng nhập vào sẽ thấy view Admin
+            request.session['is_admin_view'] = (nv.Role == 'Admin')
             return redirect('home')
         else:
             error = "Số điện thoại hoặc mật khẩu không đúng!"
@@ -1037,3 +1046,14 @@ def delete_gis_image(request):
 
 def custom_404_view(request, custom_path=None):
     return render(request, '404.html', status=404)
+
+@role_required(['Admin'])
+def switch_view_role(request):
+    """
+    Hàm đổi góc nhìn cho Admin (Admin <-> Nhân Viên)
+    """
+    if request.method == 'POST':
+        current_status = request.session.get('is_admin_view', True)
+        request.session['is_admin_view'] = not current_status
+    
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
