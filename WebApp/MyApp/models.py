@@ -2,6 +2,7 @@ from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from ckeditor.fields import RichTextField
+from django.core.validators import MinValueValidator, MaxValueValidator
 # SẢN PHẨM
 class SanPham(models.Model):
     TRANG_THAI_CHOICES = [
@@ -269,3 +270,17 @@ class Store(models.Model):
     class Meta:
         verbose_name = "Cửa hàng"
         verbose_name_plural = "Danh sách cửa hàng"
+
+
+# BẢNG ĐÁNH GIÁ CỬA HÀNG
+class DanhGiaCuaHang(models.Model):
+    CuaHang = models.ForeignKey(CuaHang, on_delete=models.CASCADE, related_name='danh_gia', db_column='mach')
+    NhanVien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, db_column='manv')
+    SoSao = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], db_column='sosao', verbose_name="Số sao")
+    NhanXet = models.TextField(blank=True, null=True, db_column='nhanxet', verbose_name="Nhận xét")
+    NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
+
+    class Meta:
+        managed = True
+        db_table = 'danhgiacuahang'
+        ordering = ['-NgayTao'] # Sắp xếp đánh giá mới nhất lên đầu

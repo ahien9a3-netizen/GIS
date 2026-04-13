@@ -13,7 +13,10 @@ import random
 from django.db.models import Count, Sum, Q
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from .models import SanPham, CuaHang, Kho, HangTonKho, NhanVien, YeuCauNhapKho, DanhMuc
+from .models import SanPham, CuaHang, Kho, HangTonKho, NhanVien, YeuCauNhapKho, DanhMuc, DanhGiaCuaHang
+from .forms import DanhGiaForm 
+from django.db.models import Avg
+
 
 class MultipleFileInput(ClearableFileInput):
     allow_multiple_selected = True
@@ -508,8 +511,37 @@ class CuaHangUpdateView(SidebarContextMixin, UpdateView):
 def store_detail_view(request, pk):
     if 'user_id' not in request.session: return redirect('login')
     store = get_object_or_404(CuaHang, MaCH=pk)
+    
+    # Lấy danh sách đánh giá
+    reviews = store.danh_gia.all()
+    
+    # --- LOGIC TÍNH ĐIỂM TRUNG BÌNH ---
+    total_reviews = reviews.count()
+    # Tính trung bình, nếu chưa có ai đánh giá thì mặc định là 0
+    avg_rating = reviews.aggregate(Avg('SoSao'))['SoSao__avg'] or 0
+    avg_rating = round(avg_rating, 1) # Làm tròn 1 chữ số thập phân (VD: 4.7)
+    # Tính phần trăm để hiển thị thanh sao màu xanh (VD: 4.7 sao = 94%)
+    avg_percent = (avg_rating / 5) * 100 if total_reviews > 0 else 0
+    
+    # Xử lý khi gửi form
+    if request.method == 'POST':
+        form = DanhGiaForm(request.POST)
+        if form.is_valid():
+            danh_gia = form.save(commit=False)
+            danh_gia.CuaHang = store
+            danh_gia.NhanVien = get_object_or_404(NhanVien, MaNV=request.session['user_id'])
+            danh_gia.save()
+            return redirect('store_detail', pk=pk)
+    else:
+        form = DanhGiaForm()
+
     return render(request, 'MyApp/store_detail.html', {
         'store': store,
+        'reviews': reviews,
+        'form': form,
+        'avg_rating': avg_rating,       # Truyền điểm trung bình ra giao diện
+        'total_reviews': total_reviews, # Truyền tổng số lượt ra giao diện
+        'avg_percent': avg_percent,     # Truyền % để vẽ sao
         'sidebar_active': 'stores',
         'page_title': 'Chi tiết Cửa hàng',
         'user_name': request.session.get('user_name', 'Khách'),
@@ -1057,3 +1089,46 @@ def switch_view_role(request):
         request.session['is_admin_view'] = not current_status
     
     return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+# HÀM XÓA ĐÁNH GIÁ
+def delete_review(request, pk):
+    if 'user_id' not in request.session: return redirect('login')
+    
+    review = get_object_or_404(DanhGiaCuaHang, id=pk)
+    store_id = review.CuaHang.MaCH
+
+    # CHỐT CHẶN BẢO MẬT: Chỉ chủ nhân mới được xóa
+    if review.NhanVien.MaNV == request.session['user_id']:
+        review.delete()
+
+    return redirect('store_detail', pk=store_id)
+
+
+# HÀM SỬA ĐÁNH GIÁ
+def edit_review(request, pk):
+    if 'user_id' not in request.session: return redirect('login')
+    
+    review = get_object_or_404(DanhGiaCuaHang, id=pk)
+    store_id = review.CuaHang.MaCH
+
+    # CHỐT CHẶN BẢO MẬT: Chặn nếu người khác cố tình truy cập link để sửa
+    if review.NhanVien.MaNV != request.session['user_id']:
+        return redirect('store_detail', pk=store_id)
+
+    if request.method == 'POST':
+        form = DanhGiaForm(request.POST, instance=review) # instance=review để load dữ liệu cũ lên
+        if form.is_valid():
+            form.save()
+            return redirect('store_detail', pk=store_id)
+    else:
+        form = DanhGiaForm(instance=review)
+
+    return render(request, 'MyApp/edit_review.html', {
+        'form': form,
+        'review': review,
+        'store': review.CuaHang,
+        'page_title': 'Sửa đánh giá',
+        'sidebar_active': 'stores',
+        'user_name': request.session.get('user_name', 'Khách'),
+        'user_role': request.session.get('user_role', '')
+    })

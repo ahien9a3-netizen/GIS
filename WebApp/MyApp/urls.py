@@ -3,7 +3,7 @@ from django.views.generic import TemplateView
 from .tool import store_geojson, store_heatmap, service_area, kho_geojson
 from .views import (
     home, report_view, login_view, logout_view, settings_view, gis_map, inventory_stats, upload_gis_images, delete_gis_image,
-    forgot_password_view, reset_password_view, verify_otp_view, switch_view_role,
+    forgot_password_view, reset_password_view, verify_otp_view, switch_view_role, delete_review, edit_review,
     CuaHangListView, CuaHangCreateView, CuaHangUpdateView, CuaHangDeleteView, store_detail_view,
     SanPhamListView, SanPhamCreateView, SanPhamUpdateView, SanPhamDeleteView, SanPhamDetailView,
     DanhMucListView, DanhMucCreateView, DanhMucUpdateView, DanhMucDeleteView,
@@ -38,6 +38,8 @@ urlpatterns = [
     path('stores/<str:pk>/', store_detail_view, name='store_detail'),
     path('stores/<str:pk>/edit/', CuaHangUpdateView.as_view(), name='store_edit'),
     path('stores/<str:pk>/delete/', CuaHangDeleteView.as_view(), name='store_delete'),
+    path('review/edit/<int:pk>/', edit_review, name='edit_review'),
+    path('review/delete/<int:pk>/', delete_review, name='delete_review'),
 
     # Sản phẩm
     path('products/', SanPhamListView.as_view(), name='product_list'),
