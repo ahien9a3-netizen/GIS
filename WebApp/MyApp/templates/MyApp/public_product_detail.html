@@ -1,0 +1,423 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #1d4ed8;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e3a8a;
+            --secondary: #10b981;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.85);
+        }
+
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background-color: var(--light); color: #334155; }
+
+        .navbar { position: fixed; top: 0; width: 100%; height: 70px; background: var(--glass); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 4%; box-sizing: border-box; }
+        .nav-brand { font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        
+        /* Cart Styles */
+        .cart-btn { position: relative; width: 42px; height: 42px; background: #eff6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); text-decoration: none; transition: 0.3s; margin-right: 10px; }
+        .cart-btn:hover { background: var(--primary); color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(29, 78, 216, 0.2); }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 10px; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .nav-brand i { color: var(--primary-light); }
+        
+        .main-container { padding-top: 100px; padding-bottom: 60px; max-width: 1200px; margin: 0 auto; padding-left: 5%; padding-right: 5%; }
+
+        /* Product Hero */
+        .product-hero { background: white; border-radius: 30px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.05); display: flex; flex-wrap: wrap; margin-bottom: 40px; }
+        .product-hero-img { flex: 1; min-width: 300px; height: 500px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; }
+        .product-hero-img img { width: 100%; height: 100%; object-fit: cover; }
+        .product-hero-content { flex: 1.2; padding: 50px; display: flex; flex-direction: column; justify-content: center; }
+        
+        .cat-tag { background: #eff6ff; color: var(--primary-light); padding: 5px 15px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; width: fit-content; margin-bottom: 20px; text-transform: uppercase; }
+        .product-name { font-family: 'Outfit', sans-serif; font-size: 2.8rem; font-weight: 800; color: var(--dark); margin: 0 0 15px 0; line-height: 1.1; }
+        
+        .rating-summary { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
+        .stars { color: #f59e0b; font-size: 1.1rem; }
+        .rating-avg { font-weight: 800; font-size: 1.2rem; color: var(--dark); }
+        
+        .product-desc { font-size: 1.1rem; line-height: 1.8; color: #64748b; margin-bottom: 40px; }
+
+        .price-badge { font-size: 0.9rem; font-weight: 700; color: var(--primary); margin-bottom: 10px; display: block; }
+        .status-badge { padding: 4px 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; background: #dcfce7; color: #166534; width: fit-content; }
+
+        .btn-buy { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; padding: 18px 45px; border-radius: 50px; font-size: 1.1rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 12px; width: fit-content; box-shadow: 0 10px 25px rgba(29, 78, 216, 0.3); transition: all 0.3s; }
+        .btn-buy:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(29, 78, 216, 0.4); }
+
+        /* Detail Section */
+        .detail-section { background: white; border-radius: 30px; padding: 40px; margin-bottom: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        .section-title { font-family: 'Outfit', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--dark); margin-bottom: 30px; display: flex; align-items: center; gap: 12px; }
+        .section-title::after { content: ''; flex: 1; height: 1px; background: #e2e8f0; }
+
+        /* Reviews */
+        .reviews-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 50px; }
+        @media (max-width: 900px) { .reviews-grid { grid-template-columns: 1fr; } }
+
+        .review-card { padding: 25px; background: #f8fafc; border-radius: 20px; border: 1px solid #f1f5f9; margin-bottom: 20px; transition: 0.3s; }
+        .review-card:hover { border-color: var(--primary-light); background: white; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .review-user { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .user-info { font-weight: 800; color: var(--dark); font-size: 1.05rem; }
+        .review-date { font-size: 0.8rem; color: #94a3b8; font-weight: 400; }
+        .review-text { color: #475569; line-height: 1.7; margin-top: 15px; }
+
+        .review-form { background: #eff6ff; padding: 35px; border-radius: 25px; height: fit-content; position: sticky; top: 100px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 700; color: var(--primary-dark); margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; border: 1px solid #fff; padding: 15px; border-radius: 12px; background: white; font-family: inherit; font-size: 1rem; outline: none; transition: 0.3s; box-sizing: border-box; }
+        .form-group input:focus, .form-group textarea:focus { border-color: var(--primary-light); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+
+        /* Custom Star Rating Input */
+        .star-input { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 5px; }
+        .star-radio { display: none; }
+        .star-label { cursor: pointer; font-size: 1.8rem; color: #cbd5e1; transition: color 0.2s; }
+        .star-radio:checked ~ .star-label, .star-label:hover, .star-label:hover ~ .star-label { color: #f59e0b; }
+
+        .btn-submit { background: var(--dark); color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; transition: 0.3s; }
+        .btn-submit:hover { background: var(--primary-dark); transform: scale(1.02); }
+
+        .btn-back { display: inline-flex; align-items: center; gap: 8px; color: #64748b; text-decoration: none; font-weight: 600; margin-bottom: 30px; transition: 0.3s; }
+        .btn-back:hover { color: var(--primary); }
+
+        /* Toast Notification */
+        #toast-container { position: fixed; bottom: 30px; right: 30px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: white; border-left: 4px solid var(--primary); padding: 15px 25px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 15px; transform: translateX(120%); transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); font-weight: 600; color: var(--dark); font-size:0.95rem; }
+        .toast.show { transform: translateX(0); }
+        .toast i { color: var(--primary); font-size: 1.2rem; }
+
+        /* User Dropdown */
+        .user-dropdown { position: relative; }
+        .user-trigger { display: flex; align-items: center; gap: 12px; padding: 6px 16px 6px 6px; background: white; border-radius: 50px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-decoration: none; }
+        .user-trigger:hover { background: #f8fafc; border-color: var(--primary-light); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        
+        .avatar-circle { width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 10px rgba(29, 78, 216, 0.3); }
+        .user-name-text { font-weight: 700; color: #334155; font-size: 0.95rem; }
+
+        .dropdown-menu { position: absolute; top: calc(100% + 15px); right: 0; width: 300px; background: white; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.05); padding: 12px; z-index: 1000; opacity: 0; visibility: hidden; transform: translateY(10px); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .user-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        .dropdown-header { padding: 20px; background: #f8fafc; border-radius: 16px; margin-bottom: 8px; text-align: left; }
+        .profile-name { display: block; font-weight: 800; color: var(--dark); font-size: 1.1rem; margin-bottom: 2px; }
+        .profile-email { display: block; font-size: 0.85rem; color: #64748b; margin-bottom: 12px; }
+        .profile-role { display: inline-block; padding: 4px 12px; background: #dbeafe; color: #1e40af; border-radius: 6px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .dropdown-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #475569; text-decoration: none; border-radius: 12px; transition: 0.2s; font-weight: 600; font-size: 0.95rem; text-align: left; }
+        .dropdown-link:hover { background: #f1f5f9; color: var(--primary); padding-left: 20px; }
+        .dropdown-link i { width: 20px; text-align: center; color: #94a3b8; transition: 0.2s; }
+        .dropdown-link:hover i { color: var(--primary); }
+
+        .dropdown-divider { height: 1px; background: #f1f5f9; margin: 8px 0; }
+        .dropdown-logout { color: #ef4444; }
+        .dropdown-logout:hover { background: #fef2f2; color: #ef4444; }
+        .dropdown-logout i { color: #ef4444; }
+
+        /* Breadcrumb System */
+        .breadcrumb { font-size: 0.85rem; color: #64748b; margin-bottom: 25px; display: flex; align-items: center; gap: 8px; }
+        .breadcrumb a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb i { font-size: 0.65rem; color: #cbd5e1; }
+        .breadcrumb span { color: #94a3b8; font-weight: 500; }
+
+        /* Review Section Modernization */
+        .footer { background: #0f172a; color: #94a3b8; padding: 80px 5% 30px; margin-top: 80px; position: relative; overflow: hidden; border-top: 2px solid var(--primary-light); }
+        .footer-grid-main { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 50px; margin-bottom: 60px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+        @media (max-width: 1024px) { .footer-grid-main { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 640px) { .footer-grid-main { grid-template-columns: 1fr; } }
+        
+        .footer-logo-main { font-size: 1.8rem; color: white; font-weight: 800; display: flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 25px; }
+        .footer-desc { line-height: 1.8; margin-top: 0; font-size: 0.95rem; }
+        .social-links { display: flex; gap: 15px; margin-top: 25px; }
+        .social-links a { width: 40px; height: 40px; background: #1e293b; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: 0.3s; }
+        .social-links a:hover { background: var(--primary); transform: translateY(-3px); }
+
+        .footer-title { color: white; font-size: 1.2rem; font-weight: 700; margin-bottom: 25px; position: relative; padding-bottom: 10px; }
+        .footer-title::after { content: ''; position: absolute; bottom: 0; left: 0; width: 40px; height: 3px; background: var(--primary); border-radius: 2px; }
+        
+        .footer-links { list-style: none; padding: 0; }
+        .footer-links li { margin-bottom: 15px; }
+        .footer-links a { color: #94a3b8; text-decoration: none; transition: 0.3s; font-size: 0.95rem; }
+        .footer-links a:hover { color: white; padding-left: 5px; }
+
+        .footer-info { list-style: none; padding: 0; }
+        .footer-info li { display: flex; gap: 12px; margin-bottom: 18px; line-height: 1.5; font-size: 0.95rem; }
+        .footer-info i { color: var(--primary-light); margin-top: 4px; }
+
+        .footer-bottom { text-align: center; border-top: 1px solid #1e293b; padding-top: 30px; font-size: 0.9rem; max-width: 1200px; margin-left: auto; margin-right: auto; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar" id="navbar">
+        <a href="{% url 'public_home' %}" class="nav-brand">
+            <i class="fa-solid fa-map-location-dot"></i> SMART MART
+        </a>
+        <div style="display:flex; gap:20px; align-items:center;">
+            <ul class="nav-links" style="display:flex; list-style:none; gap:25px; margin:0; padding:0; align-items:center;">
+                <li><a href="{% url 'public_home' %}" style="text-decoration:none; font-weight:600; color:{% if active_nav == 'home' %}var(--primary){% else %}#475569{% endif %};">Trang chủ</a></li>
+                <li><a href="{% url 'public_product_list' %}" style="text-decoration:none; font-weight:600; color:{% if active_nav == 'products' %}var(--primary){% else %}#475569{% endif %};">Sản phẩm</a></li>
+                <li><a href="{% url 'public_about' %}" style="text-decoration:none; font-weight:600; color:{% if active_nav == 'about' %}var(--primary){% else %}#475569{% endif %};">Về chúng tôi</a></li>
+                <li><a href="{% url 'public_gis_map' %}" style="text-decoration:none; font-weight:600; color:{% if active_nav == 'map' %}var(--primary){% else %}#475569{% endif %};">Bản đồ</a></li>
+            </ul>
+
+            <a href="{% url 'view_cart' %}" class="cart-btn">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-badge">{{ cart_count|default:0 }}</span>
+            </a>
+
+            {% if customer_name %}
+                <div class="user-dropdown">
+                    <div class="user-trigger">
+                        <div class="avatar-circle">
+                            {{ customer_name|slice:":1"|upper }}
+                        </div>
+                        <span class="user-name-text">{{ customer_name }}</span>
+                        <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: #94a3b8;"></i>
+                    </div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-header">
+                            <span class="profile-name">{{ customer_name }}</span>
+                            <span class="profile-email">{{ customer_email|default:"Chưa cập nhật Email" }}</span>
+                            <span class="profile-role">{{ user_role|default:"Khách hàng" }}</span>
+                        </div>
+                        <a href="{% url 'public_profile' %}" class="dropdown-link"><i class="fa-solid fa-user-gear"></i> Tài khoản cá nhân</a>
+                        <a href="{% url 'public_order_history' %}" class="dropdown-link"><i class="fa-solid fa-box-open"></i> Lịch sử đơn hàng</a>
+                        <a href="{% url 'view_cart' %}" class="dropdown-link"><i class="fa-solid fa-cart-shopping"></i> Giỏ hàng của tôi</a>
+                        
+                        {% if user_role == 'Admin' or user_role == 'Nhân Viên' or user_role == 'Kế Toán' %}
+                            <div class="dropdown-divider"></div>
+                            <a href="{% url 'home' %}" class="dropdown-link" style="color:var(--primary-dark);"><i class="fa-solid fa-user-shield"></i> Quản trị hệ thống</a>
+                        {% endif %}
+                        
+                        <div class="dropdown-divider"></div>
+                        <a href="{% url 'public_logout' %}" class="dropdown-link dropdown-logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+                    </div>
+                </div>
+            {% else %}
+                <div style="display:flex; gap:10px;">
+                    <a href="{% url 'public_login' %}" style="text-decoration:none; color:var(--dark); font-weight:600;">Đăng nhập</a>
+                    <a href="{% url 'public_register' %}" style="text-decoration:none; color:var(--primary); font-weight:700;">Đăng ký</a>
+                </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="main-container">
+        <div class="breadcrumb" data-aos="fade-right">
+            <a href="{% url 'public_home' %}">Trang chủ</a> 
+            <i class="fa-solid fa-chevron-right"></i>
+            <span>{{ product.Ten }}</span>
+        </div>
+
+        <div class="product-hero" data-aos="fade-up">
+            <div class="product-hero-img">
+                {% if product.Image %}
+                    <img src="{{ product.Image.url }}" alt="{{ product.Ten }}">
+                {% else %}
+                    <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=1200" alt="Default Product">
+                {% endif %}
+            </div>
+            <div class="product-hero-content">
+                <span class="cat-tag">{{ product.DanhMuc.Ten|default:"Sản phẩm nổi bật" }}</span>
+                <h1 class="product-name">{{ product.Ten }}</h1>
+                
+                <div class="rating-summary">
+                    <div class="stars">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= avg_rating %}
+                                <i class="fa-solid fa-star"></i>
+                            {% else %}
+                                <i class="fa-regular fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <span class="rating-avg">{{ avg_rating|default:"5.0" }}</span>
+                    <span style="color:#94a3b8; font-size:0.9rem;">({{ reviews.count }} đánh giá)</span>
+                </div>
+
+                <div class="product-desc">
+                    {{ product.MieuTa|default:"Bên cạnh việc cung cấp các tiện ích hệ thống GIS tìm vị trí, chúng tôi cam kết sản phẩm được chọn lọc với chất lượng đảm bảo theo đúng quy chuẩn hệ thống chuỗi SMART MART." }}
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <div style="color: var(--primary); font-size: 2.5rem; font-weight: 800;">{{ product.Gia|default:0|floatformat:"0" }} <small style="font-size: 1.1rem;">VND</small></div>
+                    <div style="color: #64748b; font-size: 0.9rem; margin-top: 5px;"><i class="fa-solid fa-tag"></i> Sản phẩm đang có sẵn tại hệ thống Smart Mart</div>
+                </div>
+
+                <div style="margin-bottom:30px;">
+                    <div class="price-badge">MÃ SẢN PHẨM: {{ product.MaSP }}</div>
+                    <div class="status-badge">{{ product.TrangThai }}</div>
+                </div>
+
+                <button class="btn-buy" onclick="showToast('Đã thêm {{ product.Ten|escapejs }} vào giỏ hàng!')">
+                    <i class="fa-solid fa-cart-plus"></i> THÊM VÀO GIỎ HÀNG
+                </button>
+            </div>
+        </div>
+
+        <div class="detail-section" data-aos="fade-up">
+            <h2 class="section-title"><i class="fa-solid fa-star"></i> Đánh giá khách hàng</h2>
+            
+            <div class="reviews-grid">
+                <div class="reviews-list">
+                    {% for r in reviews %}
+                        <div class="review-card">
+                            <div class="review-user">
+                                <span class="user-info"><i class="fa-solid fa-user-circle"></i> {{ r.NguoiDung }}</span>
+                                <span class="review-date">{{ r.NgayTao|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            <div class="stars" style="font-size:0.8rem;">
+                                {% for i in "12345" %}
+                                    <i class="fa-{% if forloop.counter <= r.Diem %}solid{% else %}regular{% endif %} fa-star"></i>
+                                {% endfor %}
+                            </div>
+                            <div class="review-text">{{ r.BinhLuan }}</div>
+                        </div>
+                    {% empty %}
+                        <div style="text-align: center; padding: 50px; color: #94a3b8;">
+                            <i class="fa-solid fa-comment-slash" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
+                            Chưa có nhận xét nào. Hãy trở thành người đầu tiên đánh giá sản phẩm này!
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="review-form">
+                    <h3 style="color:var(--primary-dark); margin-bottom:25px;">Gửi đánh giá của bạn</h3>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {% if customer_name %}
+                            <p style="margin-bottom:20px; color:#475569; font-size:0.9rem;">
+                                <i class="fa-solid fa-circle-user" style="color:var(--primary);"></i>
+                                Đánh giá với tài khoản: <strong>{{ customer_name }}</strong>
+                            </p>
+                        {% endif %}
+
+                        <div class="form-group">
+                            <label>Hài lòng của bạn</label>
+                            <div class="star-input">
+                                <input type="radio" name="rating" id="star5" value="5" class="star-radio" checked><label for="star5" class="star-label"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" name="rating" id="star4" value="4" class="star-radio"><label for="star4" class="star-label"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" name="rating" id="star3" value="3" class="star-radio"><label for="star3" class="star-label"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" name="rating" id="star2" value="2" class="star-radio"><label for="star2" class="star-label"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" name="rating" id="star1" value="1" class="star-radio"><label for="star1" class="star-label"><i class="fa-solid fa-star"></i></label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Bình luận</label>
+                            <textarea name="comment" rows="5" placeholder="Bạn thấy sản phẩm này thế nào?" required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit">GỬI NHẬN XÉT</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-grid-main">
+            <div class="footer-col" data-aos="fade-up">
+                <a href="#" class="footer-logo-main"><i class="fa-solid fa-map-location-dot"></i> SMART MART</a>
+                <p class="footer-desc">Nền tảng GIS hàng đầu giúp bạn tìm kiếm và trải nghiệm mua sắm thông minh tại chuỗi cửa hàng SMART MART toàn quốc.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-col" data-aos="fade-up" data-aos-delay="100">
+                <h4 class="footer-title">Khám Phá</h4>
+                <ul class="footer-links">
+                    <li><a href="{% url 'public_home' %}">Trang chủ</a></li>
+                    <li><a href="{% url 'public_gis_map' %}">Bản đồ GIS</a></li>
+                    <li><a href="#products">Danh mục sản phẩm</a></li>
+                    <li><a href="#">Hệ thống cửa hàng</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col" data-aos="fade-up" data-aos-delay="200">
+                <h4 class="footer-title">Hỗ Trợ</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Chính sách bảo hành</a></li>
+                    <li><a href="#">Điều khoản sử dụng</a></li>
+                    <li><a href="#">Câu hỏi thường gặp</a></li>
+                    <li><a href="{% url 'public_about' %}">Về chúng tôi</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col" data-aos="fade-up" data-aos-delay="300">
+                <h4 class="footer-title">Liên Hệ</h4>
+                <ul class="footer-info">
+                    <li><i class="fa-solid fa-location-dot"></i> 123 Đường ABC, Quận 1, TP. Hồ Chí Minh</li>
+                    <li><i class="fa-solid fa-phone"></i> Hotline: 1900 1234</li>
+                    <li><i class="fa-solid fa-envelope"></i> support@smartmart.vn</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Smart Mart GIS Platform. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="toast-container"></div>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true });
+        
+        function addToCart(pk, productName) {
+            fetch(`/api/cart/add/${pk}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message);
+                    // Update all badges on page
+                    const badges = document.querySelectorAll('.cart-badge');
+                    badges.forEach(badge => {
+                        badge.innerText = data.cart_count;
+                        badge.style.transform = 'scale(1.3)';
+                        setTimeout(() => badge.style.transform = 'scale(1)', 200);
+                    });
+                } else if (data.require_login) {
+                    window.location.href = "{% url 'public_login' %}";
+                } else {
+                    showToast(data.message || 'Có lỗi xảy ra');
+                }
+            });
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
+            
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

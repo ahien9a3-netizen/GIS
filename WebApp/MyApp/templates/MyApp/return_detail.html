@@ -1,0 +1,142 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .order-detail-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+    .card-title { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
+    
+    .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; }
+    .info-label { color: #64748b; font-weight: 500; }
+    .info-value { color: var(--dark); font-weight: 700; text-align: right; }
+    
+    .status-picker { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #e2e8f0; font-family: inherit; font-weight: 700; outline: none; transition: 0.3s; margin-bottom: 15px; }
+    .status-picker:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+    
+    .form-input { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #e2e8f0; font-family: inherit; outline: none; transition: 0.3s; margin-bottom: 15px; box-sizing: border-box; }
+    .form-input:focus { border-color: var(--primary); }
+    
+    .btn-update { width: 100%; padding: 12px; border-radius: 12px; background: var(--primary); color: white; font-weight: 700; border: none; cursor: pointer; transition: 0.3s; }
+    .btn-update:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(29, 78, 216, 0.2); }
+
+    .item-table { width: 100%; border-collapse: collapse; }
+    .item-table th { text-align: left; padding: 12px; border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 0.8rem; text-transform: uppercase; }
+    .item-table td { padding: 15px 12px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+    .item-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid #eee; }
+</style>
+
+<div class="page-header">
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <a href="{% url 'return_list' %}" style="text-decoration: none; color: #64748b; background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm);"><i class="fa-solid fa-arrow-left"></i></a>
+        <div>
+            <h1>Yêu cầu trả hàng #{{ ret.MaYCTH }}</h1>
+            <p>Đơn hàng liên quan: <a href="{% url 'order_detail' ret.DonHang.MaDH %}" style="color: var(--primary); font-weight: 700; text-decoration: none;">#{{ ret.DonHang.MaDH }}</a></p>
+        </div>
+    </div>
+</div>
+
+<div class="order-detail-grid">
+    <div class="checkout-left">
+        <!-- Return Items Summary -->
+        <div class="chart-card" style="margin-bottom: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: var(--shadow);">
+            <h3 class="card-title"><i class="fa-solid fa-file-invoice" style="color: #ef4444;"></i> Chi tiết yêu cầu</h3>
+            <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 25px;">
+                <div style="font-weight: 700; color: #1e293b; margin-bottom: 10px; font-size: 0.95rem;">Lý do trả hàng từ quản khách hàng:</div>
+                <div style="color: #475569; line-height: 1.6; font-style: italic;">"{{ ret.LyDo }}"</div>
+            </div>
+
+            <h3 class="card-title" style="border-top: 1px solid #f1f5f9; padding-top: 20px; margin-top: 20px;"><i class="fa-solid fa-box" style="color: var(--primary);"></i> Sản phẩm trong đơn hàng</h3>
+            <table class="item-table">
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th style="text-align: right;">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in ret.DonHang.items.all %}
+                    <tr>
+                        <td>
+                            <div style="display: flex; gap: 15px; align-items: center;">
+                                {% if item.SanPham.Image %}
+                                <img src="{{ item.SanPham.Image.url }}" class="item-img">
+                                {% else %}
+                                <div class="item-img" style="background:#f1f5f9; display:flex; align-items:center; justify-content:center; color:#cbd5e1;"><i class="fa-solid fa-image"></i></div>
+                                {% endif %}
+                                <div>
+                                    <div style="font-weight: 700; color: var(--dark);">{{ item.SanPham.Ten }}</div>
+                                    <div style="font-size: 0.75rem; color: #94a3b8;">Mã: {{ item.SanPham.MaSP }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-weight: 700;">x{{ item.SoLuong }}</td>
+                        <td>{{ item.GiaBan|floatformat:"0" }} <small>VND</small></td>
+                        <td style="text-align: right; font-weight: 800; color: var(--primary);">
+                            {% widthratio item.GiaBan 1 item.SoLuong %} <small>VND</small>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="chart-card" style="padding: 25px; background: white; border-radius: 12px; box-shadow: var(--shadow);">
+            <h3 class="card-title"><i class="fa-solid fa-user-tag" style="color: #6366f1;"></i> Thông tin khách hàng</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                <div>
+                    <div class="info-row">
+                        <span class="info-label">Họ tên:</span>
+                        <span class="info-value">{{ ret.DonHang.TenNguoiNhan }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Số điện thoại:</span>
+                        <span class="info-value">{{ ret.DonHang.SDT_Nhan }}</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">{{ ret.DonHang.NguoiDung.Email|default:"Không có" }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Ngày yêu cầu:</span>
+                        <span class="info-value">{{ ret.NgayTao|date:"d/m/Y H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="checkout-right">
+        <!-- Status Management -->
+        <div class="chart-card" style="padding: 25px; position: sticky; top: 100px; background: white; border-radius: 12px; box-shadow: var(--shadow);">
+            <h3 class="card-title"><i class="fa-solid fa-shield-halved" style="color: var(--secondary);"></i> Xử lý yêu cầu</h3>
+            
+            <form action="{% url 'update_return_status' ret.MaYCTH %}" method="post">
+                {% csrf_token %}
+                <div class="info-label" style="margin-bottom: 10px;">Trạng thái xử lý:</div>
+                <select name="status" class="status-picker">
+                    {% for val, text in ret.TRANG_THAI_CHOICES %}
+                        <option value="{{ val }}" {% if ret.TrangThai == val %}selected{% endif %}>{{ text }}</option>
+                    {% endfor %}
+                </select>
+
+                <div class="info-label" style="margin-bottom: 10px;">Số tiền hoàn trả (VND):</div>
+                <input type="number" name="amount" value="{{ ret.SoTienHoan|floatformat:'0' }}" class="form-input">
+
+                <div class="info-label" style="margin-bottom: 10px;">Ghi chú của Admin:</div>
+                <textarea name="note" rows="4" class="form-input" style="height: auto; resize: none;" placeholder="Lý do xử lý...">{{ ret.GhiChuAdmin|default:"" }}</textarea>
+
+                <button type="submit" class="btn-update">CẬP NHẬT & GỬI MAIL</button>
+            </form>
+
+            <div style="margin-top: 25px; padding: 15px; border-radius: 12px; background: #eff6ff; border: 1px solid #bfdbfe; font-size: 0.8rem; color: #1e40af; line-height: 1.5;">
+                <i class="fa-solid fa-circle-info" style="margin-right: 5px;"></i>
+                Khi chuyển sang trạng thái <strong>"Đã hoàn tiền"</strong>, hệ thống sẽ tự động gửi Email thông báo đến khách hàng qua Mailtrap.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

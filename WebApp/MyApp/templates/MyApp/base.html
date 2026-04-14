@@ -29,6 +29,29 @@
         .logout-link:hover {
             color: #ef4444;
         }
+
+        .view-site-btn {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #1d4ed8;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border: 1px solid #bfdbfe;
+        }
+
+        .view-site-btn:hover {
+            background: #1d4ed8;
+            color: white;
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
+            transform: translateY(-1px);
+        }
     </style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -94,6 +117,11 @@
                 <i class="fa-solid fa-file-invoice"></i>
                 <span>Nhập kho</span>
             </a>
+            <a href="{% url 'stock_out_list' %}"
+                class="sidebar-item {% if sidebar_active == 'stock_out' %}active{% endif %}">
+                <i class="fa-solid fa-file-export"></i>
+                <span>Xuất kho</span>
+            </a>
             {% endif %}
             <a href="{% url 'inventory_list' %}"
                 class="sidebar-item {% if sidebar_active == 'inventory' %}active{% endif %}">
@@ -103,6 +131,14 @@
             <a href="{% url 'gis_map' %}" class="sidebar-item {% if sidebar_active == 'gis_map' %}active{% endif %}">
                 <i class="fa-solid fa-map-location-dot"></i>
                 <span>Bản đồ GIS</span>
+            </a>
+            <a href="{% url 'order_list' %}" class="sidebar-item {% if sidebar_active == 'orders' %}active{% endif %}">
+                <i class="fa-solid fa-shopping-bag"></i>
+                <span>Đơn hàng</span>
+            </a>
+            <a href="{% url 'return_list' %}" class="sidebar-item {% if sidebar_active == 'returns' %}active{% endif %}">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Trả hàng</span>
             </a>
             {% if user_role == 'Admin' or user_role == 'Kế Toán' %}
             <a href="{% url 'reports' %}" class="sidebar-item {% if sidebar_active == 'reports' %}active{% endif %}">
@@ -125,7 +161,11 @@
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" placeholder="Tìm kiếm sản phẩm, cửa hàng...">
             </div>
-            <div class="header-actions">
+            <div class="header-actions" style="gap: 1.5rem;">
+                <a href="{% url 'public_home' %}" class="view-site-btn" title="Xem trang người dùng">
+                    <i class="fa-solid fa-earth-asia"></i>
+                    <span>Xem trang chủ</span>
+                </a>
                 <button class="header-icon-btn">
                     <i class="fa-solid fa-bell"></i>
                     <span class="notification-badge">3</span>

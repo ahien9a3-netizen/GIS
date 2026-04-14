@@ -1,0 +1,242 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ page_title }}{% endblock %}</title>
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    
+    <style>
+        :root {
+            /* Brand colors */
+            --primary: #1d4ed8;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e3a8a;
+            --secondary: #10b981;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.9);
+
+            /* Gray scale - needed by shared gis_map.html */
+            --gray-50:  #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --gray-900: #0f172a;
+
+            /* Shadows - needed by shared gis_map.html */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow:    0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+
+            /* Layout */
+            --header-height: 80px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light);
+            color: #334155;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .nav-brand { font-family: 'Outfit', sans-serif; }
+
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 4%;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        .navbar.scrolled { height: 70px; background: rgba(255, 255, 255, 0.97); box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+        .nav-brand { font-size: 1.8rem; font-weight: 800; color: var(--primary-dark); text-decoration: none; display: flex; align-items: center; gap: 10px; font-family: 'Outfit', sans-serif; }
+        .nav-brand i { color: var(--primary-light); }
+
+        .nav-links { display: flex; gap: 20px; list-style: none; margin: 0; padding: 0; align-items: center; }
+        .nav-links a { text-decoration: none; color: #475569; font-weight: 600; font-size: 1rem; transition: color 0.3s; position: relative; }
+        .nav-links a:hover { color: var(--primary-light); }
+        .nav-links a.active { color: var(--primary); }
+        .nav-links a.active::after { content: ''; position: absolute; bottom: -5px; left: 0; width: 100%; height: 2px; background: var(--primary); border-radius: 2px; }
+
+        .btn-login { background: linear-gradient(135deg, var(--primary-light), var(--primary)); color: white !important; padding: 10px 24px; border-radius: 30px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; transition: 0.3s; }
+        .btn-login:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(29, 78, 216, 0.3); }
+
+        .cart-btn { position: relative; width: 45px; height: 45px; background: #eff6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); text-decoration: none; transition: 0.3s; margin-right: 5px; }
+        .cart-btn:hover { background: var(--primary); color: white; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(29, 78, 216, 0.2); }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.65rem; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        /* User Dropdown */
+        .user-dropdown { position: relative; }
+        .user-trigger { display: flex; align-items: center; gap: 12px; padding: 6px 16px 6px 6px; background: white; border-radius: 50px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; text-decoration: none; }
+        .user-trigger:hover { background: #f8fafc; border-color: var(--primary-light); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+        .avatar-circle { width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; box-shadow: 0 4px 10px rgba(29, 78, 216, 0.3); }
+        .user-name-text { font-weight: 700; color: #334155; font-size: 0.95rem; }
+
+        .dropdown-menu { position: absolute; top: calc(100% + 15px); right: 0; width: 300px; background: white; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15); border: 1px solid rgba(0,0,0,0.05); padding: 12px; z-index: 3000; opacity: 0; visibility: hidden; transform: translateY(10px); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .dropdown-menu::before { content: ""; position: absolute; top: -20px; left: 0; width: 100%; height: 20px; background: transparent; }
+        .user-dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        .dropdown-header { padding: 16px; background: #f8fafc; border-radius: 14px; margin-bottom: 8px; }
+        .profile-name { display: block; font-weight: 800; color: var(--dark); font-size: 1.05rem; margin-bottom: 2px; }
+        .profile-email { display: block; font-size: 0.82rem; color: #64748b; margin-bottom: 10px; }
+        .profile-role { display: inline-block; padding: 3px 10px; background: #dbeafe; color: #1e40af; border-radius: 6px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .dropdown-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #475569; text-decoration: none; border-radius: 12px; transition: 0.2s; font-weight: 600; font-size: 0.95rem; }
+        .dropdown-link:hover { background: #f1f5f9; color: var(--primary); padding-left: 20px; }
+        .dropdown-link i { width: 20px; text-align: center; color: #94a3b8; transition: 0.2s; }
+        .dropdown-link:hover i { color: var(--primary); }
+        .dropdown-divider { height: 1px; background: #f1f5f9; margin: 8px 0; }
+        .dropdown-logout { color: #ef4444 !important; }
+        .dropdown-logout:hover { background: #fef2f2 !important; color: #ef4444 !important; }
+        .dropdown-logout i { color: #ef4444 !important; }
+
+        /* Footer */
+        .footer { background: #0f172a; color: #94a3b8; padding: 80px 5% 30px; margin-top: 0; position: relative; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 50px; margin-bottom: 60px; }
+        .footer-logo { font-size: 1.8rem; color: white; font-weight: 800; display: flex; align-items: center; gap: 10px; text-decoration: none; margin-bottom: 25px; }
+        .footer-title { color: white; font-size: 1.2rem; font-weight: 700; margin-bottom: 25px; position: relative; padding-bottom: 10px; }
+        .footer-title::after { content: ''; position: absolute; bottom: 0; left: 0; width: 40px; height: 3px; background: var(--primary); border-radius: 2px; }
+        .footer-links { list-style: none; padding: 0; }
+        .footer-links li { margin-bottom: 15px; }
+        .footer-links a { color: #94a3b8; text-decoration: none; transition: 0.3s; }
+        .footer-links a:hover { color: white; padding-left: 5px; }
+        .footer-bottom { text-align: center; border-top: 1px solid #1e293b; padding-top: 30px; font-size: 0.9rem; }
+
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <nav class="navbar" id="main-navbar">
+        <a href="{% url 'public_home' %}" class="nav-brand">
+            <i class="fa-solid fa-map-location-dot"></i> SMART MART
+        </a>
+        <ul class="nav-links">
+            <li><a href="{% url 'public_home' %}" class="{% if active_nav == 'home' %}active{% endif %}">Trang chủ</a></li>
+            <li><a href="{% url 'public_product_list' %}" class="{% if active_nav == 'products' %}active{% endif %}">Sản phẩm</a></li>
+            <li><a href="{% url 'public_about' %}" class="{% if active_nav == 'about' %}active{% endif %}">Về chúng tôi</a></li>
+            <li><a href="{% url 'public_gis_map' %}" class="{% if active_nav == 'map' %}active{% endif %}">Bản đồ</a></li>
+            {% if customer_name %}
+            <li style="display: flex; align-items: center; gap: 15px;">
+                <a href="{% url 'view_cart' %}" class="cart-btn">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-badge">{{ cart_count }}</span>
+                </a>
+                <div class="user-dropdown">
+                    <div class="user-trigger">
+                        <div class="avatar-circle">{{ customer_name|slice:":1"|upper }}</div>
+                        <span class="user-name-text">{{ customer_name }}</span>
+                        <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; color: #94a3b8;"></i>
+                    </div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-header">
+                            <span class="profile-name">{{ customer_name }}</span>
+                            <span class="profile-email">{{ customer_email|default:"Chưa cập nhật Email" }}</span>
+                            <span class="profile-role">{{ user_role|default:"Khách hàng" }}</span>
+                        </div>
+                        <a href="{% url 'public_profile' %}" class="dropdown-link"><i class="fa-solid fa-user-gear"></i> Tài khoản cá nhân</a>
+                        <a href="{% url 'public_order_history' %}" class="dropdown-link"><i class="fa-solid fa-box-open"></i> Lịch sử đơn hàng</a>
+                        <a href="{% url 'view_cart' %}" class="dropdown-link"><i class="fa-solid fa-cart-shopping"></i> Giỏ hàng của tôi</a>
+                        {% if user_role == 'Admin' or user_role == 'Nhân Viên' or user_role == 'Kế Toán' %}
+                            <div class="dropdown-divider"></div>
+                            <a href="{% url 'home' %}" class="dropdown-link" style="color:var(--primary-dark);"><i class="fa-solid fa-user-shield"></i> Quản trị hệ thống</a>
+                        {% endif %}
+                        <div class="dropdown-divider"></div>
+                        <a href="{% url 'public_logout' %}" class="dropdown-link dropdown-logout"><i class="fa-solid fa-right-from-bracket"></i> Đăng xuất</a>
+                    </div>
+                </div>
+            </li>
+            {% else %}
+            <li style="display: flex; align-items: center; gap: 15px;">
+                <a href="{% url 'view_cart' %}" class="cart-btn">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-badge">{{ cart_count }}</span>
+                </a>
+                <a href="{% url 'public_login' %}" style="text-decoration:none; color:#475569; font-weight:600;">Đăng nhập</a>
+                <a href="{% url 'public_register' %}" class="btn-login">Đăng ký</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    {% if not hide_footer %}
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <a href="#" class="footer-logo"><i class="fa-solid fa-map-location-dot"></i> SMART MART</a>
+                <p>Nền tảng GIS hàng đầu giúp bạn tìm kiếm và trải nghiệm mua sắm thông minh tại chuỗi cửa hàng SMART MART toàn quốc.</p>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-title">Khám Phá</h4>
+                <ul class="footer-links">
+                    <li><a href="{% url 'public_home' %}">Trang chủ</a></li>
+                    <li><a href="{% url 'public_gis_map' %}">Bản đồ GIS</a></li>
+                    <li><a href="{% url 'public_about' %}">Về chúng tôi</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-title">Hỗ Trợ</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Điều khoản sử dụng</a></li>
+                    <li><a href="#">Câu hỏi thường gặp</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-title">Liên Hệ</h4>
+                <p style="font-size:0.9rem; line-height:1.6;"><i class="fa-solid fa-location-dot" style="color:var(--primary-light); margin-right:10px;"></i> TP. Hồ Chí Minh<br><i class="fa-solid fa-phone" style="color:var(--primary-light); margin-right:10px;"></i> 1900 1234</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Smart Mart Platform.</p>
+        </div>
+    </footer>
+    {% endif %}
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 1000, once: true });
+        
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('main-navbar');
+            if (navbar) {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            }
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,163 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .order-detail-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+    .card-title { font-size: 1.1rem; font-weight: 800; color: var(--dark); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; }
+    
+    .info-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; }
+    .info-label { color: #64748b; font-weight: 500; }
+    .info-value { color: var(--dark); font-weight: 700; text-align: right; }
+    
+    .status-picker { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #e2e8f0; font-family: inherit; font-weight: 700; outline: none; transition: 0.3s; margin-bottom: 15px; }
+    .status-picker:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+    
+    .btn-update { width: 100%; padding: 12px; border-radius: 12px; background: var(--primary); color: white; font-weight: 700; border: none; cursor: pointer; transition: 0.3s; }
+    .btn-update:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(29, 78, 216, 0.2); }
+
+    .item-table { width: 100%; border-collapse: collapse; }
+    .item-table th { text-align: left; padding: 12px; border-bottom: 2px solid #f1f5f9; color: #64748b; font-size: 0.8rem; text-transform: uppercase; }
+    .item-table td { padding: 15px 12px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+    .item-img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; border: 1px solid #eee; }
+</style>
+
+<div class="page-header">
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <a href="{% url 'order_list' %}" style="text-decoration: none; color: #64748b; background: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm);"><i class="fa-solid fa-arrow-left"></i></a>
+        <div>
+            <h1>Đơn hàng #{{ order.MaDH }}</h1>
+            <p>Ngày đặt: {{ order.NgayTao|date:"d/m/Y H:i" }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="order-detail-grid">
+    <div class="checkout-left">
+        <!-- Order Items -->
+        <div class="chart-card" style="margin-bottom: 30px; padding: 25px;">
+            <h3 class="card-title"><i class="fa-solid fa-box-open" style="color: var(--primary);"></i> Chi tiết sản phẩm</h3>
+            <table class="item-table">
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th style="text-align: right;">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td>
+                            <div style="display: flex; gap: 15px; align-items: center;">
+                                {% if item.SanPham.Image %}
+                                <img src="{{ item.SanPham.Image.url }}" class="item-img">
+                                {% else %}
+                                <div class="item-img" style="background:#f1f5f9; display:flex; align-items:center; justify-content:center; color:#cbd5e1;"><i class="fa-solid fa-image"></i></div>
+                                {% endif %}
+                                <div>
+                                    <div style="font-weight: 700; color: var(--dark);">{{ item.SanPham.Ten }}</div>
+                                    <div style="font-size: 0.75rem; color: #94a3b8;">Mã: {{ item.SanPham.MaSP }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-weight: 700;">x{{ item.SoLuong }}</td>
+                        <td>{{ item.GiaBan|floatformat:"0" }} <small>VND</small></td>
+                        <td style="text-align: right; font-weight: 800; color: var(--primary);">
+                            {% widthratio item.GiaBan 1 item.SoLuong %} <small>VND</small>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div style="margin-top: 25px; display: flex; justify-content: flex-end;">
+                <div style="width: 250px;">
+                    <div class="info-row" style="font-size: 1.1rem;">
+                        <span class="info-label">Tổng thanh toán:</span>
+                        <span class="info-value" style="color: #10b981; font-size: 1.3rem;">{{ order.TongTien|floatformat:"0" }} VND</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-card" style="padding: 25px;">
+            <h3 class="card-title"><i class="fa-solid fa-truck-fast" style="color: #6366f1;"></i> Thông tin giao hàng</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                <div>
+                    <div class="info-row">
+                        <span class="info-label">Người nhận:</span>
+                        <span class="info-value">{{ order.TenNguoiNhan }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Số điện thoại:</span>
+                        <span class="info-value">{{ order.SDT_Nhan }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email tài khoản:</span>
+                        <span class="info-value">{{ order.NguoiDung.Email|default:"Không có" }}</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="info-row">
+                        <span class="info-label">Địa chỉ cụ thể:</span>
+                    </div>
+                    <div style="background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; font-weight: 600; font-size: 0.9rem; color: var(--dark); line-height: 1.5;">
+                        {{ order.DiaChi_Nhan }}
+                    </div>
+                </div>
+            </div>
+            {% if order.GhiChu %}
+            <div style="margin-top: 20px;">
+                <div class="info-label" style="margin-bottom: 8px; font-weight:700;">Ghi chú từ khách hàng:</div>
+                <div style="background: #fffbeb; padding: 15px; border-radius: 12px; border: 1px solid #fde68a; font-style: italic; color: #92400e; font-size: 0.9rem;">
+                    "{{ order.GhiChu }}"
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="checkout-right">
+        <!-- Status Management -->
+        <div class="chart-card" style="padding: 25px; position: sticky; top: 100px;">
+            <h3 class="card-title"><i class="fa-solid fa-gears" style="color: var(--secondary);"></i> Trạng thái đơn hàng</h3>
+            
+            <div style="margin-bottom: 25px;">
+                <div class="info-label" style="margin-bottom: 10px;">Trạng thái hiện tại:</div>
+                <div style="padding: 15px; border-radius: 12px; text-align: center; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+                    {% if order.TrangThai == 'Mới' %}background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+                    {% elif order.TrangThai == 'Đã hoàn thành' %}background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;
+                    {% elif order.TrangThai == 'Đã hủy' %}background: #fef2f2; color: #991b1b; border: 1px solid #fecaca;
+                    {% else %}background: #fffbeb; color: #92400e; border: 1px solid #fef3c7;{% endif %}">
+                    {{ order.TrangThai }}
+                </div>
+            </div>
+
+            <form action="{% url 'update_order_status' order.MaDH %}" method="post">
+                {% csrf_token %}
+                <div class="info-label" style="margin-bottom: 10px;">Cập nhật trạng thái mới:</div>
+                <select name="status" class="status-picker">
+                    <option value="Mới" {% if order.TrangThai == 'Mới' %}selected{% endif %}>Mới</option>
+                    <option value="Đang xử lý" {% if order.TrangThai == 'Đang xử lý' %}selected{% endif %}>Đang xử lý</option>
+                    <option value="Đang giao" {% if order.TrangThai == 'Đang giao' %}selected{% endif %}>Đang giao</option>
+                    <option value="Đã hoàn thành" {% if order.TrangThai == 'Đã hoàn thành' %}selected{% endif %}>Đã hoàn thành</option>
+                    <option value="Đã hủy" {% if order.TrangThai == 'Đã hủy' %}selected{% endif %}>Đã hủy</option>
+                </select>
+                <button type="submit" class="btn-update">CẬP NHẬT TRẠNG THÁI</button>
+            </form>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
+                <div class="info-row">
+                    <span class="info-label">Phương thức TT:</span>
+                    <span class="info-value">{{ order.get_PhuongThucThanhToan_display }}</span>
+                </div>
+                <a href="{% url 'public_order_invoice' order.MaDH %}" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #e2e8f0; color: #475569; text-decoration: none; font-weight: 700; margin-top: 15px; transition: 0.3s;">
+                    <i class="fa-solid fa-print"></i> XEM BẢN IN HÓA ĐƠN
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

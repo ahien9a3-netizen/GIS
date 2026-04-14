@@ -105,6 +105,7 @@
                 <th style="padding: 1rem;">Mã NV</th>
                 <th style="padding: 1rem;">Họ và Tên</th>
                 <th style="padding: 1rem;">Số điện thoại</th>
+                <th style="padding: 1rem;">Email</th>
                 <th style="padding: 1rem;">Vai trò</th>
                 <th style="padding: 1rem;">Thao tác</th>
             </tr>
@@ -120,6 +121,7 @@
                     {% endif %}
                 </td>
                 <td style="padding: 1rem;">{{ nv.SDT }}</td>
+                <td style="padding: 1rem;">{{ nv.Email }}</td>
                 <td style="padding: 1rem;">
                     <span class="order-status status-processing">
                         {{ nv.Role }}
@@ -144,7 +146,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" style="padding: 2rem; text-align: center; color: var(--gray-400);">Chưa có nhân viên
+                <td colspan="6" style="padding: 2rem; text-align: center; color: var(--gray-400);">Chưa có nhân viên
                     nào.</td>
             </tr>
             {% endfor %}

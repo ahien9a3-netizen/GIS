@@ -10,14 +10,46 @@ from .views import (
     KhoListView, KhoCreateView, KhoUpdateView, KhoDeleteView, kho_detail_view,
     NhanVienListView, NhanVienCreateView, NhanVienUpdateView, NhanVienDeleteView,
     StockInListView, StockInCreateView, StockInUpdateView, StockInDeleteView, StockInDetailView,
-    HangTonKhoListView, HangTonKhoCreateView, HangTonKhoUpdateView, HangTonKhoDeleteView
+    HangTonKhoListView, HangTonKhoCreateView, HangTonKhoUpdateView, HangTonKhoDeleteView,
+    public_home, public_about, public_product_list, public_product_detail, public_store_detail, public_kho_detail, public_login, public_register, public_logout, public_gis_map,
+    customer_forgot_password_view, customer_verify_otp_view, customer_reset_password_view,
+    view_cart, ajax_add_to_cart, ajax_update_cart, public_checkout, create_order, public_order_invoice, public_return_request, public_order_history, public_profile, submit_return_request,
+    public_store_list,
+    OrderListView, OrderDetailView, update_order_status,
+    ReturnListView, ReturnDetailView, update_return_status,
+    StockOutListView, StockOutCreateView, StockOutUpdateView, StockOutDetailView, StockOutDeleteView
 )
 
 urlpatterns = [
-    path('', home, name='home'),
+    path('', public_home, name='public_home'),
+    path('about/', public_about, name='public_about'),
+    path('products-all/', public_product_list, name='public_product_list'),
+    path('stores-all/', public_store_list, name='public_store_list'),
+    path('map/', public_gis_map, name='public_gis_map'),
+    path('product/<str:pk>/', public_product_detail, name='public_product_detail'),
+    path('store/detail/<str:pk>/', public_store_detail, name='public_store_detail'),
+    path('warehouses/public/<str:pk>/', public_kho_detail, name='public_kho_detail'),
+    path('customer/login/', public_login, name='public_login'),
+    path('customer/forgot-password/', customer_forgot_password_view, name='customer_forgot_password'),
+    path('customer/verify-otp/', customer_verify_otp_view, name='customer_verify_otp'),
+    path('customer/reset-password/', customer_reset_password_view, name='customer_reset_password'),
+    path('customer/register/', public_register, name='public_register'),
+    path('customer/logout/', public_logout, name='public_logout'),
+    path('cart/', view_cart, name='view_cart'),
+    path('checkout/', public_checkout, name='public_checkout'),
+    path('api/cart/add/<str:pk>/', ajax_add_to_cart, name='ajax_add_to_cart'),
+    path('api/cart/update/', ajax_update_cart, name='ajax_update_cart'),
+    path('api/order/create/', create_order, name='create_order'),
+
+    # --- GIS API ENDPOINTS ---
+    path('api/stores-geojson/', store_geojson, name='store_geojson'),
+    path('api/store-heatmap/', store_heatmap, name='store_heatmap'),
+    path('api/service-area/', service_area, name='service_area'),
+    path('api/kho-geojson/', kho_geojson, name='kho_geojson'),
+    path('dashboard/', home, name='home'),
     path('gis-map/', gis_map, name='gis_map'),
     path('reports/', report_view, name='reports'),
-    path('login/', login_view, name='login'),
+    path('login/', login_view, name='login'),  # Admin/Staff login - riêng biệt với public login
     path('forgot-password/', forgot_password_view, name='forgot_password'),
     path('reset-password/', reset_password_view, name='reset_password'),
     path('verify-otp/', verify_otp_view, name='verify_otp'),
@@ -84,4 +116,27 @@ urlpatterns = [
     # Test error pages (temporary)
     path('test-404/', TemplateView.as_view(template_name='404.html')),
     path('test-403/', TemplateView.as_view(template_name='403.html')),
+    
+    # Public Invoice & History
+    path('order/invoice/<str:order_id>/', public_order_invoice, name='public_order_invoice'),
+    path('order/<str:order_id>/return-request/', public_return_request, name='public_return_request'),
+    path('customer/order-history/', public_order_history, name='public_order_history'),
+    path('customer/profile/', public_profile, name='public_profile'),
+    path('customer/submit-return/<str:order_id>/', submit_return_request, name='submit_return_request'),
+
+    # --- ADMIN ORDER MANAGEMENT ---
+    path('management/orders/', OrderListView.as_view(), name='order_list'),
+    path('management/orders/<str:order_id>/', OrderDetailView.as_view(), name='order_detail'),
+    path('management/orders/update-status/<str:order_id>/', update_order_status, name='update_order_status'),
+    # --- ADMIN RETURNS MANAGEMENT ---
+    path('management/returns/', ReturnListView.as_view(), name='return_list'),
+    path('management/returns/<str:request_id>/', ReturnDetailView.as_view(), name='return_detail'),
+    path('management/returns/update-status/<str:request_id>/', update_return_status, name='update_return_status'),
+    
+    # --- ADMIN STOCK OUT MANAGEMENT ---
+    path('stock-out/', StockOutListView.as_view(), name='stock_out_list'),
+    path('stock-out/add/', StockOutCreateView.as_view(), name='stock_out_add'),
+    path('stock-out/<str:pk>/', StockOutDetailView.as_view(), name='stock_out_detail'),
+    path('stock-out/<str:pk>/edit/', StockOutUpdateView.as_view(), name='stock_out_edit'),
+    path('stock-out/<str:pk>/delete/', StockOutDeleteView.as_view(), name='stock_out_delete'),
 ]
