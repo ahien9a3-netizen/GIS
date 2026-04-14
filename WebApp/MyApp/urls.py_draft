@@ -1,0 +1,49 @@
+from django.urls import path, reverse_lazy
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from .models import CuaHang, SanPham, KhachHang, DonHang, GiaoHang, Kho
+from .views import (
+    home, store_geojson, store_heatmap, service_area, kho_geojson, inventory_stats
+)
+
+app_name = 'MyApp'
+
+urlpatterns = [
+    path('', home, name='home'),
+    
+    # API GIS
+    path('api/stores-geojson/', store_geojson, name='store_geojson'),
+    path('api/stores-heatmap/', store_heatmap, name='store_heatmap'),
+    path('api/service-area/', service_area, name='service_area'),
+    path('api/kho-geojson/', kho_geojson, name='kho_geojson'),
+    path('api/inventory-stats/', inventory_stats, name='inventory_stats'),
+
+    # Cửa hàng (Stores)
+    path('stores/', CuaHangListView.as_view(), name='store_list'),
+    path('stores/add/', CuaHangCreateView.as_view(), name='store_add'),
+    path('stores/<str:pk>/edit/', CuaHangUpdateView.as_view(), name='store_edit'),
+    path('stores/<str:pk>/delete/', CuaHangDeleteView.as_view(), name='store_delete'),
+
+    # Sản phẩm (Products)
+    path('products/', SanPhamListView.as_view(), name='product_list'),
+    path('products/add/', SanPhamCreateView.as_view(), name='product_add'),
+    path('products/<str:pk>/edit/', SanPhamUpdateView.as_view(), name='product_edit'),
+    path('products/<str:pk>/delete/', SanPhamDeleteView.as_view(), name='product_delete'),
+
+    # Khách hàng (Customers)
+    path('customers/', KhachHangListView.as_view(), name='customer_list'),
+    path('customers/add/', KhachHangCreateView.as_view(), name='customer_add'),
+    path('customers/<str:pk>/edit/', KhachHangUpdateView.as_view(), name='customer_edit'),
+    path('customers/<str:pk>/delete/', KhachHangDeleteView.as_view(), name='customer_delete'),
+
+    # Đơn hàng (Orders)
+    path('orders/', DonHangListView.as_view(), name='order_list'),
+    path('orders/add/', DonHangCreateView.as_view(), name='order_add'),
+    path('orders/<str:pk>/edit/', DonHangUpdateView.as_view(), name='order_edit'),
+    path('orders/<str:pk>/delete/', DonHangDeleteView.as_view(), name='order_delete'),
+
+    # Giao hàng (Delivery)
+    path('delivery/', GiaoHangListView.as_view(), name='delivery_list'),
+    path('delivery/add/', GiaoHangCreateView.as_view(), name='delivery_add'),
+    path('delivery/<str:pk>/edit/', GiaoHangUpdateView.as_view(), name='delivery_edit'),
+    path('delivery/<str:pk>/delete/', GiaoHangDeleteView.as_view(), name='delivery_delete'),
+]

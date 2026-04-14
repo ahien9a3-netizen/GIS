@@ -1,0 +1,224 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SMART MART - Hệ Thống Quản Lý Chuỗi Cửa Hàng{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'MyApp/favicon.png' %}">
+    <style>
+        .header-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .logout-link {
+            color: var(--gray-400);
+            transition: color 0.2s;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .logout-link:hover {
+            color: #ef4444;
+        }
+    </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="{% static 'MyApp/style.css' %}">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="dashboard-layout">
+
+    
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fa-solid fa-store"></i>
+                <span>SMART MART</span>
+            </div>
+            <button class="sidebar-toggle">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'home' %}" class="sidebar-item {% if sidebar_active == 'dashboard' %}active{% endif %}">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a href="{% url 'store_list' %}" class="sidebar-item {% if sidebar_active == 'stores' %}active{% endif %}">
+                <i class="fa-solid fa-shop"></i>
+                <span>Cửa hàng</span>
+            </a>
+            <a href="{% url 'kho_list' %}"
+                class="sidebar-item {% if sidebar_active == 'warehouses' %}active{% endif %}">
+                <i class="fa-solid fa-warehouse"></i>
+                <span>Kho hàng</span>
+            </a>
+            <a href="{% url 'product_list' %}"
+                class="sidebar-item {% if sidebar_active == 'products' %}active{% endif %}">
+                <i class="fa-solid fa-box"></i>
+                <span>Sản phẩm</span>
+            </a>
+            <a href="{% url 'danhmuc_list' %}"
+                class="sidebar-item {% if sidebar_active == 'categories' %}active{% endif %}">
+                <i class="fa-solid fa-list"></i>
+                <span>Danh mục</span>
+            </a>
+            {% if user_role == 'Admin' and is_admin_view %}
+            <a href="{% url 'nhanvien_list' %}"
+                class="sidebar-item {% if sidebar_active == 'employees' %}active{% endif %}">
+                <i class="fa-solid fa-user-tie"></i>
+                <span>Nhân viên</span>
+            </a>
+            {% endif %}
+            {% if user_role == 'Admin' or user_role == 'Kế Toán' %}
+            <a href="{% url 'stock_in_list' %}"
+                class="sidebar-item {% if sidebar_active == 'stock_in' %}active{% endif %}">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span>Nhập kho</span>
+            </a>
+            {% endif %}
+            <a href="{% url 'inventory_list' %}"
+                class="sidebar-item {% if sidebar_active == 'inventory' %}active{% endif %}">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                <span>Tồn kho</span>
+            </a>
+            <a href="{% url 'gis_map' %}" class="sidebar-item {% if sidebar_active == 'gis_map' %}active{% endif %}">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span>Bản đồ GIS</span>
+            </a>
+            {% if user_role == 'Admin' or user_role == 'Kế Toán' %}
+            <a href="{% url 'reports' %}" class="sidebar-item {% if sidebar_active == 'reports' %}active{% endif %}">
+                <i class="fa-solid fa-chart-bar"></i>
+                <span>Báo cáo</span>
+            </a>
+            {% endif %}
+            <a href="{% url 'settings' %}" class="sidebar-item {% if sidebar_active == 'settings' %}active{% endif %}">
+                <i class="fa-solid fa-gear"></i>
+                <span>Cài đặt</span>
+            </a>
+        </nav>
+
+    </aside>
+
+    
+    <div class="main-content">
+        <header class="dashboard-header">
+            <div class="header-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Tìm kiếm sản phẩm, cửa hàng...">
+            </div>
+            <div class="header-actions">
+                <button class="header-icon-btn">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                <div class="header-user">
+                    <div class="header-user-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="header-user-info" style="display: flex; align-items: center; gap: 10px;">
+                        {% if request.session.user_role == 'Admin' %}
+                        <form action="{% url 'switch_view' %}" method="POST" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" style="background: white; border: 1px solid #e2e8f0; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 5px;">
+                                {% if request.session.is_admin_view %}
+                                    <i class="fa-solid fa-toggle-on" style="color: #3b82f6; font-size: 1.2rem;"></i> 
+                                    <span style="color: #3b82f6;">View: Admin</span>
+                                {% else %}
+                                    <i class="fa-solid fa-toggle-off" style="color: #94a3b8; font-size: 1.2rem;"></i> 
+                                    <span style="color: #64748b;">View: Nhân Viên</span>
+                                {% endif %}
+                            </button>
+                        </form>
+                        {% endif %}
+
+                        <span class="user-name">{{ user_name|default:"Admin" }}</span>
+                        <a href="{% url 'logout' %}" class="logout-link" title="Đăng xuất">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+       
+        <div class="page-content">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+        
+        <footer class="dashboard-footer">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <h3>SMART MART</h3>
+                    <p>Giải pháp quản lý chuỗi cửa hàng tiện lợi, gia dụng và điện tử tối ưu dựa trên công nghệ GIS.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#"><i class="fa-brands fa-github"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Liên Kết Nhanh</h3>
+                    <ul>
+                        <li><a href="#">Về chúng tôi</a></li>
+                        <li><a href="#">Danh sách cửa hàng</a></li>
+                        <li><a href="#">Sản phẩm mới</a></li>
+                        <li><a href="#">Tuyển dụng</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h3>Liên Hệ</h3>
+                    <ul class="contact-info">
+                        <li><i class="fa-solid fa-location-dot"></i> 236 Đ. Lê Văn Sỹ, Phường 1, Tân Bình, TP.HCM</li>
+                        <li><i class="fa-solid fa-phone"></i> 1900 888 999</li>
+                        <li><i class="fa-solid fa-envelope"></i> contact@smartmart.vn</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 SMART MART. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    {% block extra_js %}{% endblock %}
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true,
+            mirror: false
+        });
+
+        document.querySelector('.sidebar-toggle')?.addEventListener('click', function () {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+        });
+    </script>
+</body>
+
+</html>

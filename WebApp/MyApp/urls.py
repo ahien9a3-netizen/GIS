@@ -1,0 +1,87 @@
+from django.urls import path
+from django.views.generic import TemplateView
+from .tool import store_geojson, store_heatmap, service_area, kho_geojson
+from .views import (
+    home, report_view, login_view, logout_view, settings_view, gis_map, inventory_stats, upload_gis_images, delete_gis_image,
+    forgot_password_view, reset_password_view, verify_otp_view, switch_view_role, delete_review, edit_review,
+    CuaHangListView, CuaHangCreateView, CuaHangUpdateView, CuaHangDeleteView, store_detail_view,
+    SanPhamListView, SanPhamCreateView, SanPhamUpdateView, SanPhamDeleteView, SanPhamDetailView,
+    DanhMucListView, DanhMucCreateView, DanhMucUpdateView, DanhMucDeleteView,
+    KhoListView, KhoCreateView, KhoUpdateView, KhoDeleteView, kho_detail_view,
+    NhanVienListView, NhanVienCreateView, NhanVienUpdateView, NhanVienDeleteView,
+    StockInListView, StockInCreateView, StockInUpdateView, StockInDeleteView, StockInDetailView,
+    HangTonKhoListView, HangTonKhoCreateView, HangTonKhoUpdateView, HangTonKhoDeleteView
+)
+
+urlpatterns = [
+    path('', home, name='home'),
+    path('gis-map/', gis_map, name='gis_map'),
+    path('reports/', report_view, name='reports'),
+    path('login/', login_view, name='login'),
+    path('forgot-password/', forgot_password_view, name='forgot_password'),
+    path('reset-password/', reset_password_view, name='reset_password'),
+    path('verify-otp/', verify_otp_view, name='verify_otp'),
+    path('logout/', logout_view, name='logout'),
+    path('settings/', settings_view, name='settings'),
+    path('switch-view/', switch_view_role, name='switch_view'),
+    path('api/stores-geojson/', store_geojson, name='store_geojson'),
+    path('api/stores-heatmap/', store_heatmap, name='store_heatmap'),
+    path('api/service-area/', service_area, name='service_area'),
+    path('api/kho-geojson/', kho_geojson, name='kho_geojson'),
+    path('api/inventory-stats/', inventory_stats, name='inventory_stats'),
+    path('api/upload-gis-images/', upload_gis_images, name='upload_gis_images'),
+    path('api/delete-gis-image/', delete_gis_image, name='delete_gis_image'),
+
+    # Cửa hàng
+    path('stores/', CuaHangListView.as_view(), name='store_list'),
+    path('stores/add/', CuaHangCreateView.as_view(), name='store_add'),
+    path('stores/<str:pk>/', store_detail_view, name='store_detail'),
+    path('stores/<str:pk>/edit/', CuaHangUpdateView.as_view(), name='store_edit'),
+    path('stores/<str:pk>/delete/', CuaHangDeleteView.as_view(), name='store_delete'),
+    path('review/edit/<int:pk>/', edit_review, name='edit_review'),
+    path('review/delete/<int:pk>/', delete_review, name='delete_review'),
+
+    # Sản phẩm
+    path('products/', SanPhamListView.as_view(), name='product_list'),
+    path('products/add/', SanPhamCreateView.as_view(), name='product_add'),
+    path('products/<str:pk>/', SanPhamDetailView.as_view(), name='product_detail'),
+    path('products/<str:pk>/edit/', SanPhamUpdateView.as_view(), name='product_edit'),
+    path('products/<str:pk>/delete/', SanPhamDeleteView.as_view(), name='product_delete'),
+
+    # Danh mục
+    path('categories/', DanhMucListView.as_view(), name='danhmuc_list'),
+    path('categories/add/', DanhMucCreateView.as_view(), name='danhmuc_add'),
+    path('categories/<str:pk>/edit/', DanhMucUpdateView.as_view(), name='danhmuc_edit'),
+    path('categories/<str:pk>/delete/', DanhMucDeleteView.as_view(), name='danhmuc_delete'),
+
+
+    # Kho hàng
+    path('warehouses/', KhoListView.as_view(), name='kho_list'),
+    path('warehouses/add/', KhoCreateView.as_view(), name='kho_add'),
+    path('warehouses/<str:pk>/', kho_detail_view, name='kho_detail'),
+    path('warehouses/<str:pk>/edit/', KhoUpdateView.as_view(), name='kho_edit'),
+    path('warehouses/<str:pk>/delete/', KhoDeleteView.as_view(), name='kho_delete'),
+
+    # Nhân viên
+    path('employees/', NhanVienListView.as_view(), name='nhanvien_list'),
+    path('employees/add/', NhanVienCreateView.as_view(), name='nhanvien_add'),
+    path('employees/<str:pk>/edit/', NhanVienUpdateView.as_view(), name='nhanvien_edit'),
+    path('employees/<str:pk>/delete/', NhanVienDeleteView.as_view(), name='nhanvien_delete'),
+
+    # Nhập kho
+    path('stock-in/', StockInListView.as_view(), name='stock_in_list'),
+    path('stock-in/add/', StockInCreateView.as_view(), name='stock_in_add'),
+    path('stock-in/<str:pk>/', StockInDetailView.as_view(), name='stock_in_detail'),
+    path('stock-in/<str:pk>/edit/', StockInUpdateView.as_view(), name='stock_in_edit'),
+    path('stock-in/<str:pk>/delete/', StockInDeleteView.as_view(), name='stock_in_delete'),
+
+    # Tồn kho
+    path('inventory/', HangTonKhoListView.as_view(), name='inventory_list'),
+    path('inventory/add/', HangTonKhoCreateView.as_view(), name='inventory_add'),
+    path('inventory/<str:makho>/<str:masp>/edit/', HangTonKhoUpdateView.as_view(), name='inventory_edit'),
+    path('inventory/<str:makho>/<str:masp>/delete/', HangTonKhoDeleteView.as_view(), name='inventory_delete'),
+
+    # Test error pages (temporary)
+    path('test-404/', TemplateView.as_view(template_name='404.html')),
+    path('test-403/', TemplateView.as_view(template_name='403.html')),
+]
