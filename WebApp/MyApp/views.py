@@ -10,10 +10,10 @@ import os
 import random
 
 
-from django.db.models import Count, Sum, Q
+from django.db.models import Count, Sum, Q, Avg, Avg as models_Avg
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from .models import SanPham, CuaHang, Kho, HangTonKho, NhanVien, YeuCauNhapKho, DanhMuc
+from .models import SanPham, CuaHang, Kho, HangTonKho, NhanVien, YeuCauNhapKho, DanhMuc, DanhGiaCuaHang, PhanBoCungCap, GioHang, ChiTietGioHang, DonHang, ChiTietDonHang
 
 class MultipleFileInput(ClearableFileInput):
     allow_multiple_selected = True
@@ -59,12 +59,456 @@ def role_required(allowed_roles=[]):
     return decorator
 
 
+from django.shortcuts import render, redirect, get_object_or_404
+
+def _get_cart_context(request):
+    """
+    Helper để lấy số lượng sản phẩm trong giỏ hàng hiện tại
+    """
+    user_id = request.session.get('user_id')
+    session_id = request.session.session_key
+    if not session_id:
+        request.session.create()
+        session_id = request.session.session_key
+    
+    cart = None
+    if user_id:
+        # Nếu là User (theo Role) thì lấy giỏ hàng của User đó
+        user = NhanVien.objects.filter(MaNV=user_id).first()
+        if user:
+            cart, _ = GioHang.objects.get_or_create(NguoiDung=user)
+    else:
+        # Nếu chưa đăng nhập, dùng SessionID
+        cart, _ = GioHang.objects.get_or_create(SessionID=session_id)
+    
+    count = 0
+    if cart:
+        count = cart.items.aggregate(total=Sum('SoLuong'))['total'] or 0
+    return {'cart_count': count, 'cart_obj': cart}
+
+def public_home(request):
+    """
+    Trang cửa hàng người dùng công khai (Public Storefront).
+    Không yêu cầu đăng nhập. Hiển thị bản đồ GIS, danh sách cửa hàng, sản phẩm nổi bật.
+    Hỗ trợ tìm kiếm qua GET param ?q=
+    """
+    total_stores = CuaHang.objects.count()
+    stores_qs = CuaHang.objects.filter(TrangThai='Hoạt động').order_by('MaCH')
+    
+    # Xử lý tìm kiếm
+    search_query = request.GET.get('q', '').strip()
+    
+    # Lấy tất cả sản phẩm đang bán và danh mục để làm Tab lọc
+    products = SanPham.objects.filter(TrangThai__iexact='đang bán').select_related('DanhMuc')
+    categories = DanhMuc.objects.all()
+    
+    if search_query:
+        products = products.filter(
+            Q(Ten__icontains=search_query) | Q(MieuTa__icontains=search_query) | Q(DanhMuc__Ten__icontains=search_query)
+        )
+        stores_qs = stores_qs.filter(
+            Q(Ten__icontains=search_query) | Q(DiaChi__icontains=search_query) | Q(Loai__icontains=search_query)
+        )
+
+    context = {
+        'total_stores': total_stores,
+        'stores_list': stores_qs,
+        'products': products,
+        'categories': categories,
+        'search_query': search_query,
+        'page_title': 'Trang Chủ - SMART MART',
+        'customer_name': request.session.get('user_name'),
+        'user_role': request.session.get('user_role'),
+        'active_nav': 'home',
+    }
+    context.update(_get_cart_context(request))
+    return render(request, 'MyApp/public_storefront.html', context)
+
+def public_about(request):
+    """
+    Trang Giới Thiệu (About Us)
+    """
+    context = {
+        'page_title': 'Giới Thiệu - SMART MART',
+        'customer_name': request.session.get('user_name'),
+        'user_role': request.session.get('user_role'),
+        'active_nav': 'about',
+    }
+    context.update(_get_cart_context(request))
+    return render(request, 'MyApp/public_about.html', context)
+
+def public_product_detail(request, pk):
+    """
+    Trang Chi Tiết Sản Phẩm dành cho Khách Hàng (có thể gửi đánh giá)
+    """
+    from .models import DanhGia
+    product = get_object_or_404(SanPham, pk=pk)
+    
+    if request.method == 'POST':
+        # Đồng bộ field names với HTML form
+        nguoi_dung = request.session.get('user_name') or request.POST.get('name') or 'Khách hàng ẩn danh'
+        diem = request.POST.get('rating')  # form HTML dùng name='rating'
+        binh_luan = request.POST.get('comment')  # form HTML dùng name='comment'
+        
+        if diem and binh_luan:
+            DanhGia.objects.create(
+                SanPham=product,
+                NguoiDung=nguoi_dung,
+                Diem=int(diem),
+                BinhLuan=binh_luan
+            )
+            return redirect('public_product_detail', pk=pk)
+            
+    # List reviews
+    reviews = DanhGia.objects.filter(SanPham=product).order_by('-NgayTao')
+    
+    # Calculate average rating
+    avg_rating = 0
+    if reviews.exists():
+        avg_rating = sum(r.Diem for r in reviews) / reviews.count()
+        avg_rating = round(avg_rating, 1)
+
+    context = {
+        'product': product,
+        'reviews': reviews,
+        'avg_rating': avg_rating,
+        'page_title': f'{product.Ten} - SMART MART',
+        'customer_name': request.session.get('user_name'),
+        'user_role': request.session.get('user_role'),
+        'active_nav': 'products',
+    }
+    context.update(_get_cart_context(request))
+    return render(request, 'MyApp/public_product_detail.html', context)
+
+def public_store_detail(request, pk):
+    """
+    Trang chi tiết cửa hàng công khai cho người dùng.
+    Hiển thị thông tin cửa hàng và vị trí trên bản đồ nhỏ.
+    Cho phép đánh giá và bình luận.
+    """
+    store = get_object_or_404(CuaHang, MaCH=pk)
+    
+    if request.method == 'POST':
+        user_name = request.session.get('user_name') or request.POST.get('name') or "Khách ẩn danh"
+        rating = request.POST.get('rating', 5)
+        comment = request.POST.get('comment', '')
+        
+        if comment:
+            DanhGiaCuaHang.objects.create(
+                CuaHang=store,
+                NguoiDung=user_name,
+                Diem=int(rating),
+                BinhLuan=comment
+            )
+            return redirect('public_store_detail', pk=pk)
+
+    reviews = store.danh_gias.all().order_by('-NgayTao')
+    avg_rating = reviews.aggregate(Avg('Diem'))['Diem__avg'] or 0
+    total_reviews = reviews.count()
+    
+    # Phân phối đánh giá (Rating distribution)
+    rating_dist = {i: reviews.filter(Diem=i).count() for i in range(1, 6)}
+    rating_percentages = {i: (count / total_reviews * 100 if total_reviews > 0 else 0) for i, count in rating_dist.items()}
+
+    # Lấy danh sách sản phẩm tại cửa hàng (thông qua Kho cung cấp)
+    warehouse_ids = PhanBoCungCap.objects.filter(cua_hang=store).values_list('kho', flat=True)
+    product_ids = HangTonKho.objects.filter(MaKho__in=warehouse_ids).values_list('MaSP', flat=True).distinct()
+    store_products = SanPham.objects.filter(MaSP__in=product_ids, TrangThai='Đang bán')[:8]
+    
+    # Tính trạng thái mở/đóng cửa dựa trên giờ thực tế
+    from datetime import datetime
+    now_time = datetime.now().time()
+    is_open = False
+    if store.GioMoCua and store.GioDongCua:
+        is_open = store.GioMoCua <= now_time <= store.GioDongCua
+    elif store.TrangThai == 'Hoạt động':
+        is_open = True  # Mặc định mở nếu cửa hàng đang hoạt động và không khai báo giờ
+    
+    context = {
+        'store': store,
+        'reviews': reviews,
+        'rating_dist': rating_dist,
+        'rating_percentages': rating_percentages,
+        'avg_rating': round(avg_rating, 1),
+        'total_reviews': total_reviews,
+        'store_products': store_products,
+        'is_open': is_open,
+        'page_title': f'{store.Ten} - SMART MART',
+        'customer_name': request.session.get('user_name'),
+        'user_role': request.session.get('user_role'),
+        'active_nav': 'stores',
+    }
+    context.update(_get_cart_context(request))
+    return render(request, 'MyApp/public_store_detail.html', context)
+
+def public_kho_detail(request, pk):
+    """
+    Trang chi tiết kho hàng công khai cho người dùng.
+    """
+    wh = get_object_or_404(Kho, MaKho=pk)
+    
+    # Lấy danh sách sản phẩm đang có tại kho này
+    inventory = HangTonKho.objects.filter(MaKho=wh).select_related('MaSP')
+    # Lọc các sản phẩm 'Đang bán'
+    inventory = [item for item in inventory if item.MaSP.TrangThai == 'Đang bán']
+    
+    context = {
+        'wh': wh,
+        'inventory': inventory,
+        'page_title': f'{wh.Ten} - SMART MART',
+        'customer_name': request.session.get('user_name'),
+        'user_role': request.session.get('user_role'),
+        'active_nav': 'warehouses',
+    }
+    context.update(_get_cart_context(request))
+    return render(request, 'MyApp/public_kho_detail.html', context)
+
+def public_login(request, next_url=None):
+    """
+    Trang đăng nhập dùng chung cho cả Khách hàng và Nhân viên
+    """
+    error = None
+    if request.method == 'POST':
+        login_id = request.POST.get('email') # Có thể là email hoặc sdt
+        password = request.POST.get('password')
+        
+        # Thử đăng nhập bằng Email hoặc SDT trong bảng NhanVien
+        user = NhanVien.objects.filter(Q(Email=login_id) | Q(SDT=login_id), MatKhau=password).first()
+        
+        if user:
+            request.session['user_id'] = user.MaNV
+            request.session['user_name'] = user.Ten
+            request.session['user_role'] = user.Role
+            
+            # Luôn trở về trang người dùng trước theo yêu cầu
+            return redirect('public_home')
+        else:
+            error = "Thông tin đăng nhập không chính xác!"
+            
+    return render(request, 'MyApp/public_login.html', {'error': error, 'page_title': 'Đăng Nhập - SMART MART'})
+
+def public_register(request):
+    """
+    Đăng ký tài khoản mặc định role là User
+    """
+    error = None
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        password = request.POST.get('password')
+        
+        if NhanVien.objects.filter(Email=email).exists():
+            error = "Email này đã tồn tại trên hệ thống!"
+        else:
+            # Tạo mã định danh MaNV cho người dùng mới
+            manv = f"USER{random.randint(10000, 99999)}"
+            while NhanVien.objects.filter(MaNV=manv).exists():
+                manv = f"USER{random.randint(10000, 99999)}"
+            
+            NhanVien.objects.create(
+                MaNV=manv,
+                Ten=name,
+                Email=email,
+                SDT=phone,
+                MatKhau=password,
+                Role='User' # Luôn mặc định là User
+            )
+            return redirect('public_login')
+            
+    return render(request, 'MyApp/public_register.html', {'error': error, 'page_title': 'Đăng Ký - SMART MART'})
+
+def public_logout(request):
+    request.session.flush()
+    return redirect('public_home')
+
+def view_cart(request):
+    """
+    Trang chi tiết giỏ hàng
+    """
+    cart_context = _get_cart_context(request)
+    cart = cart_context['cart_obj']
+    items = cart.items.all().select_related('SanPham') if cart else []
+    
+    total_price = sum(item.SanPham.Gia * item.SoLuong for item in items)
+    
+    context = {
+        'items': items,
+        'total_price': total_price,
+        'page_title': 'Giỏ hàng của bạn - SMART MART',
+        'customer_name': request.session.get('user_name'),
+        'user_role': request.session.get('user_role'),
+        'active_nav': 'cart',
+    }
+    context.update(cart_context)
+    return render(request, 'MyApp/public_cart.html', context)
+
+@csrf_exempt
+def ajax_add_to_cart(request, pk):
+    """
+    API thêm sản phẩm vào giỏ hàng (AJAX)
+    """
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'message': 'Invalid method'}, status=405)
+        
+    product = get_object_or_404(SanPham, pk=pk)
+    cart_data = _get_cart_context(request)
+    cart = cart_data['cart_obj']
+    
+    item, created = ChiTietGioHang.objects.get_or_create(GioHang=cart, SanPham=product)
+    if not created:
+        item.SoLuong += 1
+        item.save()
+        
+    # Tính lại tổng số lượng
+    new_count = cart.items.aggregate(total=Sum('SoLuong'))['total'] or 0
+    
+    return JsonResponse({
+        'success': True, 
+        'message': f'Đã thêm {product.Ten} vào giỏ hàng!',
+        'cart_count': new_count
+    })
+
+@csrf_exempt
+def ajax_update_cart(request):
+    """
+    API cập nhật số lượng (tăng/giảm/xóa)
+    """
+    import json
+    data = json.loads(request.body)
+    item_id = data.get('item_id')
+    action = data.get('action') # 'plus', 'minus', 'remove'
+    
+    item = get_object_or_404(ChiTietGioHang, id=item_id)
+    
+    if action == 'plus':
+        item.SoLuong += 1
+        item.save()
+    elif action == 'minus':
+        if item.SoLuong > 1:
+            item.SoLuong -= 1
+            item.save()
+        else:
+            item.delete()
+    elif action == 'remove':
+        item.delete()
+        
+    cart_data = _get_cart_context(request)
+    return JsonResponse({
+        'success': True,
+        'cart_count': cart_data['cart_count']
+    })
+
+def public_checkout(request):
+    """
+    Trang thanh toán - Nhập thông tin nhận hàng
+    """
+    cart_context = _get_cart_context(request)
+    cart = cart_context['cart_obj']
+    
+    if not cart or cart.items.count() == 0:
+        return redirect('view_cart')
+        
+    items = cart.items.all().select_related('SanPham')
+    total_price = sum(item.SanPham.Gia * item.SoLuong for item in items)
+    
+    # Nếu đã đăng nhập, lấy thông tin mặc định
+    user_id = request.session.get('user_id')
+    user = NhanVien.objects.filter(MaNV=user_id).first() if user_id else None
+    
+    context = {
+        'items': items,
+        'total_price': total_price,
+        'user': user,
+        'page_title': 'Thanh Toán - SMART MART',
+        'customer_name': request.session.get('user_name'),
+        'user_role': request.session.get('user_role'),
+        'active_nav': 'cart',
+    }
+    context.update(cart_context)
+    return render(request, 'MyApp/public_checkout.html', context)
+
+@csrf_exempt
+def create_order(request):
+    """
+    Xử lý tạo đơn hàng thực tế
+    """
+    if request.method != 'POST':
+        return JsonResponse({'success': False}, status=405)
+        
+    import json
+    data = json.loads(request.body)
+    
+    ten = data.get('name')
+    sdt = data.get('phone')
+    diachi = data.get('address')
+    ghichu = data.get('note', '')
+    
+    if not all([ten, sdt, diachi]):
+        return JsonResponse({'success': False, 'message': 'Vui lòng nhập đầy đủ thông tin nhận hàng.'})
+        
+    cart_data = _get_cart_context(request)
+    cart = cart_data['cart_obj']
+    items = cart.items.all()
+    
+    if items.count() == 0:
+        return JsonResponse({'success': False, 'message': 'Giỏ hàng đang trống.'})
+        
+    # Tính tổng tiền
+    total = sum(i.SanPham.Gia * i.SoLuong for i in items)
+    
+    # Tạo mã đơn hàng ngẫu nhiên
+    madh = f"DH{random.randint(100000, 999999)}"
+    while DonHang.objects.filter(MaDH=madh).exists():
+        madh = f"DH{random.randint(100000, 999999)}"
+        
+    user_id = request.session.get('user_id')
+    user = NhanVien.objects.filter(MaNV=user_id).first() if user_id else None
+    
+    from django.db import transaction
+    try:
+        with transaction.atomic():
+            # 1. Tạo đơn hàng
+            order = DonHang.objects.create(
+                MaDH=madh,
+                NguoiDung=user,
+                TenNguoiNhan=ten,
+                SDT_Nhan=sdt,
+                DiaChi_Nhan=diachi,
+                TongTien=total,
+                GhiChu=ghichu,
+                TrangThai='Mới'
+            )
+            
+            # 2. Tạo chi tiết đơn hàng
+            for item in items:
+                ChiTietDonHang.objects.create(
+                    DonHang=order,
+                    SanPham=item.SanPham,
+                    SoLuong=item.SoLuong,
+                    GiaBan=item.SanPham.Gia
+                )
+                
+            # 3. Xóa giỏ hàng
+            items.delete()
+            
+            return JsonResponse({
+                'success': True, 
+                'message': 'Đặt hàng thành công!',
+                'order_id': madh
+            })
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': f'Lỗi hệ thống: {str(e)}'})
+
 def home(request):
     """
     dashboard chính - Sử dụng ORM để lấy dữ liệu thống kê
     """
     if 'user_id' not in request.session:
         return redirect('login')
+        
+    if request.session.get('user_role') == 'User':
+        return render(request, '403.html', {'message': 'Tài khoản khách hàng không có quyền truy cập trang quản trị!'}, status=403)
 
     total_stores = CuaHang.objects.count()
     total_warehouses = Kho.objects.count()
@@ -367,10 +811,14 @@ def settings_view(request):
 
 def gis_map(request):
     """
-    Trang bản đồ GIS chuyên dụng (Full screen)
+    Trang bản đồ GIS chuyên dụng (Full screen) - Dành cho nhân viên
     """
     if 'user_id' not in request.session:
         return redirect('login')
+        
+    if request.session.get('user_role') == 'User':
+        return redirect('public_gis_map')
+
     context = {
         'sidebar_active': 'gis_map',
         'page_title': 'Bản đồ GIS Chuyên sâu',
@@ -378,6 +826,18 @@ def gis_map(request):
         'user_role': request.session.get('user_role', '')
     }
     return render(request, 'MyApp/gis_map.html', context)
+
+def public_gis_map(request):
+    """
+    Trang bản đồ GIS công khai cho người dùng và khách hàng
+    """
+    context = {
+        'page_title': 'Bản đồ SMART MART',
+        'customer_name': request.session.get('user_name'),
+        'user_role': request.session.get('user_role'),
+        'active_nav': 'map',
+    }
+    return render(request, 'MyApp/public_gis_map.html', context)
 
 
 
@@ -804,7 +1264,7 @@ class NhanVienListView(SidebarContextMixin, ListView):
 
 class NhanVienCreateView(SidebarContextMixin, CreateView):
     model = NhanVien
-    fields = ['MaNV', 'Ten', 'SDT', 'Role', 'MatKhau']
+    fields = ['MaNV', 'Ten', 'SDT', 'Email', 'Role', 'MatKhau']
     template_name = 'MyApp/nhanvien_form.html'
     success_url = reverse_lazy('nhanvien_list')
     sidebar_active = 'employees'
@@ -812,7 +1272,7 @@ class NhanVienCreateView(SidebarContextMixin, CreateView):
 
 class NhanVienUpdateView(SidebarContextMixin, UpdateView):
     model = NhanVien
-    fields = ['Ten', 'SDT', 'Role', 'MatKhau']
+    fields = ['Ten', 'SDT', 'Email', 'Role', 'MatKhau']
     template_name = 'MyApp/nhanvien_form.html'
     success_url = reverse_lazy('nhanvien_list')
     sidebar_active = 'employees'

@@ -10,14 +10,30 @@ from .views import (
     KhoListView, KhoCreateView, KhoUpdateView, KhoDeleteView, kho_detail_view,
     NhanVienListView, NhanVienCreateView, NhanVienUpdateView, NhanVienDeleteView,
     StockInListView, StockInCreateView, StockInUpdateView, StockInDeleteView, StockInDetailView,
-    HangTonKhoListView, HangTonKhoCreateView, HangTonKhoUpdateView, HangTonKhoDeleteView
+    HangTonKhoListView, HangTonKhoCreateView, HangTonKhoUpdateView, HangTonKhoDeleteView,
+    public_home, public_about, public_product_detail, public_store_detail, public_kho_detail, public_login, public_register, public_logout, public_gis_map,
+    view_cart, ajax_add_to_cart, ajax_update_cart, public_checkout, create_order
 )
 
 urlpatterns = [
-    path('', home, name='home'),
+    path('', public_home, name='public_home'),
+    path('about/', public_about, name='public_about'),
+    path('map/', public_gis_map, name='public_gis_map'),
+    path('product/<str:pk>/', public_product_detail, name='public_product_detail'),
+    path('store/detail/<str:pk>/', public_store_detail, name='public_store_detail'),
+    path('warehouses/public/<str:pk>/', public_kho_detail, name='public_kho_detail'),
+    path('customer/login/', public_login, name='public_login'),
+    path('customer/register/', public_register, name='public_register'),
+    path('customer/logout/', public_logout, name='public_logout'),
+    path('cart/', view_cart, name='view_cart'),
+    path('checkout/', public_checkout, name='public_checkout'),
+    path('api/cart/add/<str:pk>/', ajax_add_to_cart, name='ajax_add_to_cart'),
+    path('api/cart/update/', ajax_update_cart, name='ajax_update_cart'),
+    path('api/order/create/', create_order, name='create_order'),
+    path('dashboard/', home, name='home'),
     path('gis-map/', gis_map, name='gis_map'),
     path('reports/', report_view, name='reports'),
-    path('login/', login_view, name='login'),
+    path('login/', login_view, name='login'),  # Admin/Staff login - riêng biệt với public login
     path('forgot-password/', forgot_password_view, name='forgot_password'),
     path('reset-password/', reset_password_view, name='reset_password'),
     path('verify-otp/', verify_otp_view, name='verify_otp'),

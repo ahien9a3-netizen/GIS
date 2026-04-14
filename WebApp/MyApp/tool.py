@@ -6,9 +6,6 @@ from django.contrib.gis.db.models.functions import Distance
 from .models import CuaHang, Kho
 
 def store_geojson(request):
-    if 'user_id' not in request.session:
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
-    
     stores = CuaHang.objects.all()
     features = []
     for store in stores:
@@ -32,9 +29,6 @@ def store_geojson(request):
     return JsonResponse({"type": "FeatureCollection", "features": features})
 
 def store_heatmap(request):
-    if 'user_id' not in request.session:
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
-    
     stores = CuaHang.objects.filter(geom__isnull=False).values_list('geom', flat=True)
     warehouses = Kho.objects.filter(geom__isnull=False).values_list('geom', flat=True)
     
@@ -44,8 +38,6 @@ def store_heatmap(request):
 
 @require_GET
 def service_area(request):
-    if 'user_id' not in request.session:
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
     try:
         center_lat = float(request.GET.get('lat'))
         center_lng = float(request.GET.get('lng'))
@@ -84,8 +76,6 @@ def service_area(request):
     })
 
 def kho_geojson(request):
-    if 'user_id' not in request.session:
-        return JsonResponse({'error': 'Unauthorized'}, status=401)
     kho_list = Kho.objects.all()
     features = []
     for wh in kho_list:

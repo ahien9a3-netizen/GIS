@@ -15,6 +15,7 @@ class SanPham(models.Model):
     DanhMuc = models.ForeignKey('DanhMuc', on_delete=models.SET_NULL, blank=True, null=True, db_column='danhmuc')
     MieuTa = models.TextField(blank=True, null=True, db_column='mieuta')
     TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, db_column='trangthai')
+    Gia = models.DecimalField(max_digits=12, decimal_places=0, default=0, db_column='gia', verbose_name="Giá bán")
 
     class Meta:
         managed = True
@@ -25,7 +26,33 @@ class SanPham(models.Model):
     def __str__(self):
         return f"{self.MaSP} - {self.Ten}"
 
+# ĐÁNH GIÁ SẢN PHẨM
+class DanhGia(models.Model):
+    SanPham = models.ForeignKey(SanPham, on_delete=models.CASCADE, related_name='danh_gias', db_column='masp')
+    NguoiDung = models.CharField(max_length=255, db_column='nguoidung')
+    Diem = models.IntegerField(db_column='diem')
+    BinhLuan = models.TextField(db_column='binhluan')
+    NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
 
+    class Meta:
+        managed = True
+        db_table = 'danhgia'
+        verbose_name = "Đánh giá"
+        verbose_name_plural = "Danh sách đánh giá"
+
+# ĐÁNH GIÁ CỬA HÀNG
+class DanhGiaCuaHang(models.Model):
+    CuaHang = models.ForeignKey('CuaHang', on_delete=models.CASCADE, related_name='danh_gias', db_column='mach')
+    NguoiDung = models.CharField(max_length=255, db_column='nguoidung')
+    Diem = models.IntegerField(db_column='diem')
+    BinhLuan = models.TextField(db_column='binhluan')
+    NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
+
+    class Meta:
+        managed = True
+        db_table = 'danhgiacuahang'
+        verbose_name = "Đánh giá cửa hàng"
+        verbose_name_plural = "Danh sách đánh giá cửa hàng"
 #  KHO 
 class Kho(models.Model):
     KHO_LOAI_CHOICES = [
@@ -89,6 +116,8 @@ class CuaHang(models.Model):
     hinhanh = ArrayField(models.CharField(max_length=255), blank=True, null=True, db_column='hinhanh')
     TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, db_column='trangthai')
     geom = models.PointField(srid=4326, db_column='geom')
+    GioMoCua = models.TimeField(null=True, blank=True, db_column='giomocua', verbose_name="Giờ mở cửa")
+    GioDongCua = models.TimeField(null=True, blank=True, db_column='giodongcua', verbose_name="Giờ đóng cửa")
     MoTa = RichTextField(blank=True, null=True, db_column='mota', verbose_name="Mô tả")
 
     class Meta:
@@ -122,6 +151,7 @@ class NhanVien(models.Model):
         ('Admin', 'Admin'),
         ('Nhân Viên', 'Nhân Viên'),
         ('Kế Toán', 'Kế Toán'),
+        ('User', 'User'),
     ]
     
     
@@ -140,7 +170,6 @@ class NhanVien(models.Model):
 
     def __str__(self):
         return f"{self.MaNV} - {self.Ten}"
-
 
 #  YÊU CẦU NHẬP KHO 
 class YeuCauNhapKho(models.Model):
@@ -269,3 +298,72 @@ class Store(models.Model):
     class Meta:
         verbose_name = "Cửa hàng"
         verbose_name_plural = "Danh sách cửa hàng"
+
+# GIỎ HÀNG
+class GioHang(models.Model):
+    NguoiDung = models.OneToOneField(NhanVien, on_delete=models.CASCADE, related_name='gio_hang', db_column='manv', null=True, blank=True)
+    SessionID = models.CharField(max_length=255, null=True, blank=True, db_column='session_id') # Cho khách vãng lai
+    NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
+    NgayCapNhat = models.DateTimeField(auto_now=True, db_column='ngaycapnhat')
+
+    class Meta:
+        managed = True
+        db_table = 'giohang'
+        verbose_name = "Giỏ hàng"
+        verbose_name_plural = "Danh sách giỏ hàng"
+
+class ChiTietGioHang(models.Model):
+    GioHang = models.ForeignKey(GioHang, on_delete=models.CASCADE, related_name='items', db_column='magh')
+    SanPham = models.ForeignKey(SanPham, on_delete=models.CASCADE, db_column='masp')
+    SoLuong = models.PositiveIntegerField(default=1, db_column='soluong')
+
+    class Meta:
+        managed = True
+        db_table = 'chitietgiohang'
+        verbose_name = "Chi tiết giỏ hàng"
+        verbose_name_plural = "Chi tiết các giỏ hàng"
+        unique_together = (('GioHang', 'SanPham'),)
+
+# ĐƠN HÀNG
+class DonHang(models.Model):
+    TRANG_THAI_DH = [
+        ('Mới', 'Mới'),
+        ('Đang xử lý', 'Đang xử lý'),
+        ('Đang giao', 'Đang giao'),
+        ('Đã hoàn thành', 'Đã hoàn thành'),
+        ('Đã hủy', 'Đã hủy'),
+    ]
+
+    MaDH = models.CharField(max_length=20, primary_key=True, db_column='madh')
+    NguoiDung = models.ForeignKey(NhanVien, on_delete=models.SET_NULL, null=True, blank=True, db_column='manv')
+    
+    # Thông tin nhận hàng (để linh hoạt nếu người nhận khác người đặt)
+    TenNguoiNhan = models.CharField(max_length=255, db_column='tennguoinhan')
+    SDT_Nhan = models.CharField(max_length=20, db_column='sdt_nhan')
+    DiaChi_Nhan = models.TextField(db_column='diachi_nhan')
+    
+    TongTien = models.DecimalField(max_digits=15, decimal_places=0, db_column='tongtien')
+    TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_DH, default='Mới', db_column='trangthai')
+    GhiChu = models.TextField(blank=True, null=True, db_column='ghichu')
+    NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
+
+    class Meta:
+        managed = True
+        db_table = 'donhang'
+        verbose_name = "Đơn hàng"
+        verbose_name_plural = "Danh sách đơn hàng"
+
+    def __str__(self):
+        return f"{self.MaDH} - {self.TenNguoiNhan}"
+
+class ChiTietDonHang(models.Model):
+    DonHang = models.ForeignKey(DonHang, on_delete=models.CASCADE, related_name='items', db_column='madh')
+    SanPham = models.ForeignKey(SanPham, on_delete=models.CASCADE, db_column='masp')
+    SoLuong = models.PositiveIntegerField(db_column='soluong')
+    GiaBan = models.DecimalField(max_digits=12, decimal_places=0, db_column='giaban') # Lưu giá tại thời điểm mua
+
+    class Meta:
+        managed = True
+        db_table = 'chitietdonhang'
+        verbose_name = "Chi tiết đơn hàng"
+        verbose_name_plural = "Chi tiết các đơn hàng"
