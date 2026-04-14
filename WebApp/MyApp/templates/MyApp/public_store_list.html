@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }}</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #1d4ed8;
+            --primary-light: #3b82f6;
+            --primary-dark: #1e3a8a;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --success: #10b981;
+            --glass: rgba(255, 255, 255, 0.9);
+            --shadow: 0 10px 40px rgba(0,0,0,0.05);
+        }
+
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background-color: var(--light); color: #334155; }
+
+        /* Navbar */
+        .navbar { position: fixed; top: 0; width: 100%; height: 80px; background: var(--glass); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; box-sizing: border-box; }
+        .nav-brand { font-size: 1.8rem; font-weight: 800; color: var(--primary-dark); text-decoration: none; display: flex; align-items: center; gap: 12px; }
+        .nav-brand i { color: var(--primary-light); }
+        .nav-links { display: flex; list-style: none; gap: 25px; margin: 0; padding: 0; align-items: center; }
+        .nav-links a { text-decoration: none; color: #475569; font-weight: 600; transition: 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+        .nav-links a.active { color: var(--primary); }
+        
+        .cart-pill { position: relative; width: 45px; height: 45px; background: #eff6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); text-decoration: none; transition: 0.3s; }
+        .cart-badge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.7rem; font-weight: 800; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        /* Page Header */
+        .page-header { background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%); padding: 140px 5% 100px; text-align: center; color: white; position: relative; overflow: hidden; }
+        .page-header::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://www.transparenttextures.com/patterns/cubes.png'); opacity: 0.1; }
+        .page-title { font-family: 'Outfit'; font-size: 3.5rem; font-weight: 800; margin-bottom: 15px; position: relative; }
+        .page-subtitle { font-size: 1.15rem; color: #94a3b8; max-width: 700px; margin: 0 auto; line-height: 1.6; position: relative; }
+
+        /* Search Bar */
+        .search-section { transform: translateY(-35px); padding: 0 5%; max-width: 900px; margin: 0 auto; position: relative; z-index: 10; }
+        .search-box { background: white; padding: 12px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); display: flex; gap: 10px; }
+        .search-input-group { flex: 1; position: relative; }
+        .search-input-group i { position: absolute; left: 25px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1rem; }
+        .search-box input { width: 100%; padding: 18px 20px 18px 60px; border: none; background: #f8fafc; border-radius: 18px; font-family: inherit; font-size: 1.05rem; outline: none; border: 1px solid transparent; transition: 0.3s; box-sizing: border-box; }
+        .search-box input:focus { border-color: var(--primary-light); background: white; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+        .btn-search { background: var(--primary); color: white; border: none; padding: 0 40px; border-radius: 18px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        .btn-search:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+        /* Container */
+        .main-container { padding: 40px 5% 100px; max-width: 1400px; margin: 0 auto; }
+
+        /* Store Grid */
+        .stores-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 35px; }
+        
+        .store-card { background: white; border-radius: 28px; padding: 30px; box-shadow: var(--shadow); border: 1px solid #f1f5f9; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        .store-card:hover { transform: translateY(-12px); box-shadow: 0 30px 60px rgba(0,0,0,0.08); border-color: var(--primary-light); }
+        
+        .store-type-tag { position: absolute; top: 30px; right: 30px; background: #eff6ff; color: var(--primary); padding: 6px 16px; border-radius: 50px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .store-icon-box { width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 25px; transition: 0.3s; background: #f1f5f9; }
+        .store-card:hover .store-icon-box { transform: scale(1.1) rotate(5deg); background: var(--primary); color: white; }
+
+        .store-name { font-family: 'Outfit'; font-size: 1.6rem; font-weight: 700; color: var(--dark); margin: 0 0 15px 0; }
+        
+        .info-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; font-size: 0.95rem; color: #64748b; line-height: 1.4; }
+        .info-row i { color: var(--primary-light); width: 20px; text-align: center; margin-top: 3px; }
+        
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block; margin-right: 8px; box-shadow: 0 0 10px var(--success); }
+
+        .btn-detail { margin-top: 30px; background: #f8fafc; color: var(--primary); border: 1px solid #e2e8f0; padding: 15px; border-radius: 16px; font-weight: 700; text-align: center; text-decoration: none; transition: 0.3s; display: block; }
+        .store-card:hover .btn-detail { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Empty State */
+        .empty-results { text-align: center; padding: 100px 0; }
+        .empty-results i { font-size: 4rem; color: #cbd5e1; margin-bottom: 20px; }
+        .empty-results h3 { font-size: 1.8rem; color: var(--dark); font-weight: 700; }
+        .empty-results p { color: #94a3b8; font-size: 1.1rem; }
+
+        @media (max-width: 768px) {
+            .page-title { font-size: 2.5rem; }
+            .search-box { flex-direction: column; padding: 20px; }
+            .btn-search { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="{% url 'public_home' %}" class="nav-brand">
+            <i class="fa-solid fa-map-location-dot"></i> SMART MART
+        </a>
+        <ul class="nav-links">
+            <li><a href="{% url 'public_home' %}" class="{% if active_nav == 'home' %}active{% endif %}">Trang chủ</a></li>
+            <li><a href="{% url 'public_product_list' %}" class="{% if active_nav == 'products' %}active{% endif %}">Sản phẩm</a></li>
+            <li><a href="{% url 'public_about' %}" class="{% if active_nav == 'about' %}active{% endif %}">Về chúng tôi</a></li>
+            <li><a href="{% url 'public_gis_map' %}" class="{% if active_nav == 'map' %}active{% endif %}">Bản đồ</a></li>
+            <li>
+                <a href="{% url 'view_cart' %}" class="cart-pill">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-badge">{{ cart_count|default:0 }}</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <header class="page-header">
+        <h1 class="page-title" data-aos="fade-down">Hệ Thống Cửa Hàng</h1>
+        <p class="page-subtitle" data-aos="fade-up" data-aos-delay="200">
+            Tìm kiếm cơ sở Smart Mart gần bạn nhất để trải nghiệm dịch vụ mua sắm thông minh và giao hàng siêu tốc.
+        </p>
+    </header>
+
+    <section class="search-section" data-aos="zoom-in" data-aos-delay="400">
+        <form action="" method="GET" class="search-box">
+            <div class="search-input-group">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="q" value="{{ search_q }}" placeholder="Tìm tên cửa hàng, địa chỉ hoặc khu vực...">
+            </div>
+            <button type="submit" class="btn-search">TÌM KIẾM</button>
+        </form>
+    </section>
+
+    <main class="main-container">
+        <div class="stores-grid">
+            {% for store in stores_list %}
+            <div class="store-card" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:1 }}00">
+                <span class="store-type-tag">{{ store.Loai }}</span>
+                
+                <div class="store-icon-box">
+                    {% if store.Loai == 'Tiện Lợi' %}<i class="fa-solid fa-basket-shopping"></i>
+                    {% elif store.Loai == 'Gia Dụng' %}<i class="fa-solid fa-house"></i>
+                    {% elif store.Loai == 'Điện Tử' %}<i class="fa-solid fa-bolt"></i>
+                    {% else %}<i class="fa-solid fa-store"></i>
+                    {% endif %}
+                </div>
+
+                <h3 class="store-name">{{ store.Ten }}</h3>
+                
+                <div class="info-row">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <span>{{ store.DiaChi }}</span>
+                </div>
+                
+                <div class="info-row" style="color: var(--success); font-weight: 700;">
+                    <i class="fa-regular fa-clock"></i>
+                    <span>
+                        {% if store.GioMoCua and store.GioDongCua %}
+                            {{ store.GioMoCua|time:"H:i" }} – {{ store.GioDongCua|time:"H:i" }}
+                        {% else %}
+                            08:00 – 22:00
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="info-row">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span><span class="status-dot"></span> Đang hoạt động</span>
+                </div>
+
+                <a href="{% url 'public_store_detail' store.MaCH %}" class="btn-detail">Xem chi tiết & Mua sắm</a>
+            </div>
+            {% empty %}
+            <div class="empty-results">
+                <i class="fa-regular fa-face-frown"></i>
+                <h3>Opps! Không tìm thấy cửa hàng nào</h3>
+                <p>Thử tìm kiếm với từ khóa khác hoặc quay lại xem tất cả cửa hàng.</p>
+                <a href="{% url 'public_store_list' %}" style="color: var(--primary); font-weight: 800; text-decoration: none; display: inline-block; margin-top: 20px;">Làm mới kết quả</a>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ once: true, duration: 800 });
+    </script>
+</body>
+</html>

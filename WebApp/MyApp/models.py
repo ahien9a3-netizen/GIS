@@ -249,6 +249,54 @@ class NhapKhoChiTiet(models.Model):
         verbose_name_plural = "Chi tiết nhập kho"
 
 
+#  YÊU CẦU XUẤT KHO 
+class YeuCauXuatKho(models.Model):
+    TRANG_THAI_CHOICES = [
+        ('Mới', 'Mới'),
+        ('Đã xuất', 'Đã xuất'),
+        ('Đã hủy', 'Đã hủy'),
+    ]
+
+    LY_DO_CHOICES = [
+        ('Bán hàng', 'Bán hàng'),
+        ('Trả hàng nhà cung cấp', 'Trả hàng nhà cung cấp'),
+        ('Hàng hỏng', 'Hàng hỏng'),
+        ('Chuyển kho', 'Chuyển kho'),
+        ('Khác', 'Khác'),
+    ]
+
+    MaPX = models.CharField(max_length=20, primary_key=True, db_column='mapx', verbose_name="Mã phiếu xuất")
+    Ngay = models.DateField(auto_now_add=True, db_column='ngay', verbose_name="Ngày xuất")
+    LyDo = models.CharField(max_length=50, choices=LY_DO_CHOICES, default='Bán hàng', db_column='lydo', verbose_name="Lý do xuất")
+    DonHang = models.ForeignKey('DonHang', on_delete=models.SET_NULL, null=True, blank=True, db_column='madh', verbose_name="Đơn hàng liên kết")
+    TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, default='Mới', db_column='trangthai', verbose_name="Trạng thái")
+    GhiChu = models.TextField(blank=True, null=True, db_column='ghichu', verbose_name="Ghi chú")
+    MaNV = models.ForeignKey('NhanVien', on_delete=models.CASCADE, db_column='manv', verbose_name="Nhân viên thực hiện")
+
+    class Meta:
+        managed = True
+        db_table = 'yeucauxuatkho'
+        verbose_name = "Yêu cầu xuất kho"
+        verbose_name_plural = "Danh sách yêu cầu xuất kho"
+
+    def __str__(self):
+        return f"{self.MaPX} - {self.TrangThai}"
+
+#  XUẤT KHO CHI TIẾT 
+class XuatKhoChiTiet(models.Model):
+    PhieuXuat = models.ForeignKey(YeuCauXuatKho, on_delete=models.CASCADE, related_name='items', db_column='mapx')
+    MaKho = models.ForeignKey('Kho', on_delete=models.CASCADE, db_column='makho')
+    MaSP = models.ForeignKey('SanPham', on_delete=models.CASCADE, db_column='masp')
+    SoLuong = models.PositiveIntegerField(db_column='soluong')
+
+    class Meta:
+        managed = True
+        db_table = 'xuatkhochitiet'
+        unique_together = (('PhieuXuat', 'MaKho', 'MaSP'),)
+        verbose_name = "Xuất kho chi tiết"
+        verbose_name_plural = "Chi tiết xuất kho"
+
+
 #  DANH MỤC 
 class DanhMuc(models.Model):
     MaDM = models.CharField(max_length=20, primary_key=True, db_column='madm')
@@ -327,11 +375,17 @@ class ChiTietGioHang(models.Model):
 # ĐƠN HÀNG
 class DonHang(models.Model):
     TRANG_THAI_DH = [
-        ('Mới', 'Mới'),
         ('Đang xử lý', 'Đang xử lý'),
         ('Đang giao', 'Đang giao'),
         ('Đã hoàn thành', 'Đã hoàn thành'),
         ('Đã hủy', 'Đã hủy'),
+        ('Đã trả hàng', 'Đã trả hàng'),
+    ]
+
+    PHUONG_THUC_TT = [
+        ('COD', 'Thanh toán khi nhận hàng'),
+        ('MoMo', 'Ví điện tử MoMo'),
+        ('Bank', 'Chuyển khoản Ngân hàng'),
     ]
 
     MaDH = models.CharField(max_length=20, primary_key=True, db_column='madh')
@@ -343,7 +397,8 @@ class DonHang(models.Model):
     DiaChi_Nhan = models.TextField(db_column='diachi_nhan')
     
     TongTien = models.DecimalField(max_digits=15, decimal_places=0, db_column='tongtien')
-    TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_DH, default='Mới', db_column='trangthai')
+    PhuongThucThanhToan = models.CharField(max_length=50, choices=PHUONG_THUC_TT, default='COD', db_column='pt_thanhtoan')
+    TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_DH, default='Đang xử lý', db_column='trangthai')
     GhiChu = models.TextField(blank=True, null=True, db_column='ghichu')
     NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
 
@@ -367,3 +422,36 @@ class ChiTietDonHang(models.Model):
         db_table = 'chitietdonhang'
         verbose_name = "Chi tiết đơn hàng"
         verbose_name_plural = "Chi tiết các đơn hàng"
+
+class YeuCauTraHang(models.Model):
+    TRANG_THAI_CHOICES = [
+        ('Mới', 'Mới'),
+        ('Đang xử lý', 'Đang xử lý'),
+        ('Đã hoàn tiền', 'Đã hoàn tiền'),
+        ('Từ chối', 'Từ chối'),
+    ]
+    
+    MaYCTH = models.CharField(max_length=20, primary_key=True, verbose_name="Mã yêu cầu")
+    DonHang = models.ForeignKey(DonHang, on_delete=models.CASCADE, related_name='return_requests', verbose_name="Đơn hàng")
+    SdtLienHe = models.CharField(max_length=20, null=True, blank=True, verbose_name="Số điện thoại liên hệ")
+    EmailLienHe = models.EmailField(null=True, blank=True, verbose_name="Email liên hệ")
+    SoTaiKhoanNH = models.CharField(max_length=100, null=True, blank=True, verbose_name="Số tài khoản ngân hàng")
+    SoTaiKhoanMoMo = models.CharField(max_length=100, null=True, blank=True, verbose_name="Số tài khoản MoMo")
+    LyDo = models.TextField(verbose_name="Lý do trả hàng")
+    AnhHoaDon = models.ImageField(upload_to='returns/invoices/', null=True, blank=True, verbose_name="Ảnh hóa đơn")
+    AnhMinhChung = models.ImageField(upload_to='returns/proof/', null=True, blank=True, verbose_name="Ảnh minh chứng")
+    GhiChuAdmin = models.TextField(null=True, blank=True, verbose_name="Ghi chú của Admin")
+    SoTienHoan = models.DecimalField(max_digits=15, decimal_places=0, default=0, verbose_name="Số tiền hoàn lại")
+    TrangThai = models.CharField(max_length=20, choices=TRANG_THAI_CHOICES, default='Mới', verbose_name="Trạng thái")
+    NgayTao = models.DateTimeField(auto_now_add=True, verbose_name="Ngày yêu cầu")
+    NgayXuLy = models.DateTimeField(null=True, blank=True, verbose_name="Ngày xử lý")
+
+    class Meta:
+        managed = True
+        db_table = 'yeucautrahang'
+        verbose_name = "Yêu cầu trả hàng"
+        verbose_name_plural = "Các yêu cầu trả hàng"
+        ordering = ['-NgayTao']
+
+    def __str__(self):
+        return f"YCTH {self.MaYCTH} - Đơn {self.DonHang.MaDH}"

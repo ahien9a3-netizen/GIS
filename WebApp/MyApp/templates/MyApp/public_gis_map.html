@@ -1,589 +1,770 @@
+{% extends 'MyApp/public_base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page_title }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    
-    <style>
-        :root {
-            --primary: #1e3a8a;
-            --primary-light: #3b82f6;
-            --secondary: #10b981;
-            --dark: #0f172a;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
-            --gray-300: #cbd5e1;
-            --gray-600: #475569;
-            --glass: rgba(255, 255, 255, 0.95);
-        }
 
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: #f8fafc;
-            overflow: hidden;
-        }
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+<style>
+    /* ==================== PUBLIC MAP LAYOUT ==================== */
+    html, body { overflow: hidden; height: 100vh; margin: 0; }
 
-        /* Navbar Style */
-        .navbar {
-            position: fixed;
-            top: 0; 
-            width: 100%;
-            height: 70px;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            z-index: 2000;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 4%;
-            box-sizing: border-box;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
-        }
+    .public-map-wrapper {
+        position: fixed;
+        top: 80px;   /* Below fixed navbar */
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+    }
 
-        .nav-brand { font-size: 1.5rem; font-weight: 800; color: var(--primary); text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        .nav-links { display: flex; gap: 20px; list-style: none; padding: 0; margin: 0; align-items: center; }
-        .nav-links a { text-decoration: none; color: #475569; font-weight: 600; font-size: 0.95rem; transition: all 0.3s; }
-        .nav-links a:hover, .nav-links a.active { color: var(--primary-light); }
-        .btn-login { background: var(--primary); color: white !important; padding: 8px 18px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; }
-        .cart-btn { position: relative; width: 42px; height: 42px; background: #eff6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); text-decoration: none; margin-right: 15px; }
+    #public-gis-map {
+        width: 100%;
+        height: 100%;
+    }
 
-        /* Map Section */
-        .map-section { padding-top: 70px; height: 100vh; width: 100%; box-sizing: border-box; position: relative; }
-        #public-gis-map { height: 100%; width: 100%; }
+    /* ==================== OVERLAY CONTROLS ==================== */
+    .map-overlay-controls {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 1000;
+        background: white;
+        padding: 12px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 200px;
+    }
 
-        /* Advanced UI Controls */
-        .map-floating-panel { position: absolute; right: 20px; z-index: 1000; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); border: 1px solid rgba(0,0,0,0.05); overflow: hidden; width: 260px; }
-        .analysis-panel { top: 90px; }
-        .panel-header { background: var(--gray-100); padding: 12px 18px; border-bottom: 1px solid var(--gray-200); font-weight: 700; color: var(--dark); display: flex; justify-content: space-between; align-items: center; }
-        .panel-body { padding: 15px; display: flex; flex-direction: column; gap: 8px; }
+    .map-tool-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.25s;
+        width: 100%;
+        font-family: 'Inter', sans-serif;
+    }
+    .map-tool-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
-        .action-btn { background: white; border: 1px solid var(--gray-200); padding: 10px 15px; border-radius: 10px; cursor: pointer; text-align: left; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 10px; transition: 0.2s; width: 100%; color: var(--gray-600); }
-        .action-btn:hover { background: var(--gray-100); border-color: var(--primary-light); color: var(--primary); }
-        .action-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .radius-control {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        background: #f8fafc;
+        padding: 8px 10px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+    .radius-control label { font-size: 0.8rem; font-weight: 700; color: #64748b; white-space: nowrap; }
+    .radius-control input { width: 65px; padding: 5px 8px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; font-size: 0.85rem; }
 
-        /* Heatmap & Analysis Panels */
-        .config-overlay { position: absolute; bottom: 30px; left: 20px; z-index: 1000; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 280px; display: none; }
-        .config-overlay.active { display: block; animation: fadeInUp 0.3s ease-out; }
+    /* ==================== LOCATE BUTTON ==================== */
+    .btn-locate-me {
+        position: absolute;
+        bottom: 35px;
+        right: 15px;
+        z-index: 1000;
+        background: white;
+        border: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        cursor: pointer;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        transition: all 0.2s;
+        font-size: 1.1rem;
+    }
+    .btn-locate-me:hover { background: var(--primary); color: white; transform: translateY(-2px); }
 
-        /* Legend Panel */
-        .legend-panel { 
-            position: absolute; 
-            bottom: 30px; 
-            left: 20px; 
-            z-index: 1100; 
-            background: white; 
-            padding: 15px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
-            border: 1px solid var(--gray-200); 
-            font-size: 0.75rem; 
-            transition: 0.3s;
-        }
-        .legend-panel.hidden { opacity: 0; pointer-events: none; transform: translateY(10px); }
-        .legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-weight: 600; color: var(--gray-600); }
-        .legend-color { width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 1px rgba(0,0,0,0.1); }
+    /* ==================== HEATMAP PANEL ==================== */
+    #heatmap-config-panel {
+        position: absolute;
+        top: 15px;
+        left: 58px;
+        z-index: 1000;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        width: 300px;
+        display: none;
+        flex-direction: column;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+    }
+    .heatmap-panel-header {
+        background: #5b21b6;
+        color: white;
+        padding: 12px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 700;
+    }
+    .heatmap-panel-body { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+    .heatmap-panel-body label { font-size: 0.8rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+    .heatmap-panel-body select, .heatmap-panel-body input[type=range] { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; font-family: inherit; }
+    .heatmap-panel-body input[type=range] { padding: 4px 0; }
 
-        /* Geocoder UI Overrides */
-        .leaflet-control-geocoder { 
-            border: none !important; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important; 
-            border-radius: 12px !important; 
-            overflow: hidden; 
-            width: 300px !important;
-            margin-top: 20px !important;
-            margin-left: 20px !important;
-        }
-        .leaflet-control-geocoder-form input { 
-            padding: 12px 15px !important; 
-            font-size: 14px !important; 
-            font-family: 'Inter', sans-serif !important; 
-        }
-        .leaflet-control-geocoder-icon { 
-            width: 40px !important; 
-            height: 40px !important; 
-            background-size: 20px !important; 
-        }
+    /* ==================== LEGEND ==================== */
+    .map-legend {
+        position: absolute;
+        bottom: 90px;
+        right: 15px;
+        z-index: 1000;
+        background: white;
+        padding: 12px 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        font-size: 0.8rem;
+    }
+    .legend-title { font-weight: 800; color: #94a3b8; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 1px; margin-bottom: 8px; }
+    .legend-item { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid white; }
+    .legend-square { width: 12px; height: 12px; border-radius: 2px; }
 
-        /* Geolocation & Zoom Buttons */
-        .map-side-btns { position: absolute; bottom: 30px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
-        .round-btn { width: 44px; height: 44px; background: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); cursor: pointer; transition: 0.3s; color: var(--dark); border: 1px solid var(--gray-200); }
-        .round-btn:hover { background: var(--primary); color: white; transform: translateY(-3px); }
+    /* ==================== SIDEBAR ==================== */
+    .map-detail-sidebar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 380px;
+        height: 100%;
+        background: white;
+        z-index: 2000;
+        box-shadow: -4px 0 25px rgba(0,0,0,0.12);
+        transform: translateX(100%);
+        transition: transform 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .map-detail-sidebar.active { transform: translateX(0); }
 
-        /* Sidebar Improvement */
-        .map-sidebar { position: absolute; top: 70px; right: 0; transform: translateX(100%); width: 400px; height: calc(100% - 70px); background: white; z-index: 2500; box-shadow: -15px 0 35px rgba(0,0,0,0.1); transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); display: flex; flex-direction: column; }
-        .map-sidebar.active { transform: translateX(0); }
-        .sidebar-header { padding: 25px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
-        .sidebar-body { padding: 25px; flex: 1; overflow-y: auto; }
+    .sidebar-header {
+        padding: 20px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-shrink: 0;
+    }
+    .sidebar-header h3 { margin: 0; font-size: 1.1rem; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 10px; }
+    .sidebar-close-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .sidebar-close-btn:hover { background: rgba(255,255,255,0.3); }
 
-        .swiper-container { width: 100%; height: 180px; border-radius: 12px; overflow: hidden; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .info-card { background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
-    </style>
+    .sidebar-body { padding: 20px; flex: 1; overflow-y: auto; }
 
-        @media (max-width: 768px) {
-            .map-sidebar { width: 100%; }
-            .nav-links { display: none; }
-        }
-    </style>
-</head>
-<body>
+    /* Swiper */
+    .swiper-gallery-main { width: 100%; border-radius: 10px; overflow: hidden; height: 180px; margin-bottom: 8px; background: #f1f5f9; }
+    .swiper-gallery-main img { width: 100%; height: 100%; object-fit: cover; }
+    .swiper-gallery-thumbs { margin-bottom: 18px; }
+    .swiper-gallery-thumbs .swiper-slide { height: 52px; border-radius: 6px; overflow: hidden; opacity: 0.4; cursor: pointer; transition: opacity 0.2s; }
+    .swiper-gallery-thumbs .swiper-slide-thumb-active { opacity: 1; outline: 2px solid var(--primary); }
+    .swiper-gallery-thumbs img { width: 100%; height: 100%; object-fit: cover; }
 
-    <nav class="navbar">
-        <a href="{% url 'public_home' %}" class="nav-brand">
-            <i class="fa-solid fa-map-location-dot"></i> SMART MART
-        </a>
-        <ul class="nav-links">
-            <a href="#" class="cart-btn">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span class="cart-badge">0</span>
-            </a>
-            <li><a href="{% url 'public_home' %}" class="{% if active_nav == 'home' %}active{% endif %}">Trang chủ</a></li>
-            <li><a href="{% url 'public_about' %}" class="{% if active_nav == 'about' %}active{% endif %}">Về chúng tôi</a></li>
-            <li><a href="{% url 'public_gis_map' %}" class="{% if active_nav == 'map' %}active{% endif %}">Bản đồ</a></li>
-            {% if customer_name %}
-                <span style="font-weight: 700; color: var(--primary);"><i class="fa-solid fa-circle-user"></i> {{ customer_name }}</span>
-                {% if user_role != 'User' %}
-                    <li><a href="{% url 'home' %}" class="btn-login" style="background: var(--dark);"><i class="fa-solid fa-user-lock"></i> Quản trị</a></li>
-                {% endif %}
-                <li><a href="{% url 'public_logout' %}" style="color: #ef4444;"><i class="fa-solid fa-right-from-bracket"></i> Thoát</a></li>
-            {% else %}
-                <li><a href="{% url 'public_login' %}">Đăng nhập</a></li>
-                <li><a href="{% url 'public_register' %}" class="btn-login">Đăng ký</a></li>
-            {% endif %}
-        </ul>
-    </nav>
+    /* Info groups */
+    .detail-group { margin-bottom: 16px; }
+    .detail-label { font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px; }
+    .detail-value { font-size: 0.95rem; color: #1e293b; font-weight: 600; display: flex; align-items: flex-start; gap: 10px; }
+    .detail-value i { color: var(--primary); margin-top: 3px; width: 16px; flex-shrink: 0; }
 
-    <div class="map-section">
-        <div id="public-gis-map"></div>
+    /* Action buttons */
+    .sidebar-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.25s;
+        border: none;
+        text-decoration: none;
+        font-family: 'Inter', sans-serif;
+    }
+    .sidebar-action-btn.primary { background: var(--primary); color: white; }
+    .sidebar-action-btn.primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+    .sidebar-action-btn.dark { background: #1e293b; color: white; }
+    .sidebar-action-btn.dark:hover { background: #0f172a; transform: translateY(-1px); }
+    .sidebar-action-btn.red { background: #ef4444; color: white; }
+    .sidebar-action-btn.red:hover { background: #dc2626; transform: translateY(-1px); }
 
-        <!-- Floating Control Panel -->
-        <div class="map-floating-panel analysis-panel">
-            <div class="panel-header">
-                <span><i class="fa-solid fa-gears"></i> Công cụ GIS</span>
-                <i class="fa-solid fa-chevron-down"></i>
-            </div>
-            <div class="panel-body">
-                <button id="toggle-heatmap" class="action-btn">
-                    <i class="fa-solid fa-fire-flame-curved" style="color: #ef4444;"></i> Bản đồ nhiệt mật độ
-                </button>
-                <button id="toggle-routing" class="action-btn">
-                    <i class="fa-solid fa-route" style="color: #10b981;"></i> Đo đường & Chỉ dẫn
-                </button>
-                <button id="toggle-service" class="action-btn">
-                    <i class="fa-solid fa-bullseye" style="color: #3b82f6;"></i> Phân tích vùng phục vụ
-                </button>
-            </div>
+    /* ==================== ROUTING STYLES ==================== */
+    .leaflet-routing-container {
+        background-color: white !important;
+        padding: 10px !important;
+        border-radius: 10px !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+        border: 1px solid #e2e8f0 !important;
+        max-height: 280px !important;
+        overflow-y: auto !important;
+        font-family: 'Inter', sans-serif !important;
+        width: 260px !important;
+        font-size: 12px !important;
+    }
+
+    /* ==================== MARKER EFFECTS ==================== */
+    .user-location-marker {
+        width: 16px; height: 16px;
+        background: #10b981; border: 3px solid white; border-radius: 50%;
+        box-shadow: 0 0 0 6px rgba(16,185,129,0.2);
+        animation: pulseGreen 2s infinite;
+    }
+    @keyframes pulseGreen {
+        0% { box-shadow: 0 0 0 4px rgba(16,185,129,0.3); }
+        100% { box-shadow: 0 0 0 12px rgba(16,185,129,0); }
+    }
+    @keyframes blinkStore {
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(59,130,246,0)); }
+        50% { transform: scale(1.3); filter: drop-shadow(0 0 10px rgba(59,130,246,0.8)); }
+    }
+    .blinking-store > div { animation: blinkStore 0.9s infinite alternate !important; z-index: 1000 !important; }
+
+    /* ==================== POPUP STYLES ==================== */
+    .leaflet-popup-content-wrapper { border-radius: 12px !important; padding: 4px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.12) !important; }
+    .popup-card { padding: 4px; min-width: 180px; }
+    .popup-name { font-weight: 700; color: #1e293b; font-size: 0.95rem; margin-bottom: 4px; }
+    .popup-type-badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+    .popup-addr { font-size: 0.8rem; color: #64748b; margin-top: 5px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="public-map-wrapper" id="map-wrapper">
+
+    <!-- Heatmap Config Panel -->
+    <div id="heatmap-config-panel">
+        <div class="heatmap-panel-header">
+            <span><i class="fa-solid fa-fire"></i> Cấu hình Mật độ</span>
+            <button id="btn-close-heatmap" style="background:none;border:none;color:white;cursor:pointer;font-size:1.1rem;"><i class="fa-solid fa-xmark"></i></button>
         </div>
-
-        <!-- Heatmap Config Overlay -->
-        <div id="heatmap-config" class="config-overlay">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
-                <h4 style="margin:0; font-size:1rem; color:var(--dark);">Thiết lập Heatmap</h4>
-                <i class="fa-solid fa-times" onclick="document.getElementById('toggle-heatmap').click()" style="cursor:pointer;"></i>
+        <div class="heatmap-panel-body">
+            <div>
+                <label>Lọc theo loại:</label>
+                <select id="heatmap-type">
+                    <option value="all">Tất cả</option>
+                    <option value="Tiện Lợi">Cửa hàng Tiện Lợi</option>
+                    <option value="Điện Tử">Cửa hàng Điện Tử</option>
+                    <option value="Gia Dụng">Cửa hàng Gia Dụng</option>
+                    <option value="Kho Hàng">Kho Hàng</option>
+                </select>
             </div>
-            <div style="display:flex; flex-direction:column; gap:12px;">
-                <div>
-                    <label style="display:block; font-size:11px; font-weight:700; color:#64748b; margin-bottom:5px;">LỌC THEO LOẠI HÌNH</label>
-                    <select id="heat-type" style="width:100%; padding:8px; border-radius:8px; border:1px solid var(--gray-200);">
-                        <option value="all">Tất cả điểm</option>
-                        <option value="Tiện Lợi">Cửa hàng Tiện Lợi</option>
-                        <option value="Gia Dụng">Cửa hàng Gia Dụng</option>
-                        <option value="Điện Tử">Cửa hàng Điện Tử</option>
-                        <option value="Kho Hàng">Kho Hàng</option>
-                    </select>
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <div style="flex:1;">
-                        <label style="display:block; font-size:11px; font-weight:700; color:#64748b; margin-bottom:5px;">BÁN KÍNH (RADIUS)</label>
-                        <input type="range" id="heat-radius" min="10" max="60" value="25" style="width:100%;">
-                    </div>
-                </div>
-                <div>
-                    <label style="display:block; font-size:11px; font-weight:700; color:#64748b; margin-bottom:5px;">CHẾ ĐỘ HIỂN THỊ</label>
-                    <select id="heat-theme" style="width:100%; padding:8px; border-radius:8px; border:1px solid var(--gray-200);">
-                        <option value="classic">Tiêu chuẩn (Classic)</option>
-                        <option value="neon">Nổi bật (Neon)</option>
-                    </select>
-                </div>
+            <div>
+                <label>Bán kính tỏa nhiệt</label>
+                <input type="range" id="heatmap-radius" min="10" max="50" value="25">
             </div>
-        </div>
-
-        <!-- Service Area Config Overlay -->
-        <div id="service-config" class="config-overlay">
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px; align-items:center;">
-                <h4 style="margin:0; font-size:1rem; color:var(--dark);">Phân tích bán kính</h4>
-                <i class="fa-solid fa-times" onclick="document.getElementById('toggle-service').click()" style="cursor:pointer;"></i>
+            <div>
+                <label>Độ mờ (Blur)</label>
+                <input type="range" id="heatmap-blur" min="5" max="30" value="15">
             </div>
-            <div style="margin-bottom:15px;">
-                <label style="display:block; font-size:11px; font-weight:700; color:#64748b; margin-bottom:5px;">KHOẢNG CÁCH PHỤC VỤ (KM)</label>
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <input type="range" id="service-radius-slider" min="1" max="30" value="5" style="flex:1;">
-                    <span id="radius-val" style="font-weight:800; color:var(--primary); font-size:0.9rem;">5km</span>
-                </div>
-            </div>
-            <p style="font-size:12px; color:#64748b; margin:0;"><i class="fa-solid fa-circle-info"></i> Click vào vị trí bất kỳ trên bản đồ để bắt đầu phân tích vùng.</p>
-        </div>
-
-        <!-- Legend Panel -->
-        <div class="legend-panel">
-            <h5 style="margin:0 0 10px 0; font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#94a3b8;">Chú giải bản đồ</h5>
-            <div class="legend-item"><div class="legend-color" style="background:#3b82f6;"></div> <span>Cửa hàng Tiện Lợi</span></div>
-            <div class="legend-item"><div class="legend-color" style="background:#10b981;"></div> <span>Cửa hàng Gia Dụng</span></div>
-            <div class="legend-item"><div class="legend-color" style="background:#f59e0b;"></div> <span>Cửa hàng Điện Tử</span></div>
-            <div class="legend-item"><div class="legend-color" style="background:#ef4444;"></div> <span>Kho hàng trung tâm</span></div>
-        </div>
-
-        <!-- Side Utility Buttons -->
-        <div class="map-side-btns">
-            <button id="btn-locate" class="round-btn" title="Vị trí của tôi"><i class="fa-solid fa-location-crosshairs"></i></button>
-            <button id="btn-reset-map" class="round-btn" title="Đặt lại bản đồ"><i class="fa-solid fa-compress"></i></button>
-        </div>
-
-        <!-- Improved Sidebar Detail -->
-        <div id="map-sidebar" class="map-sidebar">
-            <div class="sidebar-header">
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <div id="side-icon-box" style="width:45px; height:45px; background:rgba(255,255,255,0.2); border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
-                        <i class="fa-solid fa-store"></i>
-                    </div>
-                    <div>
-                        <h3 style="margin:0; font-size:1.1rem; font-weight:800;" id="side-title">Chi tiết</h3>
-                        <span id="side-badge" style="font-size:0.7rem; font-weight:700; background:rgba(255,255,255,0.2); padding:2px 8px; border-radius:50px; text-transform:uppercase;">Cửa hàng</span>
-                    </div>
-                </div>
-                <button id="close-sidebar" style="background:none; border:none; color:white; font-size:1.8rem; cursor:pointer; line-height:1;">&times;</button>
-            </div>
-            <div class="sidebar-body" id="side-content">
-                <!-- Content injected via JS -->
+            <div>
+                <label>Theme màu:</label>
+                <select id="heatmap-theme">
+                    <option value="classic">Cổ điển</option>
+                    <option value="neon">Neon hiện đại</option>
+                </select>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <!-- Tool Buttons -->
+    <div class="map-overlay-controls">
+        <button id="btn-heatmap" class="map-tool-btn" style="background: #7c3aed;">
+            <i class="fa-solid fa-fire"></i> Mật độ hệ thống
+        </button>
+        <button id="btn-route" class="map-tool-btn" style="background: #10b981;">
+            <i class="fa-solid fa-route"></i> Đo quãng đường
+        </button>
+        <button id="btn-analysis" class="map-tool-btn" style="background: var(--primary);">
+            <i class="fa-solid fa-magnifying-glass-location"></i> Phân tích vùng
+        </button>
+        <div class="radius-control" id="radius-control">
+            <label for="analysis-radius">Bán kính (km):</label>
+            <input type="number" id="analysis-radius" value="5" min="1" max="100" step="0.5">
+        </div>
+    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var map = L.map('public-gis-map').setView([10.7769, 106.7009], 12);
-            
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(map);
+    <!-- Leaflet Map -->
+    <div id="public-gis-map"></div>
 
-            // Layers and Registry
-            var storesLayer = L.layerGroup().addTo(map);
-            var warehousesLayer = L.layerGroup().addTo(map);
-            var analysisLayer = L.layerGroup().addTo(map);
-            var heatLayer = null;
-            var routingControl = null;
-            var dataItems = []; // For easy filtering
-            
-            // Layer Control
-            L.control.layers(null, {
-                "<i class='fa-solid fa-cart-shopping'></i> Cửa hàng": storesLayer,
-                "<i class='fa-solid fa-warehouse'></i> Kho hàng": warehousesLayer
-            }, { position: 'topleft' }).addTo(map);
+    <!-- Legend -->
+    <div class="map-legend">
+        <div class="legend-title">Chú giải</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#3b82f6; box-shadow:0 0 0 1px #3b82f6;"></div><span>Tiện Lợi</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#0d9488; box-shadow:0 0 0 1px #0d9488;"></div><span>Gia Dụng</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b; box-shadow:0 0 0 1px #f59e0b;"></div><span>Điện Tử</span></div>
+        <div class="legend-item"><div class="legend-square" style="background:#ef4444;"></div><span>Kho Hàng</span></div>
+    </div>
 
-            // Geocoder
-            L.Control.geocoder({ 
-                defaultMarkGeocode: true, 
-                position: 'topleft',
-                placeholder: 'Tìm kiếm cửa hàng, địa chỉ...',
-                errorMessage: 'Không tìm thấy kết quả nào.'
-            }).addTo(map);
+    <!-- Locate Button -->
+    <button class="btn-locate-me" id="btn-locate" title="Vị trí của tôi">
+        <i class="fa-solid fa-location-crosshairs"></i>
+    </button>
 
-            // MiniMap
-            var osm2 = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {minZoom:0, maxZoom:12});
-            new L.Control.MiniMap(osm2, { toggleDisplay: true, position: 'bottomleft' }).addTo(map);
+    <!-- Detail Sidebar -->
+    <div class="map-detail-sidebar" id="map-sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fa-solid fa-circle-info"></i> Thông tin chi tiết</h3>
+            <button class="sidebar-close-btn" id="btn-close-sidebar"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="sidebar-body" id="sidebar-content">
+            <!-- Dynamic content injected by JS -->
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-            // Load Stores
-            fetch('/api/stores-geojson/')
-                .then(res => res.json())
-                .then(data => {
-                    L.geoJSON(data, {
-                        pointToLayer: (feature, latlng) => {
-                            let config = getTypeConfig(feature.properties.type);
-                            return L.marker(latlng, {
-                                icon: L.divIcon({
-                                    className: 'custom-marker',
-                                    html: `<div style="background: ${config.color}; color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"><i class="fa-solid ${config.icon}"></i></div>`,
-                                    iconSize: [34, 34]
-                                })
-                            });
-                        },
-                        onEachFeature: (feature, layer) => {
-                            dataItems.push({ feature, layer, type: feature.properties.type });
-                            layer.on('click', () => showDetail(feature.properties, layer.getLatLng()));
-                            layer.bindPopup(`<strong>${feature.properties.name}</strong><br><span style="font-size:12px;">${feature.properties.address}</span>`);
-                        }
-                    }).addTo(storesLayer);
-                    checkURLParams();
-                });
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
 
-            // Load Warehouses
-            fetch('/api/kho-geojson/')
-                .then(res => res.json())
-                .then(data => {
-                    L.geoJSON(data, {
-                        pointToLayer: (feature, latlng) => L.marker(latlng, {
-                            icon: L.divIcon({
-                                className: 'custom-marker',
-                                html: `<div style="background: #ef4444; color: white; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.15);"><i class="fa-solid fa-warehouse"></i></div>`,
-                                iconSize: [34, 34]
-                            })
-                        }),
-                        onEachFeature: (feature, layer) => {
-                            dataItems.push({ feature, layer, type: 'Kho Hàng' });
-                            layer.on('click', () => showDetail(feature.properties, layer.getLatLng(), true));
-                        }
-                    }).addTo(warehousesLayer);
-                });
+    // ── MAP INIT ──────────────────────────────────────────────────────────────
+    var map = L.map('public-gis-map', { zoomControl: false }).setView([10.7769, 106.7009], 12);
+    L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-            function getTypeConfig(type) {
-                if(type === 'Gia Dụng') return { color: '#10b981', icon: 'fa-house-chimney' };
-                if(type === 'Điện Tử') return { color: '#f59e0b', icon: 'fa-bolt' };
-                return { color: '#3b82f6', icon: 'fa-cart-shopping' };
-            }
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>'
+    }).addTo(map);
 
-            function showDetail(props, latlng, isWH = false) {
-                const sidebar = document.getElementById('map-sidebar');
-                const content = document.getElementById('side-content');
-                const title = document.getElementById('side-title');
-                const badge = document.getElementById('side-badge');
-                const iconBox = document.getElementById('side-icon-box');
+    // MiniMap
+    var osm2 = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {minZoom: 0, maxZoom: 13});
+    new L.Control.MiniMap(osm2, { toggleDisplay: true, position: 'bottomleft' }).addTo(map);
 
-                title.innerText = props.name;
-                badge.innerText = isWH ? 'Kho Hàng Trung Tâm' : (props.type || 'Cửa Hàng');
-                let config = isWH ? {color:'#ef4444', icon:'fa-warehouse'} : getTypeConfig(props.type);
-                iconBox.innerHTML = `<i class="fa-solid ${config.icon}"></i>`;
-                iconBox.style.color = config.color;
+    // Geocoder
+    L.Control.geocoder({
+        defaultMarkGeocode: false,
+        placeholder: 'Tìm địa điểm...',
+        position: 'topleft'
+    }).on('markgeocode', function(e) {
+        map.fitBounds(e.geocode.bbox);
+        if (window._geocoderMarker) map.removeLayer(window._geocoderMarker);
+        window._geocoderMarker = L.marker(e.geocode.center).bindPopup(e.geocode.name).addTo(map).openPopup();
+    }).addTo(map);
 
-                content.innerHTML = `
-                    <div class="swiper-container" id="side-swiper">
-                        <div class="swiper-wrapper">
-                            ${(props.hinhanh && props.hinhanh.length > 0) 
-                                ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="/media/${img}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600'" /></div>`).join('')
-                                : `<div class="swiper-slide"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=600" /></div>`
-                            }
-                        </div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <div class="info-row"><i class="fa-solid fa-location-dot"></i> <span>${props.address}</span></div>
-                        <div class="info-row"><i class="fa-solid fa-phone"></i> <span>${props.phone || '0123 456 789'}</span></div>
-                        <div class="info-row"><i class="fa-solid fa-tag"></i> <span>${props.type || (isWH ? 'Kho hàng' : 'Cửa hàng')}</span></div>
-                    </div>
+    // ── LAYERS ────────────────────────────────────────────────────────────────
+    var storesLayer     = L.layerGroup().addTo(map);
+    var warehousesLayer = L.layerGroup().addTo(map);
+    var serviceLayer    = L.layerGroup().addTo(map);
+    var heatLayer;
+    var searchableItems  = [];
+    var storesMarkers    = {};
+    var warehousesMarkers = {};
 
-                    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
-                        <a href="${isWH ? '/warehouses/public/' : '/store/detail/'}${props.id}/" class="btn-login" style="display:block; text-align:center; text-decoration:none; padding:12px; border-radius:12px; background:var(--dark);">
-                            <i class="fa-solid fa-eye"></i> XEM CHI TIẾT ${isWH ? 'KHO' : ''}
-                        </a>
-                        ${!isWH ? `
-                        <a href="{% url 'public_home' %}#products" class="btn-login" style="display:block; text-align:center; text-decoration:none; padding:12px; border-radius:12px; background:var(--primary); color:white;">
-                            <i class="fa-solid fa-cart-shopping"></i> MUA SẮM NGAY
-                        </a>
-                        ` : ''}
-                    </div>
-
-                    <div style="display:flex; gap:12px;">
-                        <button onclick="map.flyTo([${latlng.lat}, ${latlng.lng}], 17)" class="action-btn" style="flex:1; justify-content:center; padding:10px;">
-                            <i class="fa-solid fa-crosshairs"></i> Vị trí
-                        </button>
-                        <button onclick="pickRoute([${latlng.lat}, ${latlng.lng}], '${props.name}')" class="action-btn" style="flex:1; justify-content:center; background:var(--secondary); color:white; border:none; padding:10px;">
-                            <i class="fa-solid fa-route"></i> Chỉ đường
-                        </button>
-                    </div>
-                `;
-                sidebar.classList.add('active');
-                new Swiper('#side-swiper', { autoplay: { delay: 3500 }, loop: true });
-            }
-
-            // --- Geolocation ---
-            var userMarker = null;
-            document.getElementById('btn-locate').onclick = () => {
-                map.locate({setView: true, maxZoom: 15});
-            };
-            map.on('locationfound', e => {
-                if(userMarker) map.removeLayer(userMarker);
-                userMarker = L.marker(e.latlng, {
-                    icon: L.divIcon({
-                        className: 'user-marker',
-                        html: '<div style="background:#3b82f6; width:18px; height:18px; border-radius:50%; border:3px solid white; box-shadow:0 0 10px rgba(59,130,246,0.5);"></div>'
-                    })
-                }).addTo(map).bindPopup("Vị trí của bạn").openPopup();
-            });
-
-            // --- Heatmap Logic ---
-            document.getElementById('toggle-heatmap').onclick = function() {
-                this.classList.toggle('active');
-                document.getElementById('heatmap-config').classList.toggle('active');
-                
-                // Hide legend when config is open
-                document.querySelector('.legend-panel').classList.toggle('hidden', this.classList.contains('active'));
-                
-                if(this.classList.contains('active')) updateHeatmap();
-                else if(heatLayer) map.removeLayer(heatLayer);
-            };
-
-            function updateHeatmap() {
-                if(heatLayer) map.removeLayer(heatLayer);
-                let filter = document.getElementById('heat-type').value;
-                let points = [];
-                dataItems.filter(i => filter === 'all' || i.type === filter).forEach(i => {
-                    points.push([i.layer.getLatLng().lat, i.layer.getLatLng().lng, 0.7]);
-                });
-                
-                let theme = document.getElementById('heat-theme').value;
-                let gradient = theme === 'neon' ? {0.2:'indigo', 0.5:'purple', 0.8:'magenta', 1:'crimson'} : {0.4:'blue', 0.6:'cyan', 0.7:'lime', 0.8:'yellow', 1:'red'};
-                
-                heatLayer = L.heatLayer(points, {
-                    radius: parseInt(document.getElementById('heat-radius').value),
-                    blur: 15,
-                    gradient: gradient
-                }).addTo(map);
-            }
-            ['heat-type', 'heat-radius', 'heat-theme'].forEach(id => document.getElementById(id).addEventListener('change', () => {
-               if(document.getElementById('toggle-heatmap').classList.contains('active')) updateHeatmap();
-            }));
-
-            // --- Service Area Analysis ---
-            var isServiceMode = false;
-            document.getElementById('toggle-service').onclick = function() {
-                isServiceMode = !isServiceMode;
-                this.classList.toggle('active');
-                document.getElementById('service-config').classList.toggle('active');
-                
-                // Hide legend when config is open
-                document.querySelector('.legend-panel').classList.toggle('hidden', isServiceMode);
-                
-                if(!isServiceMode) {
-                    analysisLayer.clearLayers();
-                    resetBlinking();
-                    map.getContainer().style.cursor = '';
-                } else {
-                    map.getContainer().style.cursor = 'crosshair';
-                }
-            };
-
-            document.getElementById('service-radius-slider').oninput = function() {
-                document.getElementById('radius-val').innerText = this.value + 'km';
-            };
-
-            map.on('click', function(e) {
-                if(!isServiceMode) return;
-                analysisLayer.clearLayers();
-                resetBlinking();
-                
-                let radiusKm = document.getElementById('service-radius-slider').value;
-                let circle = L.circle(e.latlng, { radius: radiusKm * 1000, color: '#3b82f6', fillOpacity: 0.15, weight:2 }).addTo(analysisLayer);
-                
-                // Fetch analysis
-                fetch(`/api/service-area/?lat=${e.latlng.lat}&lng=${e.latlng.lng}&radius=${radiusKm}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        let count = data.stores.features.length;
-                        circle.bindPopup(`<strong>Tìm thấy ${count} cửa hàng</strong> trong bán kính ${radiusKm}km`).openPopup();
-                        
-                        let storeIds = data.stores.features.map(f => f.properties.id);
-                        dataItems.forEach(item => {
-                            if(storeIds.includes(item.feature.properties.id)) {
-                                L.DomUtil.addClass(item.layer.getElement(), 'blinking-store');
-                            }
-                        });
-                    });
-            });
-
-            function resetBlinking() {
-                dataItems.forEach(i => { if(i.layer.getElement()) L.DomUtil.removeClass(i.layer.getElement(), 'blinking-store'); });
-            }
-
-            // --- Routing Logic ---
-            var routePoints = [];
-            document.getElementById('toggle-routing').onclick = function() {
-                this.classList.toggle('active');
-                if(this.classList.contains('active')) {
-                    alert("Click chọn 2 điểm trên bản đồ để đo đường!");
-                    map.on('click', onRoutePick);
-                } else {
-                    map.off('click', onRoutePick);
-                    if(routingControl) map.removeControl(routingControl);
-                    routePoints = [];
-                    analysisLayer.clearLayers();
-                }
-            };
-
-            function onRoutePick(e) {
-                routePoints.push(e.latlng);
-                L.marker(e.latlng, { icon: L.divIcon({className:'route-dot', html:'<div style="background:var(--dark); width:10px; height:10px; border-radius:50%; border:2px solid white;"></div>'}) }).addTo(analysisLayer);
-                
-                if(routePoints.length === 1) {
-                    showToast("Đã chọn điểm khởi đầu. Chọn điểm đích!");
-                }
-
-                if(routePoints.length === 2) {
-                    showToast("Đang tính toán lộ trình...");
-                    if(routingControl) map.removeControl(routingControl);
-                    routingControl = L.Routing.control({
-                        waypoints: [routePoints[0], routePoints[1]],
-                        lineOptions: { styles: [{color: '#1e3a8a', weight:6, opacity:0.8}] }
-                    }).addTo(map);
-                    routePoints = [];
-                }
-            }
-
-            function showToast(msg) {
-                let t = document.createElement('div');
-                t.className = 'routing-toast';
-                t.innerHTML = `<i class="fa-solid fa-location-arrow"></i> ${msg}`;
-                document.body.appendChild(t);
-                setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translate(-50%, -20px)'; setTimeout(() => t.remove(), 500); }, 3000);
-            }
-            
-            window.pickRoute = (latlng, name) => {
-                document.getElementById('toggle-routing').classList.add('active');
-                map.on('click', onRoutePick);
-                onRoutePick({latlng: L.latLng(latlng)}); // First point
-            };
-
-            // Reset Map
-            document.getElementById('btn-reset-map').onclick = () => {
-                map.setView([10.7769, 106.7009], 12);
-                analysisLayer.clearLayers();
-                resetBlinking();
-            };
-
-            function checkURLParams() {
-                const storeId = urlParams.get('store');
-                if(storeId) {
-                    let item = dataItems.find(i => i.feature.properties.id === storeId);
-                    if(item) {
-                        setTimeout(() => {
-                            map.flyTo(item.layer.getLatLng(), 16);
-                            showDetail(item.feature.properties, item.layer.getLatLng());
-                        }, 800);
-                    }
-                }
-            }
-
-            document.getElementById('close-sidebar').onclick = () => document.getElementById('map-sidebar').classList.remove('active');
+    function makeMarkerIcon(color, iconClass) {
+        return L.divIcon({
+            className: 'custom-marker',
+            html: `<div style="background:${color};color:white;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.15);font-size:13px;"><i class="fa-solid ${iconClass}"></i></div>`,
+            iconSize: [32, 32],
+            iconAnchor: [16, 16]
         });
-    </script>
-</body>
-</html>
-</body>
-</html>
+    }
+
+    // ── STORES GeoJSON ────────────────────────────────────────────────────────
+    fetch('/api/stores-geojson/')
+        .then(r => r.json())
+        .then(data => {
+            L.geoJSON(data, {
+                pointToLayer: (feature, latlng) => {
+                    const t = feature.properties.type;
+                    let color = '#3b82f6', icon = 'fa-cart-shopping';
+                    if (t === 'Gia Dụng') { color = '#0d9488'; icon = 'fa-house-chimney'; }
+                    else if (t === 'Điện Tử') { color = '#f59e0b'; icon = 'fa-bolt'; }
+                    return L.marker(latlng, { icon: makeMarkerIcon(color, icon) });
+                },
+                onEachFeature: (feature, layer) => {
+                    const p = feature.properties;
+                    storesMarkers[p.id] = layer;
+
+                    layer.bindPopup(`
+                        <div class="popup-card">
+                            <div class="popup-name">${p.name}</div>
+                            <span class="popup-type-badge" style="background:rgba(59,130,246,0.1);color:#3b82f6;">${p.type}</span>
+                            <div class="popup-addr"><i class="fa-solid fa-location-dot" style="color:#3b82f6;margin-right:5px;"></i>${p.address}</div>
+                        </div>`);
+
+                    layer.on('click', function() {
+                        // Check if in route mode
+                        if (window._handleRoute && window._handleRoute(layer.getLatLng(), p.name)) return;
+
+                        const sidebar = document.getElementById('map-sidebar');
+                        const content = document.getElementById('sidebar-content');
+                        let typeColor = '#3b82f6';
+                        if (p.type === 'Gia Dụng') typeColor = '#0d9488';
+                        else if (p.type === 'Điện Tử') typeColor = '#f59e0b';
+
+                        const images = (p.hinhanh && p.hinhanh.length > 0)
+                            ? p.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/'+img}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=400'" loading="lazy"/></div>`).join('')
+                            : `<div class="swiper-slide"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=400"/></div>`;
+
+                        content.innerHTML = `
+                            <div style="text-align:center; margin-bottom:18px;">
+                                <h4 style="font-size:1.2rem;font-weight:800;color:#1e293b;margin:0 0 8px;">${p.name}</h4>
+                                <span style="background:${typeColor}22;color:${typeColor};padding:4px 14px;border-radius:20px;font-size:0.75rem;font-weight:800;text-transform:uppercase;">${p.type}</span>
+                            </div>
+
+                            <div class="swiper swiper-gallery-main" id="swGalleryMain">
+                                <div class="swiper-wrapper">${images}</div>
+                            </div>
+                            <div class="swiper swiper-gallery-thumbs" id="swGalleryThumbs">
+                                <div class="swiper-wrapper">${images}</div>
+                            </div>
+
+                            <div class="detail-group"><div class="detail-label">Địa chỉ</div><div class="detail-value"><i class="fa-solid fa-location-dot"></i>${p.address}</div></div>
+                            <div class="detail-group"><div class="detail-label">Liên hệ</div><div class="detail-value"><i class="fa-solid fa-phone"></i>${p.phone || 'N/A'}</div></div>
+                            <div class="detail-group"><div class="detail-label">Loại hình</div><div class="detail-value"><i class="fa-solid fa-tag"></i>${p.type}</div></div>
+
+                            <hr style="border:none;border-top:1px solid #f1f5f9;margin:16px 0;">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                                <button onclick="map.flyTo([${feature.geometry.coordinates[1]},${feature.geometry.coordinates[0]}],17)" class="sidebar-action-btn primary">
+                                    <i class="fa-solid fa-crosshairs"></i> Phóng to
+                                </button>
+                                <a href="/store/detail/${p.id}/" class="sidebar-action-btn dark">
+                                    <i class="fa-solid fa-eye"></i> Chi tiết
+                                </a>
+                            </div>`;
+
+                        sidebar.classList.add('active');
+                        setTimeout(() => {
+                            const th = new Swiper('#swGalleryThumbs', { spaceBetween: 8, slidesPerView: 4, watchSlidesProgress: true });
+                            new Swiper('#swGalleryMain', { spaceBetween: 10, thumbs: { swiper: th }, autoplay: { delay: 3000, disableOnInteraction: false } });
+                        }, 60);
+                    });
+
+                    searchableItems.push({ name: p.name, type: p.type || 'Cửa hàng', layer });
+                }
+            }).addTo(storesLayer);
+        });
+
+    // ── WAREHOUSES GeoJSON ────────────────────────────────────────────────────
+    fetch('/api/kho-geojson/')
+        .then(r => r.json())
+        .then(data => {
+            L.geoJSON(data, {
+                pointToLayer: (feature, latlng) => L.marker(latlng, { icon: makeMarkerIcon('#ef4444', 'fa-warehouse') }),
+                onEachFeature: (feature, layer) => {
+                    const p = feature.properties;
+                    warehousesMarkers[p.id] = layer;
+
+                    layer.bindPopup(`
+                        <div class="popup-card">
+                            <div class="popup-name"><i class="fa-solid fa-warehouse" style="color:#ef4444;margin-right:6px;"></i>${p.name}</div>
+                            <span class="popup-type-badge" style="background:rgba(239,68,68,0.1);color:#ef4444;">KHO HÀNG</span>
+                            <div class="popup-addr"><i class="fa-solid fa-location-dot" style="color:#ef4444;margin-right:5px;"></i>${p.address}</div>
+                        </div>`);
+
+                    layer.on('click', function() {
+                        if (window._handleRoute && window._handleRoute(layer.getLatLng(), p.name)) return;
+
+                        const sidebar = document.getElementById('map-sidebar');
+                        const content = document.getElementById('sidebar-content');
+
+                        const images = (p.hinhanh && p.hinhanh.length > 0)
+                            ? p.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/'+img}" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=400'" loading="lazy"/></div>`).join('')
+                            : `<div class="swiper-slide"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=400"/></div>`;
+
+                        content.innerHTML = `
+                            <div style="text-align:center; margin-bottom:18px;">
+                                <div style="width:56px;height:56px;background:rgba(239,68,68,0.1);color:#ef4444;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 12px;"><i class="fa-solid fa-warehouse"></i></div>
+                                <h4 style="font-size:1.1rem;font-weight:800;color:#ef4444;margin:0 0 6px;">${p.name}</h4>
+                                <span style="background:rgba(239,68,68,0.1);color:#ef4444;padding:3px 12px;border-radius:20px;font-size:0.72rem;font-weight:800;">KHO HÀNG TRUNG TÂM</span>
+                            </div>
+
+                            <div class="swiper swiper-gallery-main" id="swWhMain">
+                                <div class="swiper-wrapper">${images}</div>
+                            </div>
+                            <div class="swiper swiper-gallery-thumbs" id="swWhThumbs">
+                                <div class="swiper-wrapper">${images}</div>
+                            </div>
+
+                            <div class="detail-group"><div class="detail-label">Mã kho</div><div class="detail-value"><i class="fa-solid fa-barcode" style="color:#ef4444"></i>${p.id}</div></div>
+                            <div class="detail-group"><div class="detail-label">Địa chỉ</div><div class="detail-value"><i class="fa-solid fa-location-dot" style="color:#ef4444"></i>${p.address}</div></div>
+
+                            <hr style="border:none;border-top:1px solid #f1f5f9;margin:16px 0;">
+                            <button onclick="map.flyTo([${feature.geometry.coordinates[1]},${feature.geometry.coordinates[0]}],17)" class="sidebar-action-btn red" style="width:100%;">
+                                <i class="fa-solid fa-crosshairs"></i> Phóng to vị trí kho
+                            </button>`;
+
+                        sidebar.classList.add('active');
+                        setTimeout(() => {
+                            const th = new Swiper('#swWhThumbs', { spaceBetween: 8, slidesPerView: 4, watchSlidesProgress: true });
+                            new Swiper('#swWhMain', { spaceBetween: 10, thumbs: { swiper: th }, autoplay: { delay: 3500 } });
+                        }, 60);
+                    });
+
+                    searchableItems.push({ name: p.name, type: 'Kho Hàng', layer });
+                }
+            }).addTo(warehousesLayer);
+        });
+
+    L.control.layers(null, { "Cửa hàng": storesLayer, "Kho hàng": warehousesLayer }, { position: 'topleft' }).addTo(map);
+
+    // ── HEATMAP ───────────────────────────────────────────────────────────────
+    var isHeatmapOn = false;
+    function buildHeatmap() {
+        if (heatLayer) map.removeLayer(heatLayer);
+        const type   = document.getElementById('heatmap-type').value;
+        const radius = +document.getElementById('heatmap-radius').value;
+        const blur   = +document.getElementById('heatmap-blur').value;
+        const theme  = document.getElementById('heatmap-theme').value;
+        const pts = searchableItems
+            .filter(i => type === 'all' || i.type === type)
+            .map(i => { const ll = i.layer.getLatLng && i.layer.getLatLng(); return ll ? [ll.lat, ll.lng] : null; })
+            .filter(Boolean);
+        const grad = theme === 'neon'
+            ? {0.2:'indigo', 0.5:'purple', 0.8:'magenta', 1:'crimson'}
+            : {0.4:'blue',   0.6:'cyan',   0.7:'lime',    0.8:'yellow', 1:'red'};
+        heatLayer = L.heatLayer(pts, { radius, blur, gradient: grad }).addTo(map);
+    }
+
+    document.getElementById('btn-heatmap').onclick = function() {
+        isHeatmapOn = !isHeatmapOn;
+        this.style.background = isHeatmapOn ? '#4c1d95' : '#7c3aed';
+        document.getElementById('heatmap-config-panel').style.display = isHeatmapOn ? 'flex' : 'none';
+        if (isHeatmapOn) buildHeatmap(); else if (heatLayer) map.removeLayer(heatLayer);
+    };
+    ['heatmap-type','heatmap-theme'].forEach(id => document.getElementById(id).onchange = () => { if(isHeatmapOn) buildHeatmap(); });
+    ['heatmap-radius','heatmap-blur'].forEach(id  => document.getElementById(id).oninput  = () => { if(isHeatmapOn) buildHeatmap(); });
+    document.getElementById('btn-close-heatmap').onclick = () => { if(isHeatmapOn) document.getElementById('btn-heatmap').click(); };
+
+    // ── SERVICE AREA ANALYSIS ─────────────────────────────────────────────────
+    var isAnalysis = false;
+    function clearBlinking() {
+        searchableItems.forEach(i => { if(i.layer.getElement()) L.DomUtil.removeClass(i.layer.getElement(), 'blinking-store'); });
+    }
+
+    document.getElementById('btn-analysis').onclick = function() {
+        isAnalysis = !isAnalysis;
+        this.style.background = isAnalysis ? '#ef4444' : 'var(--primary)';
+        this.innerHTML = isAnalysis
+            ? '<i class="fa-solid fa-xmark"></i> Hủy phân tích'
+            : '<i class="fa-solid fa-magnifying-glass-location"></i> Phân tích vùng';
+        map.getContainer().style.cursor = isAnalysis ? 'crosshair' : '';
+        document.getElementById('radius-control').style.display = isAnalysis ? 'flex' : 'none';
+        
+        if (!isAnalysis) { 
+            serviceLayer.clearLayers(); clearBlinking(); 
+        } else {
+            // Nếu đã có vị trí user thì tự động dùng làm tâm
+            if (window.userMarker) {
+                startAnalysisAt(window.userMarker.getLatLng());
+            } else {
+                const t = document.createElement('div');
+                t.style.cssText='position:fixed;top:85px;left:50%;transform:translateX(-50%);background:#ef4444;color:white;padding:10px 20px;border-radius:8px;z-index:9999;font-weight:700;font-family:Inter,sans-serif;box-shadow:0 10px 25px rgba(0,0,0,0.1);';
+                t.innerHTML='<i class="fa-solid fa-crosshairs"></i> Vui lòng click lên bản đồ để đặt tâm phân tích!';
+                document.body.appendChild(t);
+                setTimeout(() => t.remove(), 3500);
+            }
+        }
+    };
+
+    function startAnalysisAt(latlng) {
+        if (!isAnalysis) return;
+        serviceLayer.clearLayers(); clearBlinking();
+        const km = parseFloat(document.getElementById('analysis-radius').value) || 5;
+        const circle = L.circle(latlng, { radius: km*1000, color:'#ef4444', fillColor:'#ef4444', fillOpacity:0.12, weight:2 }).addTo(serviceLayer);
+
+        const pin = L.marker(latlng, {
+            draggable: true,
+            icon: L.divIcon({ className:'custom-marker', html:'<div style="background:white;color:#ef4444;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #ef4444;font-size:10px;cursor:move;"><i class="fa-solid fa-arrows-up-down-left-right"></i></div>', iconSize:[24,24] })
+        }).addTo(serviceLayer);
+
+        pin.on('drag', ev => circle.setLatLng(ev.target.getLatLng()));
+        pin.on('dragend', ev => {
+            clearBlinking();
+            doAnalysis(ev.target.getLatLng(), parseFloat(document.getElementById('analysis-radius').value)||5, circle);
+        });
+        doAnalysis(latlng, km, circle);
+        map.setView(latlng, 13);
+    }
+
+    map.on('click', function(e) {
+        if (isAnalysis) startAnalysisAt(e.latlng);
+    });
+
+    window.directRouteTo = function(lat, lng, name, centerLat, centerLng) {
+        document.getElementById('btn-close-sidebar').click(); // Đóng sidebar nếu đang mở
+        if (!isRoute) document.getElementById('btn-route').click(); // Bật chế độ đo quãng đường
+        
+        // Reset đo
+        if(routeCtrl) map.removeControl(routeCtrl);
+        routePts = []; routePinsLayer.clearLayers();
+        
+        // Đo từ điểm tâm đến cửa hàng
+        window._handleRoute(L.latLng(centerLat, centerLng), 'Tâm phân tích');
+        window._handleRoute(L.latLng(lat, lng), name);
+    };
+
+    function doAnalysis(latlng, km, circle) {
+        circle.bindPopup(`<div style="padding:10px;"><b><i class="fa-solid fa-spinner fa-spin"></i> Đang tìm cửa hàng trong ${km}km...</b></div>`).openPopup();
+        fetch(`/api/service-area/?lat=${latlng.lat}&lng=${latlng.lng}&radius=${km}`)
+            .then(r => r.json())
+            .then(data => {
+                const count = data.stores.features.length;
+                let html = `<div style="min-width: 270px; padding: 5px; font-family:'Inter', sans-serif;">`;
+                html += `<div style="font-weight:800; color:var(--primary); font-size:14px; margin-bottom:10px; padding-bottom:10px; border-bottom:2px solid #f1f5f9;">
+                            <i class="fa-solid fa-shop"></i> Có <b>${count}</b> cửa hàng trong <b>${km}km</b>
+                         </div>`;
+                
+                if (count > 0) {
+                    html += `<div style="max-height: 240px; overflow-y: auto; padding-right:5px;">`;
+                    data.stores.features.forEach(f => {
+                       const p = f.properties;
+                       const distStr = p.distance_km ? p.distance_km.toFixed(2) : '?';
+                       const opTime = p.opening_time ? p.opening_time.substring(0,5) : '08:00';
+                       const clTime = p.closing_time ? p.closing_time.substring(0,5) : '22:00';
+                       
+                       html += `
+                        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:10px; transition:0.3s;" onmouseover="this.style.borderColor='var(--primary-light)'" onmouseout="this.style.borderColor='#e2e8f0'">
+                           <div style="font-weight:800; color:#1e293b; font-size:13.5px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                                <span style="line-height:1.3;">${p.name}</span>
+                                <span style="font-size:11px; font-weight:800; color:#ef4444; background:#fef2f2; padding:3px 8px; border-radius:20px; white-space:nowrap;">${distStr} km</span>
+                           </div>
+                           <div style="font-size:11.5px; color:#64748b; margin-bottom: 12px; display:flex; align-items:center; gap:6px; font-weight:600;">
+                                <div style="background:var(--primary-light); color:white; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-clock" style="font-size:10px;"></i></div>
+                                Mở cửa: ${opTime} - ${clTime}
+                           </div>
+                           <div style="display:flex; gap: 8px;">
+                               <a href="/store/detail/${p.id}/" target="_blank" style="flex:1; text-align:center; font-size:11px; font-weight:700; background:var(--primary); color:white; padding:8px 0; border-radius:8px; text-decoration:none; transition:0.2s;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Chi tiết</a>
+                               <button onclick="window.directRouteTo(${f.geometry.coordinates[1]}, ${f.geometry.coordinates[0]}, '${p.name.replace(/'/g, "\\'")}', ${latlng.lat}, ${latlng.lng})" style="flex:1.2; font-family:'Inter', sans-serif; font-size:11px; font-weight:700; background:#10b981; color:white; border:none; padding:8px 0; border-radius:8px; cursor:pointer; transition:0.2s;"><i class="fa-solid fa-route"></i> Đi đến đây</button>
+                           </div>
+                        </div>`;
+                    });
+                    html += `</div>`;
+                }
+                html += `</div>`;
+                circle.setPopupContent(html).openPopup();
+
+                const distMap = {};
+                data.stores.features.forEach(f => { distMap[f.properties.id] = f.properties.distance_km; });
+                storesLayer.eachLayer(layer => {
+                    if (!layer.eachLayer) return;
+                    layer.eachLayer(marker => {
+                        const pid = marker.feature?.properties?.id;
+                        if (distMap[pid] !== undefined && marker.getElement()) {
+                            L.DomUtil.addClass(marker.getElement(), 'blinking-store');
+                        }
+                    });
+                });
+            })
+            .catch(() => circle.setPopupContent("Lỗi kết nối!").openPopup());
+    }
+
+    // ── ROUTING ───────────────────────────────────────────────────────────────
+    var isRoute = false; var routePts = []; var routeCtrl; var routePinsLayer = L.layerGroup().addTo(map);
+
+    window._handleRoute = function(latlng, name) {
+        if (!isRoute) return false;
+        if (routePts.length === 0) routePinsLayer.clearLayers();
+        routePts.push(latlng);
+
+        // Toast
+        const toast = document.createElement('div');
+        toast.style.cssText = 'position:fixed;top:85px;left:50%;transform:translateX(-50%);background:#10b981;color:white;padding:10px 20px;border-radius:8px;z-index:9999;font-weight:700;font-family:Inter,sans-serif;box-shadow:0 4px 15px rgba(0,0,0,0.15);';
+        toast.innerHTML = `<i class="fa-solid fa-location-dot"></i> Đã ghim: ${name}`;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.opacity='0'; toast.style.transition='opacity 0.4s'; setTimeout(() => toast.remove(), 400); }, 2200);
+
+        L.circleMarker(latlng, { radius:7, color: routePts.length===1 ? '#3b82f6' : '#ef4444', fillColor:'#fff', fillOpacity:1, weight:2 })
+         .bindTooltip(name, { permanent:true, direction:'right' })
+         .addTo(routePinsLayer);
+
+        if (routePts.length === 2) {
+            if (routeCtrl) map.removeControl(routeCtrl);
+            routeCtrl = L.Routing.control({
+                waypoints: [routePts[0], routePts[1]],
+                lineOptions: { styles: [{ color:'#10b981', weight:5, opacity:0.85 }] },
+                position: 'topleft',
+                collapsible: true,
+                createMarker: () => null
+            }).addTo(map);
+            routePts = [];
+        }
+        return true;
+    };
+
+    document.getElementById('btn-route').onclick = function() {
+        isRoute = !isRoute;
+        this.style.background = isRoute ? '#059669' : '#10b981';
+        this.innerHTML = isRoute ? '<i class="fa-solid fa-xmark"></i> Hủy đo' : '<i class="fa-solid fa-route"></i> Đo quãng đường';
+        if (!isRoute) {
+            if (routeCtrl) map.removeControl(routeCtrl);
+            routePts = []; routePinsLayer.clearLayers();
+            map.getContainer().style.cursor = '';
+        } else {
+            map.getContainer().style.cursor = 'help';
+            const t = document.createElement('div');
+            t.style.cssText='position:fixed;top:85px;left:50%;transform:translateX(-50%);background:#0ea5e9;color:white;padding:10px 20px;border-radius:8px;z-index:9999;font-weight:700;font-family:Inter,sans-serif;';
+            t.innerHTML='<i class="fa-solid fa-route"></i> Hãy click chọn 2 điểm để đo quãng đường!';
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+    };
+
+    // Allow clicking on map for routing (not just markers)
+    map.on('click', function(e) {
+        if (isRoute && !isAnalysis) {
+            window._handleRoute(e.latlng, 'Điểm tùy chọn');
+        }
+    });
+
+    // ── LOCATE ME ─────────────────────────────────────────────────────────────
+    window.userMarker = null;
+    document.getElementById('btn-locate').onclick = function() {
+        if (!navigator.geolocation) { alert('Trình duyệt không hỗ trợ định vị!'); return; }
+        navigator.geolocation.getCurrentPosition(pos => {
+            const { latitude: lat, longitude: lng } = pos.coords;
+            if (window.userMarker) window.userMarker.setLatLng([lat, lng]);
+            else window.userMarker = L.marker([lat, lng], { icon: L.divIcon({ className:'user-location-marker', iconSize:[16,16], iconAnchor:[8,8] }) }).addTo(map);
+            map.setView([lat, lng], 15);
+        }, () => alert('Không thể định vị. Vui lòng cấp quyền truy cập!'));
+    };
+
+    // ── SIDEBAR CLOSE ─────────────────────────────────────────────────────────
+    document.getElementById('btn-close-sidebar').onclick = () => document.getElementById('map-sidebar').classList.remove('active');
+
+    // ── INVALIDATE SIZE (fix Leaflet sizing on fixed containers) ──────────────
+    setTimeout(() => { map.invalidateSize(true); }, 300);
+    window.addEventListener('resize', () => map.invalidateSize(true));
+
+    // ── URL DEEP LINK: /map/?id=...&type=store|warehouse ─────────────────────
+    const params = new URLSearchParams(window.location.search);
+    const pid = params.get('id'), ptype = params.get('type');
+    if (pid && ptype) {
+        setTimeout(() => {
+            const m = ptype === 'store' ? storesMarkers[pid] : warehousesMarkers[pid];
+            if (m) { map.setView(m.getLatLng(), 17); m.openPopup(); m.fire('click'); }
+        }, 1600);
+    }
+
+    // Expose map globally for inline onclick calls
+    window.map = map;
+});
+</script>
+{% endblock %}

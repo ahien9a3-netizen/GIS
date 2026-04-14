@@ -180,6 +180,11 @@
 {% endblock %}
 
 {% block content %}
+<div class="breadcrumb" style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #64748b; margin-bottom: 20px;">
+    <a href="{% url 'public_home' %}" style="color: var(--primary); text-decoration: none; font-weight: 600;">Trang chủ</a>
+    <i class="fa-solid fa-chevron-right" style="font-size: 0.65rem; color: #cbd5e1;"></i>
+    <span>Cài đặt tài khoản</span>
+</div>
 <div class="page-header">
     <h1>Cài đặt tài khoản</h1>
     <p>Quản lý hồ sơ cá nhân và cấu hình hệ thống</p>

@@ -1,6 +1,8 @@
 from django import forms
+from django.utils import timezone
 from django.forms import ClearableFileInput
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import FileSystemStorage
@@ -13,7 +15,7 @@ import random
 from django.db.models import Count, Sum, Q, Avg, Avg as models_Avg
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from .models import SanPham, CuaHang, Kho, HangTonKho, NhanVien, YeuCauNhapKho, DanhMuc, DanhGiaCuaHang, PhanBoCungCap, GioHang, ChiTietGioHang, DonHang, ChiTietDonHang
+from .models import SanPham, CuaHang, Kho, HangTonKho, NhanVien, YeuCauNhapKho, DanhMuc, DanhGiaCuaHang, PhanBoCungCap, GioHang, ChiTietGioHang, DonHang, ChiTietDonHang, YeuCauTraHang
 
 class MultipleFileInput(ClearableFileInput):
     allow_multiple_selected = True
@@ -45,6 +47,14 @@ class SidebarContextMixin:
             
         return super().dispatch(request, *args, **kwargs)
 
+def _get_cart_context(request):
+    """
+    Hàm bổ trợ lấy số lượng sản phẩm trong giỏ hàng từ session.
+    """
+    cart = request.session.get('cart', {})
+    total_items = sum(cart.values())
+    return {'cart_count': total_items}
+
 
 def role_required(allowed_roles=[]):
     def decorator(view_func):
@@ -63,7 +73,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 def _get_cart_context(request):
     """
-    Helper để lấy số lượng sản phẩm trong giỏ hàng hiện tại
+    Helper để lấy số lượng sản phẩm trong giỏ hàng hiện tại + Thông tin User
     """
     user_id = request.session.get('user_id')
     session_id = request.session.session_key
@@ -72,19 +82,28 @@ def _get_cart_context(request):
         session_id = request.session.session_key
     
     cart = None
+    user_obj = None
     if user_id:
-        # Nếu là User (theo Role) thì lấy giỏ hàng của User đó
-        user = NhanVien.objects.filter(MaNV=user_id).first()
-        if user:
-            cart, _ = GioHang.objects.get_or_create(NguoiDung=user)
-    else:
-        # Nếu chưa đăng nhập, dùng SessionID
+        # Nếu đã đăng nhập, lấy thông tin NhanVien (bao gồm Email)
+        user_obj = NhanVien.objects.filter(MaNV=user_id).first()
+        if user_obj:
+            cart, _ = GioHang.objects.get_or_create(NguoiDung=user_obj)
+    
+    if not cart:
+        # Nếu chưa đăng nhập hoặc không tìm thấy user, dùng SessionID
         cart, _ = GioHang.objects.get_or_create(SessionID=session_id)
     
     count = 0
     if cart:
         count = cart.items.aggregate(total=Sum('SoLuong'))['total'] or 0
-    return {'cart_count': count, 'cart_obj': cart}
+        
+    return {
+        'cart_count': count, 
+        'cart_obj': cart,
+        'customer_name': user_obj.Ten if user_obj else None,
+        'customer_email': user_obj.Email if user_obj else None,
+        'user_role': request.session.get('user_role'),
+    }
 
 def public_home(request):
     """
@@ -117,12 +136,66 @@ def public_home(request):
         'categories': categories,
         'search_query': search_query,
         'page_title': 'Trang Chủ - SMART MART',
-        'customer_name': request.session.get('user_name'),
+        'customer_name': request.session.get('user_name') or (request.user.username if request.user.is_authenticated else None),
         'user_role': request.session.get('user_role'),
         'active_nav': 'home',
     }
     context.update(_get_cart_context(request))
     return render(request, 'MyApp/public_storefront.html', context)
+
+def public_product_list(request):
+    """
+    Trang danh sách sản phẩm đầy đủ cho khách hàng.
+    Hỗ trợ lọc theo danh mục và tìm kiếm.
+    """
+    selected_cat = request.GET.get('cat', '')
+    search_q = request.GET.get('q', '').strip()
+    
+    products = SanPham.objects.filter(TrangThai__iexact='đang bán').select_related('DanhMuc')
+    categories = DanhMuc.objects.all()
+    
+    if selected_cat:
+        products = products.filter(DanhMuc__MaDM=selected_cat)
+        
+    if search_q:
+        products = products.filter(
+            Q(Ten__icontains=search_q) | Q(MieuTa__icontains=search_q)
+        )
+        
+    context = {
+        'products': products.order_by('Ten'),
+        'categories': categories,
+        'selected_cat': selected_cat,
+        'search_q': search_q,
+        'page_title': 'Tất cả sản phẩm - SMART MART',
+        'active_nav': 'products',
+    }
+    context.update(_get_cart_context(request))
+    return render(request, 'MyApp/public_product_list.html', context)
+
+def public_store_list(request):
+    """
+    Trang danh sách toàn bộ cửa hàng cho khách hàng.
+    """
+    search_q = request.GET.get('q', '').strip()
+    stores = CuaHang.objects.filter(TrangThai='Hoạt động').order_by('MaCH')
+    
+    if search_q:
+        stores = stores.filter(
+            Q(Ten__icontains=search_q) | Q(DiaChi__icontains=search_q) | Q(Loai__icontains=search_q)
+        )
+    
+    context = {
+        'stores_list': stores,
+        'search_q': search_q,
+        'page_title': 'Hệ Thống Cửa Hàng - SMART MART',
+        'active_nav': 'stores',
+        'customer_name': request.session.get('user_name') or (request.user.username if request.user.is_authenticated else None),
+        'customer_email': request.session.get('user_email'),
+        'user_role': request.session.get('user_role'),
+    }
+    context.update(_get_cart_context(request))
+    return render(request, 'MyApp/public_store_list.html', context)
 
 def public_about(request):
     """
@@ -130,7 +203,7 @@ def public_about(request):
     """
     context = {
         'page_title': 'Giới Thiệu - SMART MART',
-        'customer_name': request.session.get('user_name'),
+        'customer_name': request.session.get('user_name') or (request.user.username if request.user.is_authenticated else None),
         'user_role': request.session.get('user_role'),
         'active_nav': 'about',
     }
@@ -173,7 +246,7 @@ def public_product_detail(request, pk):
         'reviews': reviews,
         'avg_rating': avg_rating,
         'page_title': f'{product.Ten} - SMART MART',
-        'customer_name': request.session.get('user_name'),
+        'customer_name': request.session.get('user_name') or (request.user.username if request.user.is_authenticated else None),
         'user_role': request.session.get('user_role'),
         'active_nav': 'products',
     }
@@ -189,7 +262,11 @@ def public_store_detail(request, pk):
     store = get_object_or_404(CuaHang, MaCH=pk)
     
     if request.method == 'POST':
-        user_name = request.session.get('user_name') or request.POST.get('name') or "Khách ẩn danh"
+        user_session_name = request.session.get('user_name')
+        if not user_session_name and request.user.is_authenticated:
+            user_session_name = request.user.username
+            
+        user_name = user_session_name or request.POST.get('name') or "Khách ẩn danh"
         rating = request.POST.get('rating', 5)
         comment = request.POST.get('comment', '')
         
@@ -234,7 +311,7 @@ def public_store_detail(request, pk):
         'store_products': store_products,
         'is_open': is_open,
         'page_title': f'{store.Ten} - SMART MART',
-        'customer_name': request.session.get('user_name'),
+        'customer_name': request.session.get('user_name') or (request.user.username if request.user.is_authenticated else None),
         'user_role': request.session.get('user_role'),
         'active_nav': 'stores',
     }
@@ -256,7 +333,7 @@ def public_kho_detail(request, pk):
         'wh': wh,
         'inventory': inventory,
         'page_title': f'{wh.Ten} - SMART MART',
-        'customer_name': request.session.get('user_name'),
+        'customer_name': request.session.get('user_name') or (request.user.username if request.user.is_authenticated else None),
         'user_role': request.session.get('user_role'),
         'active_nav': 'warehouses',
     }
@@ -322,10 +399,94 @@ def public_logout(request):
     request.session.flush()
     return redirect('public_home')
 
+def customer_forgot_password_view(request):
+    """
+    Yêu cầu gửi mã OTP để đặt lại mật khẩu
+    """
+    error = None
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        user = NhanVien.objects.filter(Email=email).first()
+        
+        if user:
+            # Tạo OTP 6 số
+            otp = str(random.randint(100000, 999999))
+            print(f"DEBUG: OTP for {email} is {otp}")
+            request.session['reset_otp'] = otp
+            request.session['reset_email'] = email
+            
+            # Gửi Email qua Mailtrap
+            subject = 'Mã xác thực Đặt lại mật khẩu - SMART MART'
+            message = f'Chào {user.Ten},\n\nMã OTP để đặt lại mật khẩu của bạn là: {otp}\n\nMã này sẽ hết hạn sau khi sử dụng.'
+            
+            try:
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+                return redirect('customer_verify_otp')
+            except Exception as e:
+                error = f"Lỗi gửi mail: {str(e)}"
+        else:
+            error = "Email này không tồn tại trong hệ thống!"
+            
+    return render(request, 'MyApp/public_forgot_password.html', {'error': error, 'page_title': 'Quên mật khẩu'})
+
+def customer_verify_otp_view(request):
+    """
+    Trang nhập và kiểm tra mã OTP
+    """
+    if 'reset_otp' not in request.session:
+        return redirect('customer_forgot_password')
+        
+    error = None
+    if request.method == 'POST':
+        otp_input = request.POST.get('otp')
+        if otp_input == request.session.get('reset_otp'):
+            request.session['otp_verified'] = True
+            return redirect('customer_reset_password')
+        else:
+            error = "Mã OTP không chính xác. Vui lòng thử lại."
+            
+    return render(request, 'MyApp/public_verify_otp.html', {'error': error, 'page_title': 'Xác thực OTP'})
+
+def customer_reset_password_view(request):
+    """
+    Trang nhập mật khẩu mới sau khi xác thực OTP thành công
+    """
+    if not request.session.get('otp_verified'):
+        return redirect('customer_forgot_password')
+        
+    error = None
+    if request.method == 'POST':
+        new_password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+        
+        if new_password == confirm_password:
+            email = request.session.get('reset_email')
+            user = NhanVien.objects.filter(Email=email).first()
+            if user:
+                user.MatKhau = new_password
+                user.save()
+                
+                # Xóa dấu vết session
+                del request.session['reset_otp']
+                del request.session['reset_email']
+                del request.session['otp_verified']
+                
+                messages.success(request, 'Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.')
+                return redirect('public_login')
+        else:
+            error = "Mật khẩu xác nhận không khớp!"
+            
+    return render(request, 'MyApp/public_reset_password.html', {'error': error, 'page_title': 'Đặt lại mật khẩu'})
+
 def view_cart(request):
     """
     Trang chi tiết giỏ hàng
     """
+    if not request.session.get('user_id') and not request.user.is_authenticated:
+        from django.contrib import messages
+        messages.warning(request, 'Vui lòng Đăng nhập để sử dụng tính năng Giỏ hàng.')
+        return redirect('public_login')
+        
     cart_context = _get_cart_context(request)
     cart = cart_context['cart_obj']
     items = cart.items.all().select_related('SanPham') if cart else []
@@ -350,6 +511,9 @@ def ajax_add_to_cart(request, pk):
     """
     if request.method != 'POST':
         return JsonResponse({'success': False, 'message': 'Invalid method'}, status=405)
+        
+    if not request.session.get('user_id') and not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'message': 'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.', 'require_login': True})
         
     product = get_object_or_404(SanPham, pk=pk)
     cart_data = _get_cart_context(request)
@@ -403,6 +567,11 @@ def public_checkout(request):
     """
     Trang thanh toán - Nhập thông tin nhận hàng
     """
+    if not request.session.get('user_id') and not request.user.is_authenticated:
+        from django.contrib import messages
+        messages.warning(request, 'Vui lòng Đăng nhập để Thanh toán.')
+        return redirect('public_login')
+
     cart_context = _get_cart_context(request)
     cart = cart_context['cart_obj']
     
@@ -443,6 +612,7 @@ def create_order(request):
     sdt = data.get('phone')
     diachi = data.get('address')
     ghichu = data.get('note', '')
+    pt_thanhtoan = data.get('payment_method', 'COD')
     
     if not all([ten, sdt, diachi]):
         return JsonResponse({'success': False, 'message': 'Vui lòng nhập đầy đủ thông tin nhận hàng.'})
@@ -831,12 +1001,19 @@ def public_gis_map(request):
     """
     Trang bản đồ GIS công khai cho người dùng và khách hàng
     """
+    customer_name = request.session.get('user_name') or (request.user.username if request.user.is_authenticated else None)
+    customer_email = request.session.get('user_email')
+    if not customer_email and request.user.is_authenticated:
+        customer_email = request.user.email
+
     context = {
-        'page_title': 'Bản đồ SMART MART',
-        'customer_name': request.session.get('user_name'),
-        'user_role': request.session.get('user_role'),
+        'page_title': 'Bản đồ SMART MART - Công nghệ GIS',
         'active_nav': 'map',
+        'customer_name': customer_name,
+        'customer_email': customer_email,
+        'user_role': request.session.get('user_role'),
     }
+    context.update(_get_cart_context(request))
     return render(request, 'MyApp/public_gis_map.html', context)
 
 
@@ -1497,3 +1674,480 @@ def delete_gis_image(request):
 
 def custom_404_view(request, custom_path=None):
     return render(request, '404.html', status=404)
+
+def public_order_invoice(request, order_id):
+    """
+    Trang in hóa đơn cho Đơn hàng
+    """
+    order = get_object_or_404(DonHang.objects.prefetch_related('return_requests'), MaDH=order_id)
+    
+    # Bảo mật: Kiểm tra quyền truy cập
+    user_id = request.session.get('user_id')
+    user_obj = NhanVien.objects.filter(MaNV=user_id).first() if user_id else None
+    user_role = request.session.get('user_role')
+    is_staff = user_role in ['Admin', 'Nhân Viên', 'Kế Toán']
+    
+    if not is_staff and order.NguoiDung != user_obj:
+        return render(request, '403.html', {'message': 'Bạn không có quyền xem hóa đơn này!'}, status=403)
+
+    # Sử dụng related_name='items' từ model ChiTietDonHang
+    items = order.items.all().select_related('SanPham')
+    
+    # Lấy thông tin giỏ hàng và người dùng cho Header
+    cart_data = _get_cart_context(request)
+    customer_email = user_obj.Email if user_obj else None
+    
+    context = {
+        'order': order,
+        'items': items,
+        'page_title': f'Hóa Đơn {order.MaDH} - SMART MART',
+        'customer_name': user_obj.Ten if user_obj else None,
+        'customer_email': customer_email,
+        'user_role': user_role,
+        'cart_count': cart_data.get('cart_count', 0),
+        'active_nav': 'orders',
+    }
+    return render(request, 'MyApp/public_order_invoice.html', context)
+
+def public_return_request(request, order_id):
+    """
+    Trang gửi yêu cầu trả hàng chi tiết (Dedicated Return Page)
+    """
+    if not request.session.get('user_id'):
+        return redirect('public_login')
+        
+    order = get_object_or_404(DonHang.objects.prefetch_related('return_requests'), MaDH=order_id)
+    user_id = request.session.get('user_id')
+    user_obj = NhanVien.objects.filter(MaNV=user_id).first()
+    
+    # Kiểm tra quyền (chỉ chủ đơn hàng mới được yêu cầu trả)
+    if order.NguoiDung != user_obj and request.session.get('user_role') not in ['Admin', 'Nhân Viên']:
+        return render(request, '403.html', status=403)
+
+    # Nếu đã có yêu cầu xử lý rồi thì không cho tạo thêm
+    if order.return_requests.exists():
+        messages.warning(request, "Đơn hàng này đã có yêu cầu trả hàng đang được xử lý.")
+        return redirect('public_order_invoice', order_id=order_id)
+
+    if request.method == 'POST':
+        sdt = request.POST.get('sdt')
+        email = request.POST.get('email')
+        stk_nh = request.POST.get('stk_nh')
+        stk_momo = request.POST.get('stk_momo')
+        ly_do = request.POST.get('ly_do')
+        
+        anh_hd = request.FILES.get('anh_hoa_don')
+        anh_mc = request.FILES.get('anh_minh_chung')
+
+        import random
+        request_id = f"TH{random.randint(100000, 999999)}"
+        
+        YeuCauTraHang.objects.create(
+            MaYCTH=request_id,
+            DonHang=order,
+            SdtLienHe=sdt,
+            EmailLienHe=email,
+            SoTaiKhoanNH=stk_nh,
+            SoTaiKhoanMoMo=stk_momo,
+            LyDo=ly_do,
+            AnhHoaDon=anh_hd,
+            AnhMinhChung=anh_mc,
+            SoTienHoan=order.TongTien,
+            TrangThai='Mới'
+        )
+        messages.success(request, "Gửi yêu cầu trả hàng thành công. Smart Mart sẽ kiểm tra và phản hồi sớm nhất!")
+        return redirect('public_order_history')
+
+    cart_data = _get_cart_context(request)
+    context = {
+        'order': order,
+        'page_title': f'Trả hàng / Hoàn tiền {order.MaDH} - SMART MART',
+        'customer_name': user_obj.Ten if user_obj else None,
+        'customer_email': user_obj.Email if user_obj else None,
+        'cart_count': cart_data.get('cart_count', 0),
+        'user_role': request.session.get('user_role'),
+    }
+    return render(request, 'MyApp/public_return_request.html', context)
+
+def public_order_history(request):
+    """
+    Trang danh sách đơn hàng của khách hàng (Lịch sử mua hàng)
+    """
+    if not request.session.get('user_id') and not request.user.is_authenticated:
+        return redirect('public_login')
+        
+    user_id = request.session.get('user_id')
+    user_obj = NhanVien.objects.filter(MaNV=user_id).first() if user_id else None
+    
+    orders = []
+    if user_obj:
+        orders = DonHang.objects.filter(NguoiDung=user_obj).prefetch_related('return_requests').order_by('-NgayTao')
+        
+    # Lấy thông tin giỏ hàng cho Header
+    cart_data = _get_cart_context(request)
+    
+    context = {
+        'orders': orders,
+        'page_title': 'Lịch sử mua hàng - SMART MART',
+        'customer_name': user_obj.Ten if user_obj else None,
+        'customer_email': user_obj.Email if user_obj else None,
+        'user_role': request.session.get('user_role'),
+        'cart_count': cart_data.get('cart_count', 0),
+    }
+    return render(request, 'MyApp/public_order_history.html', context)
+
+def public_profile(request):
+    """
+    Trang cá nhân của khách hàng (Storefront Profile)
+    """
+    if not request.session.get('user_id'):
+        return redirect('public_login')
+        
+    user_id = request.session.get('user_id')
+    user = get_object_or_404(NhanVien, MaNV=user_id)
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'update_info':
+            user.Ten = request.POST.get('ten')
+            user.Email = request.POST.get('email')
+            user.SDT = request.POST.get('sdt')
+            user.save()
+            request.session['user_name'] = user.Ten 
+            messages.success(request, "Cập nhật thông tin thành công!")
+            
+        elif action == 'change_password':
+            old_pass = request.POST.get('old_password')
+            new_pass = request.POST.get('new_password')
+            confirm_pass = request.POST.get('confirm_password')
+            
+            if user.MatKhau == old_pass:
+                if new_pass == confirm_pass:
+                    user.MatKhau = new_pass
+                    user.save()
+                    messages.success(request, "Đổi mật khẩu thành công!")
+                else:
+                    messages.error(request, "Mật khẩu mới không khớp!")
+            else:
+                messages.error(request, "Mật khẩu cũ không chính xác!")
+        
+        return redirect('public_profile')
+
+    cart_data = _get_cart_context(request)
+    
+    # Lấy thống kê đơn hàng
+    orders_query = DonHang.objects.filter(NguoiDung=user)
+    total_orders = orders_query.count()
+    pending_orders = orders_query.filter(TrangThai__in=['Mới', 'Đang xử lý']).count()
+    completed_orders = orders_query.filter(TrangThai='Đã hoàn thành').count()
+    recent_orders = orders_query.order_by('-NgayTao')[:3]
+
+    context = {
+        'user': user,
+        'customer_name': user.Ten,
+        'customer_email': user.Email,
+        'user_role': request.session.get('user_role'),
+        'page_title': 'Tài khoản của tôi - SMART MART',
+        'active_nav': 'profile',
+        'total_orders': total_orders,
+        'pending_orders': pending_orders,
+        'completed_orders': completed_orders,
+        'recent_orders': recent_orders,
+    }
+    context.update(cart_data)
+    return render(request, 'MyApp/public_profile.html', context)
+
+def submit_return_request(request, order_id):
+    """
+    Gửi yêu cầu trả hàng từ phía khách hàng
+    """
+    if not request.session.get('user_id'):
+        return redirect('public_login')
+        
+    order = get_object_or_404(DonHang, MaDH=order_id)
+    
+    if request.method == 'POST':
+        ly_do = request.POST.get('ly_do')
+        if not ly_do:
+            messages.error(request, "Vui lòng nhập lý do trả hàng.")
+            return redirect('public_order_history')
+            
+        # Tạo mã yêu cầu ngẫu nhiên
+        import random
+        request_id = f"TH{random.randint(100000, 999999)}"
+        
+        YeuCauTraHang.objects.create(
+            MaYCTH=request_id,
+            DonHang=order,
+            LyDo=ly_do,
+            SoTienHoan=order.TongTien, # Mặc định hoàn toàn bộ
+            TrangThai='Mới'
+        )
+        messages.success(request, f"Đã gửi yêu cầu trả hàng cho đơn {order_id}. Chúng tôi sẽ xử lý sớm nhất!")
+        
+    return redirect('public_order_history')
+
+# --- QUẢN TRỊ ĐƠN HÀNG (DÀNH CHO ADMIN/NHÂN VIÊN) ---
+
+class OrderListView(SidebarContextMixin, ListView):
+    model = DonHang
+    template_name = 'MyApp/order_list.html'
+    context_object_name = 'orders'
+    sidebar_active = 'orders'
+    page_title = 'Quản lý Đơn hàng'
+    required_roles = ['Admin', 'Nhân Viên', 'Kế Toán']
+    paginate_by = 15
+
+    def get_queryset(self):
+        queryset = DonHang.objects.all().order_by('-NgayTao')
+        q = self.request.GET.get('q')
+        status = self.request.GET.get('status')
+        if q:
+            queryset = queryset.filter(
+                Q(MaDH__icontains=q) | 
+                Q(TenNguoiNhan__icontains=q) | 
+                Q(SDT_Nhan__icontains=q)
+            )
+        if status:
+            queryset = queryset.filter(TrangThai=status)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status_choices'] = DonHang.TRANG_THAI_DH
+        return context
+
+class OrderDetailView(SidebarContextMixin, DetailView):
+    model = DonHang
+    template_name = 'MyApp/order_detail.html'
+    context_object_name = 'order'
+    sidebar_active = 'orders'
+    page_title = 'Chi tiết Đơn hàng'
+    required_roles = ['Admin', 'Nhân Viên', 'Kế Toán']
+    pk_url_kwarg = 'order_id'
+
+    def get_object(self):
+        return get_object_or_404(DonHang, MaDH=self.kwargs.get('order_id'))
+
+@role_required(allowed_roles=['Admin', 'Nhân Viên'])
+def update_order_status(request, order_id):
+    if request.method == 'POST':
+        order = get_object_or_404(DonHang, MaDH=order_id)
+        new_status = request.POST.get('status')
+        if new_status in dict(DonHang.TRANG_THAI_DH):
+            order.TrangThai = new_status
+            order.save()
+            messages.success(request, f"Đã cập nhật trạng thái đơn hàng {order_id} thành {new_status}")
+        else:
+            messages.error(request, "Trạng thái không hợp lệ.")
+    return redirect('order_detail', order_id=order_id)
+
+# --- QUẢN TRỊ TRẢ HÀNG & HOÀN TIỀN ---
+from .emails import send_refund_notification
+
+class ReturnListView(SidebarContextMixin, ListView):
+    model = YeuCauTraHang
+    template_name = 'MyApp/return_list.html'
+    context_object_name = 'returns'
+    sidebar_active = 'returns'
+    page_title = 'Quản lý Trả hàng'
+    required_roles = ['Admin', 'Nhân Viên', 'Kế Toán']
+    paginate_by = 15
+
+    def get_queryset(self):
+        queryset = YeuCauTraHang.objects.all().order_by('-NgayTao')
+        q = self.request.GET.get('q')
+        status = self.request.GET.get('status')
+        if q:
+            queryset = queryset.filter(
+                Q(MaYCTH__icontains=q) | 
+                Q(DonHang__MaDH__icontains=q)
+            )
+        if status:
+            queryset = queryset.filter(TrangThai=status)
+        return queryset
+
+class ReturnDetailView(SidebarContextMixin, DetailView):
+    model = YeuCauTraHang
+    template_name = 'MyApp/return_detail.html'
+    context_object_name = 'ret'
+    sidebar_active = 'returns'
+    page_title = 'Chi tiết Yêu cầu Trả hàng'
+    required_roles = ['Admin', 'Nhân Viên', 'Kế Toán']
+    pk_url_kwarg = 'request_id'
+
+    def get_object(self):
+        return get_object_or_404(YeuCauTraHang, MaYCTH=self.kwargs.get('request_id'))
+
+@role_required(allowed_roles=['Admin', 'Kế Toán'])
+def update_return_status(request, request_id):
+    if request.method == 'POST':
+        ret = get_object_or_404(YeuCauTraHang, MaYCTH=request_id)
+        new_status = request.POST.get('status')
+        note = request.POST.get('note')
+        amount = request.POST.get('amount')
+
+        if new_status in dict(YeuCauTraHang.TRANG_THAI_CHOICES):
+            ret.TrangThai = new_status
+            ret.GhiChuAdmin = note
+            if amount:
+                ret.SoTienHoan = amount
+            
+            if new_status == 'Đã hoàn tiền':
+                ret.NgayXuLy = timezone.now()
+                # Gửi Email thông báo qua Mailtrap
+                send_refund_notification(ret)
+                
+                # Cập nhật trạng thái Đơn hàng thành 'Đã trả hàng'
+                order = ret.DonHang
+                order.TrangThai = 'Đã trả hàng'
+                order.save()
+                
+            ret.save()
+            messages.success(request, f"Đã cập nhật trạng thái yêu cầu {request_id}")
+        else:
+            messages.error(request, "Trạng thái không hợp lệ.")
+            
+    return redirect('return_detail', request_id=request_id)
+
+
+# --- QUẢN LÝ XUẤT KHO ---
+from .models import YeuCauXuatKho, XuatKhoChiTiet
+from .forms import YeuCauXuatKhoForm
+
+class StockOutListView(SidebarContextMixin, ListView):
+    model = YeuCauXuatKho
+    template_name = 'MyApp/stock_out_list.html'
+    context_object_name = 'requests'
+    sidebar_active = 'stock_out'
+    page_title = 'Yêu cầu Xuất kho'
+    paginate_by = 10
+    required_roles = ['Admin', 'Kế Toán']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        q = self.request.GET.get('q')
+        status = self.request.GET.get('status')
+        if q:
+            queryset = queryset.filter(Q(MaPX__icontains=q) | Q(GhiChu__icontains=q))
+        if status:
+            queryset = queryset.filter(TrangThai=status)
+        return queryset.order_by('-Ngay')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['status_choices'] = YeuCauXuatKho.objects.values_list('TrangThai', flat=True).distinct()
+        return context
+
+class StockOutDetailView(SidebarContextMixin, DetailView):
+    model = YeuCauXuatKho
+    template_name = 'MyApp/stock_out_detail.html'
+    context_object_name = 'px'
+    sidebar_active = 'stock_out'
+    page_title = 'Chi tiết Phiếu xuất kho'
+    pk_url_kwarg = 'pk'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['details'] = XuatKhoChiTiet.objects.filter(PhieuXuat=self.object).select_related('MaSP', 'MaKho')
+        return context
+
+StockOutDetailFormSet = inlineformset_factory(
+    YeuCauXuatKho, 
+    XuatKhoChiTiet,
+    fields=['MaKho', 'MaSP', 'SoLuong'],
+    extra=1,
+    can_delete=True
+)
+
+class StockOutCreateView(SidebarContextMixin, CreateView):
+    model = YeuCauXuatKho
+    form_class = YeuCauXuatKhoForm
+    template_name = 'MyApp/stock_out_form.html'
+    success_url = reverse_lazy('stock_out_list')
+    sidebar_active = 'stock_out'
+    required_roles = ['Admin', 'Kế Toán']
+    page_title = 'Tạo mới Phiếu xuất kho'
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['product_formset'] = StockOutDetailFormSet(self.request.POST)
+        else:
+            data['product_formset'] = StockOutDetailFormSet()
+        return data
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        product_formset = context['product_formset']
+        if product_formset.is_valid():
+            self.object = form.save()
+            product_formset.instance = self.object
+            product_formset.save()
+            
+            # GIẢM TỒN KHO KHI XUẤT 
+            if self.object.TrangThai == 'Đã xuất':
+                from .models import HangTonKho
+                items = self.object.items.all()
+                for item in items:
+                    try:
+                        inventory = HangTonKho.objects.get(MaKho=item.MaKho, MaSP=item.MaSP)
+                        inventory.SoLuong -= item.SoLuong
+                        inventory.save()
+                    except HangTonKho.DoesNotExist:
+                        # Nếu ko có tồn kho thì để âm hoặc báo lỗi (tùy nghiệp vụ, ở đây ta cứ trừ)
+                        HangTonKho.objects.create(MaKho=item.MaKho, MaSP=item.MaSP, SoLuong=-item.SoLuong)
+            
+            messages.success(self.request, f"Đã tạo phiếu xuất {self.object.MaPX}")
+            return redirect(self.success_url)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+class StockOutUpdateView(SidebarContextMixin, UpdateView):
+    model = YeuCauXuatKho
+    form_class = YeuCauXuatKhoForm
+    template_name = 'MyApp/stock_out_form.html'
+    success_url = reverse_lazy('stock_out_list')
+    sidebar_active = 'stock_out'
+    required_roles = ['Admin', 'Kế Toán']
+    page_title = 'Chỉnh sửa Phiếu xuất kho'
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        if self.request.POST:
+            data['product_formset'] = StockOutDetailFormSet(self.request.POST, instance=self.object)
+        else:
+            data['product_formset'] = StockOutDetailFormSet(instance=self.object)
+        return data
+
+    def form_valid(self, form):
+        # Lưu trạng thái cũ trước khi update
+        old_status = YeuCauXuatKho.objects.get(pk=self.object.pk).TrangThai
+        context = self.get_context_data()
+        product_formset = context['product_formset']
+        
+        if product_formset.is_valid():
+            self.object = form.save()
+            product_formset.save()
+            
+            # Nếu chuyển sang 'Đã xuất' từ trạng thái khác
+            if self.object.TrangThai == 'Đã xuất' and old_status != 'Đã xuất':
+                from .models import HangTonKho
+                items = self.object.items.all()
+                for item in items:
+                    inventory, created = HangTonKho.objects.get_or_create(
+                        MaKho=item.MaKho, MaSP=item.MaSP, defaults={'SoLuong': 0}
+                    )
+                    inventory.SoLuong -= item.SoLuong
+                    inventory.save()
+            
+            messages.success(self.request, f"Đã cập nhật phiếu xuất {self.object.MaPX}")
+            return redirect(self.success_url)
+        else:
+            return self.render_to_response(self.get_context_data(form=form))
+
+class StockOutDeleteView(SidebarContextMixin, DeleteView):
+    model = YeuCauXuatKho
+    success_url = reverse_lazy('stock_out_list')
+    required_roles = ['Admin']

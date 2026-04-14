@@ -93,6 +93,14 @@
         <h2>Đăng nhập hệ thống</h2>
         <p>Chào mừng bạn quay trở lại với SMART MART</p>
 
+        {% if messages %}
+            {% for message in messages %}
+                <div class="error-msg" style="background: {% if message.tags == 'success' %}#dcfce7{% else %}#fee2e2{% endif %}; color: {% if message.tags == 'success' %}#166534{% else %}#b91c1c{% endif %};">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
         {% if error %}
             <div class="error-msg">{{ error }}</div>
         {% endif %}
@@ -104,7 +112,10 @@
                 <input type="email" name="email" required placeholder="example@email.com">
             </div>
             <div class="form-group">
-                <label>Mật khẩu</label>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <label style="margin:0;">Mật khẩu</label>
+                    <a href="{% url 'customer_forgot_password' %}" style="font-size:0.8rem; color:var(--primary); text-decoration:none; font-weight:600;">Quên mật khẩu?</a>
+                </div>
                 <input type="password" name="password" required placeholder="••••••••">
             </div>
             <button type="submit" class="btn-submit">Đăng Nhập</button>

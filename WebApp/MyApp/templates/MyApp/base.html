@@ -117,6 +117,11 @@
                 <i class="fa-solid fa-file-invoice"></i>
                 <span>Nhập kho</span>
             </a>
+            <a href="{% url 'stock_out_list' %}"
+                class="sidebar-item {% if sidebar_active == 'stock_out' %}active{% endif %}">
+                <i class="fa-solid fa-file-export"></i>
+                <span>Xuất kho</span>
+            </a>
             {% endif %}
             <a href="{% url 'inventory_list' %}"
                 class="sidebar-item {% if sidebar_active == 'inventory' %}active{% endif %}">
@@ -126,6 +131,14 @@
             <a href="{% url 'gis_map' %}" class="sidebar-item {% if sidebar_active == 'gis_map' %}active{% endif %}">
                 <i class="fa-solid fa-map-location-dot"></i>
                 <span>Bản đồ GIS</span>
+            </a>
+            <a href="{% url 'order_list' %}" class="sidebar-item {% if sidebar_active == 'orders' %}active{% endif %}">
+                <i class="fa-solid fa-shopping-bag"></i>
+                <span>Đơn hàng</span>
+            </a>
+            <a href="{% url 'return_list' %}" class="sidebar-item {% if sidebar_active == 'returns' %}active{% endif %}">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Trả hàng</span>
             </a>
             {% if user_role == 'Admin' or user_role == 'Kế Toán' %}
             <a href="{% url 'reports' %}" class="sidebar-item {% if sidebar_active == 'reports' %}active{% endif %}">
