@@ -16,6 +16,10 @@ from django.db.models import Count, Sum, Q, Avg, Avg as models_Avg
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from .models import SanPham, CuaHang, Kho, HangTonKho, NhanVien, YeuCauNhapKho, DanhMuc, DanhGiaCuaHang, PhanBoCungCap, GioHang, ChiTietGioHang, DonHang, ChiTietDonHang, YeuCauTraHang
+from .models import SanPham, CuaHang, Kho, HangTonKho, NhanVien, YeuCauNhapKho, DanhMuc, DanhGiaCuaHang
+from .forms import DanhGiaForm 
+from django.db.models import Avg
+
 
 class MultipleFileInput(ClearableFileInput):
     allow_multiple_selected = True
@@ -33,6 +37,7 @@ class SidebarContextMixin:
         context['user_name'] = self.request.session.get('user_name', 'Khách')
         context['user_role'] = self.request.session.get('user_role', '')
         context['current_user_id'] = self.request.session.get('user_id', '')
+        context['is_admin_view'] = self.request.session.get('is_admin_view', False)
         return context
 
     def dispatch(self, request, *args, **kwargs):
@@ -40,14 +45,21 @@ class SidebarContextMixin:
         if 'user_id' not in request.session:
             return redirect('login')
         
-        # 2. Kiểm tra phân quyền (Role)
+        # 2. Lấy role và trạng thái view hiện tại
         user_role = request.session.get('user_role')
-        if self.required_roles and user_role not in self.required_roles:
+        is_admin_view = request.session.get('is_admin_view', False)
+
+        # 3. Kiểm tra phân quyền (Role và View)
+        if self.required_roles and 'Admin' in self.required_roles:
+            # Nếu trang yêu cầu Admin, nhưng user không phải Admin HOẶC đang tắt view Admin
+            if user_role != 'Admin' or (user_role == 'Admin' and not is_admin_view):
+                return render(request, '403.html', {'message': 'Bạn không có quyền truy cập hoặc đang ở chế độ Nhân viên!'}, status=403)
+        elif self.required_roles and user_role not in self.required_roles:
             return render(request, '403.html', {'message': 'Bạn không có quyền truy cập chức năng này!'}, status=403)
             
         return super().dispatch(request, *args, **kwargs)
 
-def _get_cart_context(request):
+-def _get_cart_context(request):
     """
     Hàm bổ trợ lấy số lượng sản phẩm trong giỏ hàng từ session.
     """
@@ -805,6 +817,8 @@ def login_view(request):
             request.session['user_id'] = nv.MaNV
             request.session['user_name'] = nv.Ten
             request.session['user_role'] = nv.Role
+            # Mặc định Admin đăng nhập vào sẽ thấy view Admin
+            request.session['is_admin_view'] = (nv.Role == 'Admin')
             return redirect('home')
         else:
             error = "Số điện thoại hoặc mật khẩu không đúng!"
@@ -1136,8 +1150,37 @@ class CuaHangUpdateView(SidebarContextMixin, UpdateView):
 def store_detail_view(request, pk):
     if 'user_id' not in request.session: return redirect('login')
     store = get_object_or_404(CuaHang, MaCH=pk)
+    
+    # Lấy danh sách đánh giá
+    reviews = store.danh_gia.all()
+    
+    # --- LOGIC TÍNH ĐIỂM TRUNG BÌNH ---
+    total_reviews = reviews.count()
+    # Tính trung bình, nếu chưa có ai đánh giá thì mặc định là 0
+    avg_rating = reviews.aggregate(Avg('SoSao'))['SoSao__avg'] or 0
+    avg_rating = round(avg_rating, 1) # Làm tròn 1 chữ số thập phân (VD: 4.7)
+    # Tính phần trăm để hiển thị thanh sao màu xanh (VD: 4.7 sao = 94%)
+    avg_percent = (avg_rating / 5) * 100 if total_reviews > 0 else 0
+    
+    # Xử lý khi gửi form
+    if request.method == 'POST':
+        form = DanhGiaForm(request.POST)
+        if form.is_valid():
+            danh_gia = form.save(commit=False)
+            danh_gia.CuaHang = store
+            danh_gia.NhanVien = get_object_or_404(NhanVien, MaNV=request.session['user_id'])
+            danh_gia.save()
+            return redirect('store_detail', pk=pk)
+    else:
+        form = DanhGiaForm()
+
     return render(request, 'MyApp/store_detail.html', {
         'store': store,
+        'reviews': reviews,
+        'form': form,
+        'avg_rating': avg_rating,       # Truyền điểm trung bình ra giao diện
+        'total_reviews': total_reviews, # Truyền tổng số lượt ra giao diện
+        'avg_percent': avg_percent,     # Truyền % để vẽ sao
         'sidebar_active': 'stores',
         'page_title': 'Chi tiết Cửa hàng',
         'user_name': request.session.get('user_name', 'Khách'),
@@ -2151,3 +2194,56 @@ class StockOutDeleteView(SidebarContextMixin, DeleteView):
     model = YeuCauXuatKho
     success_url = reverse_lazy('stock_out_list')
     required_roles = ['Admin']
+@role_required(['Admin'])
+def switch_view_role(request):
+    """
+    Hàm đổi góc nhìn cho Admin (Admin <-> Nhân Viên)
+    """
+    if request.method == 'POST':
+        current_status = request.session.get('is_admin_view', True)
+        request.session['is_admin_view'] = not current_status
+    
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+# HÀM XÓA ĐÁNH GIÁ
+def delete_review(request, pk):
+    if 'user_id' not in request.session: return redirect('login')
+    
+    review = get_object_or_404(DanhGiaCuaHang, id=pk)
+    store_id = review.CuaHang.MaCH
+
+    # CHỐT CHẶN BẢO MẬT: Chỉ chủ nhân mới được xóa
+    if review.NhanVien.MaNV == request.session['user_id']:
+        review.delete()
+
+    return redirect('store_detail', pk=store_id)
+
+
+# HÀM SỬA ĐÁNH GIÁ
+def edit_review(request, pk):
+    if 'user_id' not in request.session: return redirect('login')
+    
+    review = get_object_or_404(DanhGiaCuaHang, id=pk)
+    store_id = review.CuaHang.MaCH
+
+    # CHỐT CHẶN BẢO MẬT: Chặn nếu người khác cố tình truy cập link để sửa
+    if review.NhanVien.MaNV != request.session['user_id']:
+        return redirect('store_detail', pk=store_id)
+
+    if request.method == 'POST':
+        form = DanhGiaForm(request.POST, instance=review) # instance=review để load dữ liệu cũ lên
+        if form.is_valid():
+            form.save()
+            return redirect('store_detail', pk=store_id)
+    else:
+        form = DanhGiaForm(instance=review)
+
+    return render(request, 'MyApp/edit_review.html', {
+        'form': form,
+        'review': review,
+        'store': review.CuaHang,
+        'page_title': 'Sửa đánh giá',
+        'sidebar_active': 'stores',
+        'user_name': request.session.get('user_name', 'Khách'),
+        'user_role': request.session.get('user_role', '')
+    })

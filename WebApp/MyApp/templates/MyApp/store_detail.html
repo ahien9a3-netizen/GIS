@@ -431,6 +431,117 @@
 
     </div>
 </div>
+<hr style="margin: 3rem 0 2rem; border-top: 1px solid var(--gray-200);">
+
+    <div class="reviews-section" style="max-width: 100%;">
+        <h3 style="margin-bottom: 2rem;"><i class="fa-solid fa-star" style="color: #f59e0b;"></i> Đánh giá & Nhận xét</h3>
+        
+        <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2.5rem; padding: 1.5rem; background: white; border-radius: 20px; box-shadow: var(--shadow-sm); border: 1px solid var(--gray-100);">
+            <div style="font-size: 5rem; font-weight: 800; color: #1e293b; line-height: 1; font-family: 'Inter', sans-serif;">
+                {{ avg_rating|floatformat:1 }}
+            </div>
+            <div>
+                <div style="position: relative; display: inline-block; font-size: 1.8rem; color: #e2e8f0; margin-bottom: 0.2rem;">
+                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    <div style="position: absolute; top: 0; left: 0; white-space: nowrap; overflow: hidden; width: {{ avg_percent }}%; color: #01875f;">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                </div>
+                <div style="color: #64748b; font-size: 1.1rem;">
+                    {{ total_reviews }} bài đánh giá
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-card" style="padding: 2rem; margin-bottom: 2rem; background: white; border-radius: 20px; box-shadow: var(--shadow-md); border: 1px solid var(--gray-200);">
+            <form method="post">
+                {% csrf_token %}
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="font-weight: 700; margin-bottom: 0.5rem; display: block; color: var(--gray-700); font-size: 1.1rem;">Chấm điểm cửa hàng</label>
+                    
+                    <div class="interactive-stars" style="font-size: 2.5rem; color: #cbd5e1; cursor: pointer; display: flex; gap: 8px;">
+                        <i class="fa-solid fa-star" data-val="1"></i>
+                        <i class="fa-solid fa-star" data-val="2"></i>
+                        <i class="fa-solid fa-star" data-val="3"></i>
+                        <i class="fa-solid fa-star" data-val="4"></i>
+                        <i class="fa-solid fa-star" data-val="5"></i>
+                    </div>
+                    
+                    <div style="display: none;">{{ form.SoSao }}</div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="font-weight: 700; margin-bottom: 0.5rem; display: block; color: var(--gray-700); font-size: 1.1rem;">Nhận xét chi tiết</label>
+                    {{ form.NhanXet }}
+                </div>
+                
+                <button type="submit" class="btn-main" style="background: #3b82f6; color: white; padding: 0.8rem 2rem;">Gửi đánh giá</button>
+            </form>
+        </div>
+
+        <div class="reviews-list">
+            {% for review in reviews %}
+            <div style="padding: 1.5rem; border-radius: 20px; background: white; border: 1px solid var(--gray-100); margin-bottom: 1rem; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <strong style="font-size: 1.1rem;"><i class="fa-solid fa-circle-user" style="color: var(--accent-color);"></i> {{ review.NhanVien.Ten }}</strong>
+                        <span style="color: #94a3b8; font-size: 0.85rem;"><i class="fa-regular fa-clock"></i> {{ review.NgayTao|date:"d/m/Y H:i" }}</span>
+                    </div>
+
+                    {% if review.NhanVien.MaNV == request.session.user_id %}
+                    <div style="display: flex; gap: 12px;">
+                        <a href="{% url 'edit_review' review.id %}" style="color: #3b82f6; text-decoration: none; font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-pen-to-square"></i> Sửa</a>
+                        <a href="{% url 'delete_review' review.id %}" onclick="return confirm('Bạn có chắc chắn muốn xóa bài đánh giá này không?');" style="color: #ef4444; text-decoration: none; font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-trash"></i> Xóa</a>
+                    </div>
+                    {% endif %}
+                </div>
+                <div style="color: #01875f; margin-bottom: 0.8rem; font-size: 1rem;">
+                    {% for i in "12345" %}
+                        <i class="fa-solid fa-star" style="{% if forloop.counter <= review.SoSao %}color: #01875f;{% else %}color: #e2e8f0;{% endif %}"></i>
+                    {% endfor %}
+                </div>
+                <p style="margin: 0; color: #475569; line-height: 1.5;">{{ review.NhanXet }}</p>
+            </div>
+            {% empty %}
+            <div class="empty-state" style="height: 150px; background: transparent; border: 2px dashed var(--gray-200); border-radius: 20px;">
+                <p style="color: var(--gray-400); font-style: italic;">Chưa có đánh giá nào. Hãy là người đầu tiên nhận xét!</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const starContainer = document.querySelector('.interactive-stars');
+            if(!starContainer) return;
+
+            const stars = starContainer.querySelectorAll('i');
+            const hiddenInput = document.querySelector('input[name="SoSao"]');
+
+            // Mặc định cho 5 sao màu xanh lá (#01875f giống Google Play)
+            hiddenInput.value = 5;
+            highlightStars(5);
+
+            // Xử lý khi click vào sao
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const val = this.getAttribute('data-val');
+                    hiddenInput.value = val;
+                    highlightStars(val);
+                });
+            });
+
+            function highlightStars(val) {
+                stars.forEach(s => {
+                    if (s.getAttribute('data-val') <= val) {
+                        s.style.color = '#01875f'; 
+                    } else {
+                        s.style.color = '#cbd5e1'; // Màu xám nhạt
+                    }
+                });
+            }
+        });
+    </script>
 {% endblock %}
 
 {% block extra_js %}

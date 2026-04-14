@@ -2,6 +2,7 @@ from django.contrib.gis.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from ckeditor.fields import RichTextField
+from django.core.validators import MinValueValidator, MaxValueValidator
 # SẢN PHẨM
 class SanPham(models.Model):
     TRANG_THAI_CHOICES = [
@@ -11,7 +12,7 @@ class SanPham(models.Model):
 
     MaSP = models.CharField(max_length=20, primary_key=True, db_column='masp')
     Ten = models.CharField(max_length=255, db_column='ten')
-    Image = models.ImageField(upload_to='products/', blank=True, null=True, db_column='image')
+    Image = models.ImageField(upload_to='products/',max_length=255, blank=True, null=True, db_column='image')
     DanhMuc = models.ForeignKey('DanhMuc', on_delete=models.SET_NULL, blank=True, null=True, db_column='danhmuc')
     MieuTa = models.TextField(blank=True, null=True, db_column='mieuta')
     TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, db_column='trangthai')
@@ -400,6 +401,13 @@ class DonHang(models.Model):
     PhuongThucThanhToan = models.CharField(max_length=50, choices=PHUONG_THUC_TT, default='COD', db_column='pt_thanhtoan')
     TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_DH, default='Đang xử lý', db_column='trangthai')
     GhiChu = models.TextField(blank=True, null=True, db_column='ghichu')
+
+# BẢNG ĐÁNH GIÁ CỬA HÀNG
+class DanhGiaCuaHang(models.Model):
+    CuaHang = models.ForeignKey(CuaHang, on_delete=models.CASCADE, related_name='danh_gia', db_column='mach')
+    NhanVien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, db_column='manv')
+    SoSao = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], db_column='sosao', verbose_name="Số sao")
+    NhanXet = models.TextField(blank=True, null=True, db_column='nhanxet', verbose_name="Nhận xét")
     NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
 
     class Meta:
@@ -455,3 +463,5 @@ class YeuCauTraHang(models.Model):
 
     def __str__(self):
         return f"YCTH {self.MaYCTH} - Đơn {self.DonHang.MaDH}"
+        db_table = 'danhgiacuahang'
+        ordering = ['-NgayTao'] # Sắp xếp đánh giá mới nhất lên đầu

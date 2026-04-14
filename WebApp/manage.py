@@ -6,6 +6,7 @@ import sys
 
 def main():
     """Run administrative tasks."""
+    #tôi tìm đc cách sửa được code trực tiếp bên đây rồi nè
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'WebApp.settings')
     try:
         from django.core.management import execute_from_command_line

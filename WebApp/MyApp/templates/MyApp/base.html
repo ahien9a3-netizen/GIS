@@ -104,7 +104,7 @@
                 <i class="fa-solid fa-list"></i>
                 <span>Danh mục</span>
             </a>
-            {% if user_role == 'Admin' %}
+            {% if user_role == 'Admin' and is_admin_view %}
             <a href="{% url 'nhanvien_list' %}"
                 class="sidebar-item {% if sidebar_active == 'employees' %}active{% endif %}">
                 <i class="fa-solid fa-user-tie"></i>
@@ -174,7 +174,22 @@
                     <div class="header-user-avatar">
                         <i class="fa-solid fa-user"></i>
                     </div>
-                    <div class="header-user-info">
+                    <div class="header-user-info" style="display: flex; align-items: center; gap: 10px;">
+                        {% if request.session.user_role == 'Admin' %}
+                        <form action="{% url 'switch_view' %}" method="POST" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" style="background: white; border: 1px solid #e2e8f0; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 5px;">
+                                {% if request.session.is_admin_view %}
+                                    <i class="fa-solid fa-toggle-on" style="color: #3b82f6; font-size: 1.2rem;"></i> 
+                                    <span style="color: #3b82f6;">View: Admin</span>
+                                {% else %}
+                                    <i class="fa-solid fa-toggle-off" style="color: #94a3b8; font-size: 1.2rem;"></i> 
+                                    <span style="color: #64748b;">View: Nhân Viên</span>
+                                {% endif %}
+                            </button>
+                        </form>
+                        {% endif %}
+
                         <span class="user-name">{{ user_name|default:"Admin" }}</span>
                         <a href="{% url 'logout' %}" class="logout-link" title="Đăng xuất">
                             <i class="fa-solid fa-right-from-bracket"></i>

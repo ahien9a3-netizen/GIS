@@ -1,0 +1,44 @@
+{% extends 'myapp/base.html' %}
+{% block content %}
+
+<h3>Phân tích mật độ cửa hàng (bán kính 1km)</h3>
+
+<div id="map" style="height:500px;"></div>
+
+{% if count is not None %}
+    <p>
+        📍 Vị trí chọn: ({{ lat }}, {{ lon }})<br>
+        🏪 Số cửa hàng trong bán kính 1km: <b>{{ count }}</b>
+    </p>
+{% endif %}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    var map = L.map('map').setView([10.7769, 106.7009], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+        .addTo(map);
+
+    var circle;
+
+    map.on('click', function(e) {
+        var lat = e.latlng.lat;
+        var lon = e.latlng.lng;
+
+        if (circle) {
+            map.removeLayer(circle);
+        }
+
+        circle = L.circle([lat, lon], {
+            radius: 1000,
+            color: 'red',
+            fillOpacity: 0.2
+        }).addTo(map);
+
+        window.location.href = `?lat=${lat}&lon=${lon}`;
+    });
+</script>
+
+{% endblock %}

@@ -54,7 +54,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'MyApp.middleware.CustomErrorMiddleware',
 ]
 
 ROOT_URLCONF = 'WebApp.urls'
@@ -99,7 +98,7 @@ DATABASES = {
 # Windows GDAL Configuration 
 if os.name == 'nt':
     # Path to the discovered libraries in 'geo_tool' environment
-    VENV_BASE = r"C:\Users\Admin\anaconda3\envs\geo_tool\Library"
+    VENV_BASE = r"D:\anaconda\anaconda3\envs\seo\Library"
     VENV_BIN = os.path.join(VENV_BASE, "bin")
     
     # Add bin folder to PATH so dependent DLLs can be found
@@ -135,9 +134,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'vi'  # Sẵn tiện đổi ngôn ngữ hệ thống sang tiếng Việt luôn cho mượt
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Ho_Chi_Minh'  # Đổi sang giờ Việt Nam
 
 USE_I18N = True
 
@@ -152,13 +151,3 @@ STATIC_URL = 'static/'
 # Media files (User uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
-# Email Config for Mailtrap
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = '7c13cd7cd67989'
-EMAIL_HOST_PASSWORD = '367022c4ce40e1'
-EMAIL_PORT = '2525'
-EMAIL_USE_TLS = True
-DEFAULT_FROM_EMAIL = 'support@smartmart.com'
-
