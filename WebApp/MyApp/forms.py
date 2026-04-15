@@ -1,6 +1,5 @@
 from django import forms
-from .models import YeuCauNhapKho, YeuCauXuatKho
-
+from .models import YeuCauNhapKho, YeuCauXuatKho, DanhGiaCuaHang 
 class YeuCauNhapKhoForm(forms.ModelForm):
     class Meta:
         model = YeuCauNhapKho
@@ -13,20 +12,20 @@ class YeuCauXuatKhoForm(forms.ModelForm):
     class Meta:
         model = YeuCauXuatKho
         fields = ['MaPX', 'LyDo', 'DonHang', 'TrangThai', 'GhiChu', 'MaNV']
-from .models import DanhGiaCuaHang
 
 class DanhGiaForm(forms.ModelForm):
     class Meta:
         model = DanhGiaCuaHang
-        fields = ['SoSao', 'NhanXet']
+        # Sửa tên trường ở đây cho khớp với Model mới
+        fields = ['Diem', 'BinhLuan'] 
         widgets = {
-            'SoSao': forms.NumberInput(attrs={
+            'Diem': forms.NumberInput(attrs={
                 'class': 'form-control', 
                 'min': '1', 
                 'max': '5', 
                 'placeholder': 'Nhập số từ 1 đến 5'
             }),
-            'NhanXet': forms.Textarea(attrs={
+            'BinhLuan': forms.Textarea(attrs={
                 'class': 'form-control', 
                 'rows': 3, 
                 'placeholder': 'Cửa hàng này thế nào? Chia sẻ trải nghiệm của bạn nhé...'

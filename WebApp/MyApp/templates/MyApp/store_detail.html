@@ -467,12 +467,12 @@
                         <i class="fa-solid fa-star" data-val="5"></i>
                     </div>
                     
-                    <div style="display: none;">{{ form.SoSao }}</div>
+                    <div style="display: none;">{{ form.Diem }}</div>
                 </div>
 
                 <div style="margin-bottom: 1.5rem;">
                     <label style="font-weight: 700; margin-bottom: 0.5rem; display: block; color: var(--gray-700); font-size: 1.1rem;">Nhận xét chi tiết</label>
-                    {{ form.NhanXet }}
+                    {{ form.BinhLuan }}
                 </div>
                 
                 <button type="submit" class="btn-main" style="background: #3b82f6; color: white; padding: 0.8rem 2rem;">Gửi đánh giá</button>
@@ -484,11 +484,11 @@
             <div style="padding: 1.5rem; border-radius: 20px; background: white; border: 1px solid var(--gray-100); margin-bottom: 1rem; box-shadow: var(--shadow-sm);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 10px;">
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <strong style="font-size: 1.1rem;"><i class="fa-solid fa-circle-user" style="color: var(--accent-color);"></i> {{ review.NhanVien.Ten }}</strong>
+                        <strong style="font-size: 1.1rem;"><i class="fa-solid fa-circle-user" style="color: var(--accent-color);"></i> {{ review.NguoiDung }}</strong>
                         <span style="color: #94a3b8; font-size: 0.85rem;"><i class="fa-regular fa-clock"></i> {{ review.NgayTao|date:"d/m/Y H:i" }}</span>
                     </div>
 
-                    {% if review.NhanVien.MaNV == request.session.user_id %}
+                    {% if review.NguoiDung == request.session.user_id %}
                     <div style="display: flex; gap: 12px;">
                         <a href="{% url 'edit_review' review.id %}" style="color: #3b82f6; text-decoration: none; font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-pen-to-square"></i> Sửa</a>
                         <a href="{% url 'delete_review' review.id %}" onclick="return confirm('Bạn có chắc chắn muốn xóa bài đánh giá này không?');" style="color: #ef4444; text-decoration: none; font-size: 0.9rem; font-weight: 600;"><i class="fa-solid fa-trash"></i> Xóa</a>
@@ -497,10 +497,10 @@
                 </div>
                 <div style="color: #01875f; margin-bottom: 0.8rem; font-size: 1rem;">
                     {% for i in "12345" %}
-                        <i class="fa-solid fa-star" style="{% if forloop.counter <= review.SoSao %}color: #01875f;{% else %}color: #e2e8f0;{% endif %}"></i>
+                        <i class="fa-solid fa-star" style="{% if forloop.counter <= review.Diem %}color: #01875f;{% else %}color: #e2e8f0;{% endif %}"></i>
                     {% endfor %}
                 </div>
-                <p style="margin: 0; color: #475569; line-height: 1.5;">{{ review.NhanXet }}</p>
+                <p style="margin: 0; color: #475569; line-height: 1.5;">{{ review.BinhLuan }}</p>
             </div>
             {% empty %}
             <div class="empty-state" style="height: 150px; background: transparent; border: 2px dashed var(--gray-200); border-radius: 20px;">
@@ -516,7 +516,7 @@
             if(!starContainer) return;
 
             const stars = starContainer.querySelectorAll('i');
-            const hiddenInput = document.querySelector('input[name="SoSao"]');
+            const hiddenInput = document.querySelector('input[name="Diem"]');
 
             // Mặc định cho 5 sao màu xanh lá (#01875f giống Google Play)
             hiddenInput.value = 5;

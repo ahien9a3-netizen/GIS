@@ -59,7 +59,7 @@ class SidebarContextMixin:
             
         return super().dispatch(request, *args, **kwargs)
 
--def _get_cart_context(request):
+def _get_cart_context(request):
     """
     Hàm bổ trợ lấy số lượng sản phẩm trong giỏ hàng từ session.
     """
@@ -1151,15 +1151,16 @@ def store_detail_view(request, pk):
     if 'user_id' not in request.session: return redirect('login')
     store = get_object_or_404(CuaHang, MaCH=pk)
     
-    # Lấy danh sách đánh giá
-    reviews = store.danh_gia.all()
+    # Lấy danh sách đánh giá (Dùng đúng related_name đã đặt trong models.py)
+    reviews = store.danh_gias_store.all().order_by('-NgayTao')
     
     # --- LOGIC TÍNH ĐIỂM TRUNG BÌNH ---
     total_reviews = reviews.count()
-    # Tính trung bình, nếu chưa có ai đánh giá thì mặc định là 0
-    avg_rating = reviews.aggregate(Avg('SoSao'))['SoSao__avg'] or 0
-    avg_rating = round(avg_rating, 1) # Làm tròn 1 chữ số thập phân (VD: 4.7)
-    # Tính phần trăm để hiển thị thanh sao màu xanh (VD: 4.7 sao = 94%)
+    
+    # SỬA Ở ĐÂY: Đổi 'SoSao' thành 'Diem' cho khớp với Model mới
+    avg_rating = reviews.aggregate(Avg('Diem'))['Diem__avg'] or 0
+    avg_rating = round(avg_rating, 1) 
+    
     avg_percent = (avg_rating / 5) * 100 if total_reviews > 0 else 0
     
     # Xử lý khi gửi form
@@ -1168,7 +1169,8 @@ def store_detail_view(request, pk):
         if form.is_valid():
             danh_gia = form.save(commit=False)
             danh_gia.CuaHang = store
-            danh_gia.NhanVien = get_object_or_404(NhanVien, MaNV=request.session['user_id'])
+            # SỬA DÒNG NÀY: Gán trực tiếp ID người dùng vào trường NguoiDung
+            danh_gia.NguoiDung = request.session.get('user_name', 'Ẩn danh') 
             danh_gia.save()
             return redirect('store_detail', pk=pk)
     else:

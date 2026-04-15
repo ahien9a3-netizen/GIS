@@ -43,15 +43,15 @@ class DanhGia(models.Model):
 
 # ĐÁNH GIÁ CỬA HÀNG
 class DanhGiaCuaHang(models.Model):
-    CuaHang = models.ForeignKey('CuaHang', on_delete=models.CASCADE, related_name='danh_gias', db_column='mach')
-    NguoiDung = models.CharField(max_length=255, db_column='nguoidung')
-    Diem = models.IntegerField(db_column='diem')
-    BinhLuan = models.TextField(db_column='binhluan')
+    CuaHang = models.ForeignKey('CuaHang', on_delete=models.CASCADE, related_name='danh_gias_store', db_column='mach')
+    NguoiDung = models.CharField(max_length=255, db_column='nguoidung', default='User')
+    Diem = models.IntegerField(db_column='diem', default=5)
+    BinhLuan = models.TextField(db_column='binhluan', blank=True, null=True)
     NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
 
     class Meta:
         managed = True
-        db_table = 'danhgiacuahang'
+        db_table = 'danhgiacuahang' # Đảm bảo tên bảng đúng
         verbose_name = "Đánh giá cửa hàng"
         verbose_name_plural = "Danh sách đánh giá cửa hàng"
 #  KHO 
@@ -401,23 +401,7 @@ class DonHang(models.Model):
     PhuongThucThanhToan = models.CharField(max_length=50, choices=PHUONG_THUC_TT, default='COD', db_column='pt_thanhtoan')
     TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_DH, default='Đang xử lý', db_column='trangthai')
     GhiChu = models.TextField(blank=True, null=True, db_column='ghichu')
-
-# BẢNG ĐÁNH GIÁ CỬA HÀNG
-class DanhGiaCuaHang(models.Model):
-    CuaHang = models.ForeignKey(CuaHang, on_delete=models.CASCADE, related_name='danh_gia', db_column='mach')
-    NhanVien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, db_column='manv')
-    SoSao = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], db_column='sosao', verbose_name="Số sao")
-    NhanXet = models.TextField(blank=True, null=True, db_column='nhanxet', verbose_name="Nhận xét")
-    NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
-
-    class Meta:
-        managed = True
-        db_table = 'donhang'
-        verbose_name = "Đơn hàng"
-        verbose_name_plural = "Danh sách đơn hàng"
-
-    def __str__(self):
-        return f"{self.MaDH} - {self.TenNguoiNhan}"
+    NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao', null=True, blank=True)
 
 class ChiTietDonHang(models.Model):
     DonHang = models.ForeignKey(DonHang, on_delete=models.CASCADE, related_name='items', db_column='madh')
@@ -463,5 +447,4 @@ class YeuCauTraHang(models.Model):
 
     def __str__(self):
         return f"YCTH {self.MaYCTH} - Đơn {self.DonHang.MaDH}"
-        db_table = 'danhgiacuahang'
-        ordering = ['-NgayTao'] # Sắp xếp đánh giá mới nhất lên đầu
+        
