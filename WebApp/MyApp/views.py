@@ -59,7 +59,7 @@ class SidebarContextMixin:
             
         return super().dispatch(request, *args, **kwargs)
 
--def _get_cart_context(request):
+def _get_cart_context(request):
     """
     Hàm bổ trợ lấy số lượng sản phẩm trong giỏ hàng từ session.
     """
@@ -291,7 +291,7 @@ def public_store_detail(request, pk):
             )
             return redirect('public_store_detail', pk=pk)
 
-    reviews = store.danh_gias.all().order_by('-NgayTao')
+    reviews = store.danh_gias.all().order_by('NgayTao')
     avg_rating = reviews.aggregate(Avg('Diem'))['Diem__avg'] or 0
     total_reviews = reviews.count()
     

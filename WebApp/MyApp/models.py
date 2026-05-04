@@ -19,7 +19,7 @@ class SanPham(models.Model):
     Gia = models.DecimalField(max_digits=12, decimal_places=0, default=0, db_column='gia', verbose_name="Giá bán")
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'sanpham'
         verbose_name = "Sản phẩm"
         verbose_name_plural = "Danh sách sản phẩm"
@@ -36,24 +36,11 @@ class DanhGia(models.Model):
     NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'danhgia'
         verbose_name = "Đánh giá"
         verbose_name_plural = "Danh sách đánh giá"
 
-# ĐÁNH GIÁ CỬA HÀNG
-class DanhGiaCuaHang(models.Model):
-    CuaHang = models.ForeignKey('CuaHang', on_delete=models.CASCADE, related_name='danh_gias', db_column='mach')
-    NguoiDung = models.CharField(max_length=255, db_column='nguoidung')
-    Diem = models.IntegerField(db_column='diem')
-    BinhLuan = models.TextField(db_column='binhluan')
-    NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
-
-    class Meta:
-        managed = True
-        db_table = 'danhgiacuahang'
-        verbose_name = "Đánh giá cửa hàng"
-        verbose_name_plural = "Danh sách đánh giá cửa hàng"
 #  KHO 
 class Kho(models.Model):
     KHO_LOAI_CHOICES = [
@@ -71,7 +58,7 @@ class Kho(models.Model):
     MoTa = RichTextField(blank=True, null=True, db_column='mota', verbose_name="Mô tả")
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'kho'
         verbose_name = "Kho"
         verbose_name_plural = "Danh sách kho"
@@ -122,7 +109,7 @@ class CuaHang(models.Model):
     MoTa = RichTextField(blank=True, null=True, db_column='mota', verbose_name="Mô tả")
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'cuahang'
         verbose_name = "Cửa hàng"
         verbose_name_plural = "Danh sách cửa hàng"
@@ -164,7 +151,7 @@ class NhanVien(models.Model):
     Role = models.CharField(max_length=50, choices=ROLE_CHOICES, db_column='role')
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'nhanvien'
         verbose_name = "Nhân viên"
         verbose_name_plural = "Danh sách nhân viên"
@@ -192,7 +179,7 @@ class YeuCauNhapKho(models.Model):
     )
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'yeucaunhapkho'
         verbose_name = "Yêu cầu nhập kho"
         verbose_name_plural = "Danh sách yêu cầu nhập kho"
@@ -216,7 +203,7 @@ class HangTonKho(models.Model):
     SoLuong = models.IntegerField(db_column='soluong')
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'hangtonkho'
         unique_together = (('MaKho', 'MaSP'),)
         verbose_name = "Hàng tồn kho"
@@ -243,7 +230,7 @@ class NhapKhoChiTiet(models.Model):
     SoLuong = models.IntegerField(db_column='soluong')
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'nhapkhochitiet'
         unique_together = (('MaYC', 'MaKho', 'MaSP'),)
         verbose_name = "Nhập kho chi tiết"
@@ -275,7 +262,7 @@ class YeuCauXuatKho(models.Model):
     MaNV = models.ForeignKey('NhanVien', on_delete=models.CASCADE, db_column='manv', verbose_name="Nhân viên thực hiện")
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'yeucauxuatkho'
         verbose_name = "Yêu cầu xuất kho"
         verbose_name_plural = "Danh sách yêu cầu xuất kho"
@@ -291,7 +278,7 @@ class XuatKhoChiTiet(models.Model):
     SoLuong = models.PositiveIntegerField(db_column='soluong')
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'xuatkhochitiet'
         unique_together = (('PhieuXuat', 'MaKho', 'MaSP'),)
         verbose_name = "Xuất kho chi tiết"
@@ -304,7 +291,7 @@ class DanhMuc(models.Model):
     Ten = models.CharField(max_length=255, db_column='tendm')
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'danhmuc'
         verbose_name = "Danh mục"
         verbose_name_plural = "Danh sách danh mục"
@@ -356,7 +343,7 @@ class GioHang(models.Model):
     NgayCapNhat = models.DateTimeField(auto_now=True, db_column='ngaycapnhat')
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'giohang'
         verbose_name = "Giỏ hàng"
         verbose_name_plural = "Danh sách giỏ hàng"
@@ -367,7 +354,7 @@ class ChiTietGioHang(models.Model):
     SoLuong = models.PositiveIntegerField(default=1, db_column='soluong')
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'chitietgiohang'
         verbose_name = "Chi tiết giỏ hàng"
         verbose_name_plural = "Chi tiết các giỏ hàng"
@@ -388,7 +375,8 @@ class DonHang(models.Model):
         ('MoMo', 'Ví điện tử MoMo'),
         ('Bank', 'Chuyển khoản Ngân hàng'),
     ]
-
+    GhiChu = models.TextField(blank=True, null=True, db_column='ghichu')
+    NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
     MaDH = models.CharField(max_length=20, primary_key=True, db_column='madh')
     NguoiDung = models.ForeignKey(NhanVien, on_delete=models.SET_NULL, null=True, blank=True, db_column='manv')
     
@@ -402,16 +390,8 @@ class DonHang(models.Model):
     TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_DH, default='Đang xử lý', db_column='trangthai')
     GhiChu = models.TextField(blank=True, null=True, db_column='ghichu')
 
-# BẢNG ĐÁNH GIÁ CỬA HÀNG
-class DanhGiaCuaHang(models.Model):
-    CuaHang = models.ForeignKey(CuaHang, on_delete=models.CASCADE, related_name='danh_gia', db_column='mach')
-    NhanVien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, db_column='manv')
-    SoSao = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], db_column='sosao', verbose_name="Số sao")
-    NhanXet = models.TextField(blank=True, null=True, db_column='nhanxet', verbose_name="Nhận xét")
-    NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
-
     class Meta:
-        managed = True
+        managed = False
         db_table = 'donhang'
         verbose_name = "Đơn hàng"
         verbose_name_plural = "Danh sách đơn hàng"
@@ -426,7 +406,7 @@ class ChiTietDonHang(models.Model):
     GiaBan = models.DecimalField(max_digits=12, decimal_places=0, db_column='giaban') # Lưu giá tại thời điểm mua
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'chitietdonhang'
         verbose_name = "Chi tiết đơn hàng"
         verbose_name_plural = "Chi tiết các đơn hàng"
@@ -455,7 +435,7 @@ class YeuCauTraHang(models.Model):
     NgayXuLy = models.DateTimeField(null=True, blank=True, verbose_name="Ngày xử lý")
 
     class Meta:
-        managed = True
+        managed = False
         db_table = 'yeucautrahang'
         verbose_name = "Yêu cầu trả hàng"
         verbose_name_plural = "Các yêu cầu trả hàng"
@@ -463,5 +443,18 @@ class YeuCauTraHang(models.Model):
 
     def __str__(self):
         return f"YCTH {self.MaYCTH} - Đơn {self.DonHang.MaDH}"
+
+# ===== ĐÁNH GIÁ CỬA HÀNG =====
+class DanhGiaCuaHang(models.Model):
+    CuaHang = models.ForeignKey(CuaHang, on_delete=models.CASCADE, related_name='danh_gia_cuahang', db_column='mach')
+    NhanVien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, db_column='manv')
+    SoSao = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], db_column='sosao', verbose_name="Số sao")
+    NhanXet = models.TextField(blank=True, null=True, db_column='nhanxet', verbose_name="Nhận xét")
+    NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
+
+    class Meta:
+        managed = False
         db_table = 'danhgiacuahang'
-        ordering = ['-NgayTao'] # Sắp xếp đánh giá mới nhất lên đầu
+        verbose_name = "Đánh giá cửa hàng"
+        verbose_name_plural = "Danh sách đánh giá cửa hàng"
+        ordering = ['-NgayTao']

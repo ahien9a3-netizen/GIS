@@ -19,6 +19,11 @@ from .views import (
     ReturnListView, ReturnDetailView, update_return_status,
     StockOutListView, StockOutCreateView, StockOutUpdateView, StockOutDetailView, StockOutDeleteView
 )
+from .excel_views import (
+    SanPhamExportView, SanPhamImportView, KhoExportView, CuaHangExportView,
+    HangTonKhoExportView, DonHangExportView, NhanVienExportView, YeuCauNhapKhoExportView, YeuCauXuatKhoExportView,
+    BulkImportView, ExportTemplateView
+)
 
 urlpatterns = [
     path('', public_home, name='public_home'),
@@ -139,4 +144,18 @@ urlpatterns = [
     path('stock-out/<str:pk>/', StockOutDetailView.as_view(), name='stock_out_detail'),
     path('stock-out/<str:pk>/edit/', StockOutUpdateView.as_view(), name='stock_out_edit'),
     path('stock-out/<str:pk>/delete/', StockOutDeleteView.as_view(), name='stock_out_delete'),
+
+    # --- EXCEL IMPORT/EXPORT ---
+    path('export/products/', SanPhamExportView.as_view(), name='export_sanpham'),
+    path('export/warehouses/', KhoExportView.as_view(), name='export_kho'),
+    path('export/stores/', CuaHangExportView.as_view(), name='export_cuahang'),
+    path('export/inventory/', HangTonKhoExportView.as_view(), name='export_hangtonkho'),
+    path('export/orders/', DonHangExportView.as_view(), name='export_donhang'),
+    path('export/employees/', NhanVienExportView.as_view(), name='export_nhanvien'),
+    path('export/stock-in/', YeuCauNhapKhoExportView.as_view(), name='export_yeucaunhapkho'),
+    path('export/stock-out/', YeuCauXuatKhoExportView.as_view(), name='export_yeucauxuatkho'),
+    
+    path('import/products/', SanPhamImportView.as_view(), name='import_sanpham'),
+    path('import/bulk/<str:model_name>/', BulkImportView.as_view(), name='bulk_import'),
+    path('template/<str:model_name>/', ExportTemplateView.as_view(), name='export_template'),
 ]

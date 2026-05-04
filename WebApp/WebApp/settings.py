@@ -87,7 +87,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis', 
-        'NAME': 'webapp',
+        'NAME': 'webapp_gis',
         'USER': 'postgres',
         'PASSWORD': '123',
         'HOST': 'localhost',
@@ -98,7 +98,7 @@ DATABASES = {
 # Windows GDAL Configuration 
 if os.name == 'nt':
     # Path to the discovered libraries in 'geo_tool' environment
-    VENV_BASE = r"D:\anaconda\anaconda3\envs\seo\Library"
+    VENV_BASE = r"C:\Users\Admin\anaconda3\envs\tktmdt\Library"
     VENV_BIN = os.path.join(VENV_BASE, "bin")
     
     # Add bin folder to PATH so dependent DLLs can be found
