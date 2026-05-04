@@ -1,0 +1,17 @@
+{% extends 'myapp/base.html' %}
+{% block content %}
+<h3>Danh sách kho</h3>
+
+<table class="table">
+<tr>
+    <th>Mã kho</th><th>Tên</th><th>Loại</th>
+</tr>
+{% for k in data %}
+<tr>
+    <td>{{ k.MaKho }}</td>
+    <td>{{ k.Ten }}</td>
+    <td>{{ k.Loai }}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

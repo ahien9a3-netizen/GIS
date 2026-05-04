@@ -1,0 +1,22 @@
+{% extends 'myapp/base.html' %}
+{% block content %}
+
+<h2>Hệ Thống Quản Lý Chuỗi Cửa Hàng</h2>
+<p class="text-muted">Dashboard GIS - Giám sát và phân tích mạng lưới</p>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="card p-3">Tổng cửa hàng: <b>{{ tong_cua_hang }}</b></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3">Kho hàng: <b>{{ tong_kho }}</b></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3">Sản phẩm: <b>{{ tong_san_pham }}</b></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3">Tồn kho: <b>{{ tong_ton_kho }}</b></div>
+    </div>
+</div>
+
+{% endblock %}

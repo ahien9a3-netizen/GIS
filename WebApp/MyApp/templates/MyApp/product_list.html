@@ -2,17 +2,120 @@
 {% load static %}
 
 {% block content %}
+<style>
+    .filter-bar {
+        display: flex;
+        gap: 1rem;
+        background: white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex: 1;
+        min-width: 200px;
+    }
+    .filter-group label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+    .filter-input {
+        padding: 0.6rem 1rem;
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        font-size: 0.9rem;
+        outline: none;
+        transition: all 0.2s;
+    }
+    .filter-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .btn-filter {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-clear {
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border: none;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+    }
+</style>
+
 <div class="page-header">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <div>
             <h1>{{ page_title }}</h1>
             <p>Quản lý danh mục sản phẩm</p>
         </div>
-        <a href="{% url 'product_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
-            <i class="fa-solid fa-plus"></i> Thêm Sản phẩm
-        </a>
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <!-- Download Template -->
+            <a href="{% url 'export_template' 'SanPham' %}" class="leaflet-analysis-btn" style="text-decoration: none; background: #6366f1;">
+                <i class="fa-solid fa-file-excel"></i> Tải template
+            </a>
+            <!-- Export Button -->
+            <a href="{% url 'export_sanpham' %}" class="leaflet-analysis-btn" style="text-decoration: none; background: #10b981;">
+                <i class="fa-solid fa-download"></i> Xuất Excel
+            </a>
+            <!-- Import Button -->
+            <button type="button" class="leaflet-analysis-btn" style="background: #f59e0b;" onclick="document.getElementById('import-file').click();">
+                <i class="fa-solid fa-upload"></i> Nhập Excel
+            </button>
+            <form id="import-form" action="{% url 'bulk_import' 'sanpham' %}" method="post" enctype="multipart/form-data" style="display: none;">
+                {% csrf_token %}
+                <input type="file" id="import-file" name="file" accept=".xlsx,.xls" onchange="document.getElementById('import-form').submit();">
+            </form>
+            <!-- Add New Button -->
+            <a href="{% url 'product_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
+                <i class="fa-solid fa-plus"></i> Thêm Sản phẩm
+            </a>
+        </div>
     </div>
 </div>
+
+<form method="get" class="filter-bar">
+    <div class="filter-group">
+        <label>Tìm kiếm</label>
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Tên hoặc mã sản phẩm..." class="filter-input">
+    </div>
+    <div class="filter-group">
+        <label>Danh mục</label>
+        <select name="danhmuc" class="filter-input">
+            <option value="">-- Tất cả --</option>
+            {% for dm in danhmuc_choices %}
+            <option value="{{ dm.MaDM }}" {% if request.GET.danhmuc == dm.MaDM|stringformat:"s" %}selected{% endif %}>{{ dm.Ten }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn-filter">
+        <i class="fa-solid fa-magnifying-glass"></i> Lọc
+    </button>
+    {% if request.GET.q or request.GET.danhmuc %}
+    <a href="{% url 'product_list' %}" class="btn-clear">Xóa lọc</a>
+    {% endif %}
+</form>
 
 <div class="chart-card" style="padding: 1rem;">
     <table class="crud-table" style="width: 100%; border-collapse: collapse;">
@@ -51,14 +154,19 @@
                 </td>
                 <td style="padding: 1rem;">
                     <div style="display: flex; gap: 0.5rem;">
-                        <a href="{% url 'product_edit' p.pk %}" style="color: var(--primary);"><i
-                                class="fa-solid fa-pen-to-square"></i></a>
+                        <a href="{% url 'product_detail' p.pk %}" style="color: var(--secondary); margin-right: 0.25rem;" title="Xem chi tiết">
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                        <a href="{% url 'product_edit' p.pk %}" style="color: var(--primary);" title="Chỉnh sửa">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </a>
                         <form action="{% url 'product_delete' p.pk %}" method="post" style="display: inline;"
                             onsubmit="return confirm('Bạn có chắc chắn muốn xóa?')">
                             {% csrf_token %}
                             <button type="submit"
-                                style="background: none; border: none; color: var(--danger); cursor: pointer;"><i
-                                    class="fa-solid fa-trash"></i></button>
+                                style="background: none; border: none; color: var(--danger); cursor: pointer;" title="Xóa">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
                         </form>
                     </div>
                 </td>

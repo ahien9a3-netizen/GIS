@@ -2,17 +2,120 @@
 {% load static %}
 
 {% block content %}
+<style>
+    .filter-bar {
+        display: flex;
+        gap: 1rem;
+        background: white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex: 1;
+        min-width: 200px;
+    }
+    .filter-group label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+    .filter-input {
+        padding: 0.6rem 1rem;
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        font-size: 0.9rem;
+        outline: none;
+        transition: all 0.2s;
+    }
+    .filter-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .btn-filter {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-clear {
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border: none;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+    }
+</style>
+
 <div class="page-header">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
         <div>
             <h1>{{ page_title }}</h1>
             <p>Hệ thống kho bãi và điểm phân phối</p>
         </div>
-        <a href="{% url 'kho_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
-            <i class="fa-solid fa-plus"></i> Thêm Kho mới
-        </a>
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <!-- Download Template -->
+            <a href="{% url 'export_template' 'Kho' %}" class="leaflet-analysis-btn" style="text-decoration: none; background: #6366f1;">
+                <i class="fa-solid fa-file-excel"></i> Tải template
+            </a>
+            <!-- Export Button -->
+            <a href="{% url 'export_kho' %}" class="leaflet-analysis-btn" style="text-decoration: none; background: #10b981;">
+                <i class="fa-solid fa-download"></i> Xuất Excel
+            </a>
+            <!-- Import Button -->
+            <button type="button" class="leaflet-analysis-btn" style="background: #f59e0b;" onclick="document.getElementById('import-file').click();">
+                <i class="fa-solid fa-upload"></i> Nhập Excel
+            </button>
+            <form id="import-form" action="{% url 'bulk_import' 'kho' %}" method="post" enctype="multipart/form-data" style="display: none;">
+                {% csrf_token %}
+                <input type="file" id="import-file" name="file" accept=".xlsx,.xls" onchange="document.getElementById('import-form').submit();">
+            </form>
+            <!-- Add New Button -->
+            <a href="{% url 'kho_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
+                <i class="fa-solid fa-plus"></i> Thêm Kho mới
+            </a>
+        </div>
     </div>
 </div>
+
+<form method="get" class="filter-bar">
+    <div class="filter-group">
+        <label>Tìm kiếm</label>
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Tên, địa chỉ hoặc mã..." class="filter-input">
+    </div>
+    <div class="filter-group">
+        <label>Loại kho</label>
+        <select name="loai" class="filter-input">
+            <option value="">-- Tất cả --</option>
+            {% for choice in loai_choices %}
+            <option value="{{ choice }}" {% if request.GET.loai == choice %}selected{% endif %}>{{ choice }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn-filter">
+        <i class="fa-solid fa-magnifying-glass"></i> Lọc
+    </button>
+    {% if request.GET.q or request.GET.loai %}
+    <a href="{% url 'kho_list' %}" class="btn-clear">Xóa lọc</a>
+    {% endif %}
+</form>
 
 <div class="chart-card" style="padding: 1rem;">
     <table class="crud-table" style="width: 100%; border-collapse: collapse;">
@@ -34,6 +137,8 @@
                 <td style="padding: 1rem;">{{ wh.DiaChi }}</td>
                 <td style="padding: 1rem;">
                     <div style="display: flex; gap: 0.5rem;">
+                        <a href="{% url 'kho_detail' wh.pk %}" style="color: var(--secondary);"><i
+                                class="fa-solid fa-eye"></i></a>
                         <a href="{% url 'kho_edit' wh.pk %}" style="color: var(--primary);"><i
                                 class="fa-solid fa-pen-to-square"></i></a>
                         <form action="{% url 'kho_delete' wh.pk %}" method="post" style="display: inline;"

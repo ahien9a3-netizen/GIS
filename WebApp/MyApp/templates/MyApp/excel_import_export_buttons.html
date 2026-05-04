@@ -1,0 +1,148 @@
+<!-- Excel Import/Export Buttons Template -->
+<!-- Include this in your list views to add Excel functionality -->
+
+<div class="excel-controls mb-3">
+    <div class="btn-group" role="group">
+        <!-- Export Button -->
+        <a href="{% url export_url_name %}" class="btn btn-success btn-sm" title="Export to Excel">
+            <i class="fas fa-download"></i> Export Excel
+        </a>
+        
+        <!-- Import Button -->
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#importModal" title="Import from Excel">
+            <i class="fas fa-upload"></i> Import Excel
+        </button>
+        
+        <!-- Download Template Button -->
+        <a href="{% url template_url_name model_name %}" class="btn btn-info btn-sm" title="Download template">
+            <i class="fas fa-file-excel"></i> Template
+        </a>
+    </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Import from Excel</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="importForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="fileInput" class="form-label">Select Excel File</label>
+                        <input type="file" class="form-control" id="fileInput" name="file" accept=".xlsx, .xls" required>
+                        <small class="form-text text-muted">Supported formats: .xlsx, .xls</small>
+                    </div>
+                    <div id="importProgress" style="display:none;">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <small id="progressText" class="text-muted">Importing...</small>
+                    </div>
+                    <div id="importResult" style="display:none;">
+                        <div id="resultMessage" class="alert" role="alert"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="importBtn">Import</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.excel-controls {
+    padding: 10px 0;
+}
+
+.excel-controls .btn-group {
+    gap: 5px;
+}
+
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+}
+
+#importProgress {
+    margin: 15px 0;
+}
+
+#importResult {
+    margin: 15px 0;
+}
+
+.alert {
+    margin: 0;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const importBtn = document.getElementById('importBtn');
+    const importForm = document.getElementById('importForm');
+    const fileInput = document.getElementById('fileInput');
+    
+    if (importBtn) {
+        importBtn.addEventListener('click', function() {
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+            
+            // Show progress
+            document.getElementById('importProgress').style.display = 'block';
+            document.getElementById('importResult').style.display = 'none';
+            
+            // Send request
+            fetch('{{ import_url }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('importProgress').style.display = 'none';
+                document.getElementById('importResult').style.display = 'block';
+                
+                const resultDiv = document.getElementById('resultMessage');
+                
+                if (data.success) {
+                    resultDiv.className = 'alert alert-success';
+                    resultDiv.innerHTML = `<strong>Success!</strong> ${data.message}`;
+                } else {
+                    resultDiv.className = 'alert alert-danger';
+                    resultDiv.innerHTML = `<strong>Error:</strong> ${data.error}`;
+                }
+                
+                // Clear form and close after 3 seconds if successful
+                if (data.success) {
+                    fileInput.value = '';
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('importProgress').style.display = 'none';
+                document.getElementById('importResult').style.display = 'block';
+                
+                const resultDiv = document.getElementById('resultMessage');
+                resultDiv.className = 'alert alert-danger';
+                resultDiv.innerHTML = '<strong>Error:</strong> ' + error.message;
+            });
+        });
+    }
+});
+</script>

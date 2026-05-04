@@ -1,0 +1,323 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>403 - Quyền Truy Cập Bị Từ Chối</title>
+    <style>
+        /* Import phông chữ máy tính (Monospace) và phông viễn tưởng (Orbitron) */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Share+Tech+Mono&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            width: 100%;
+            background-color: #050505;
+            color: #ff3333;
+            font-family: 'Share Tech Mono', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- 1. HIỆU ỨNG NỀN (Lưới không gian mạng & CRT) --- */
+        .cyber-grid {
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            top: -50%;
+            left: -50%;
+            background-image:
+                linear-gradient(rgba(255, 0, 0, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            transform: perspective(600px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+            animation: grid-move 10s linear infinite;
+            z-index: 0;
+        }
+
+        /* Hiệu ứng sọc ngang của màn hình hỏng (Scanline) */
+        .crt-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        /* --- 2. HỆ THỐNG LASER AN NINH --- */
+        .laser-defense {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .laser {
+            position: absolute;
+            background: #ff0000;
+            box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+        }
+
+        .laser-h {
+            width: 100%;
+            height: 2px;
+            top: -10%;
+            animation: scan-horizontal 6s infinite ease-in-out;
+        }
+
+        .laser-v {
+            width: 2px;
+            height: 100%;
+            left: -10%;
+            animation: scan-vertical 8s infinite ease-in-out;
+        }
+
+        /* --- 3. BẢNG ĐIỀU KHIỂN BỊ KHÓA (Terminal) --- */
+        .terminal-card {
+            position: relative;
+            z-index: 10;
+            background: #0a0a0c;
+            border: 2px solid #ff1a1a;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.2), inset 0 0 20px rgba(255, 0, 0, 0.1);
+            max-width: 650px;
+            width: 90%;
+            /* Góc cạnh sắc lẹm */
+            border-radius: 0;
+            animation: system-boot 1s ease-out;
+        }
+
+        .terminal-header {
+            background: #ff1a1a;
+            color: #000;
+            padding: 10px 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: 2px;
+        }
+
+        .terminal-header span {
+            animation: blink 1s step-end infinite;
+        }
+
+        .terminal-body {
+            padding: 3rem;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Mã lỗi 403 & Hiệu ứng Glitch */
+        .error-code {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 130px;
+            color: #fff;
+            text-shadow: 0 0 10px #ff1a1a, 0 0 20px #ff1a1a, 0 0 40px #ff1a1a;
+            line-height: 1;
+            margin-bottom: 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        /* Tạo 2 lớp giả để làm hiệu ứng nhiễu sóng */
+        .error-code::before, .error-code::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0c;
+            color: #fff;
+        }
+
+        .error-code::before {
+            left: 4px;
+            text-shadow: -2px 0 red;
+            animation: glitch-anim-1 2s infinite linear alternate-reverse;
+            clip-path: polygon(0 20%, 100% 20%, 100% 30%, 0 30%);
+        }
+
+        .error-code::after {
+            left: -4px;
+            text-shadow: -2px 0 #0ff; /* Chút xanh lơ tạo cảm giác viễn tưởng */
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+            clip-path: polygon(0 60%, 100% 60%, 100% 70%, 0 70%);
+        }
+
+        .warning-banner {
+            display: inline-block;
+            background: rgba(255, 26, 26, 0.1);
+            border: 1px solid #ff1a1a;
+            padding: 5px 15px;
+            color: #ff1a1a;
+            font-size: 1rem;
+            margin-bottom: 25px;
+            letter-spacing: 3px;
+        }
+
+        .error-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #ffffff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .error-desc {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #cccccc;
+            margin-bottom: 40px;
+            text-align: justify;
+            text-align-last: center; /* Căn giữa dòng cuối */
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 12px;
+            height: 1.2em;
+            background-color: #ff1a1a;
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+            margin-left: 5px;
+        }
+
+        /* Nút rút lui dứt khoát */
+        .btn-disconnect {
+            display: inline-block;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #0a0a0c;
+            background: #ff1a1a;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border: 2px solid #ff1a1a;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-disconnect:hover {
+            background: transparent;
+            color: #ff1a1a;
+            box-shadow: 0 0 20px rgba(255, 26, 26, 0.4);
+            text-shadow: 0 0 5px #ff1a1a;
+        }
+
+        /* --- KEYFRAMES ANIMATIONS --- */
+
+        @keyframes grid-move {
+            0% { transform: perspective(600px) rotateX(60deg) translateY(0) translateZ(-200px); }
+            100% { transform: perspective(600px) rotateX(60deg) translateY(40px) translateZ(-200px); }
+        }
+
+        @keyframes scan-horizontal {
+            0% { top: -10%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 110%; opacity: 0; }
+        }
+
+        @keyframes scan-vertical {
+            0% { left: -10%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: 110%; opacity: 0; }
+        }
+
+        @keyframes system-boot {
+            0% { transform: scale(0.9); opacity: 0; filter: blur(10px); }
+            50% { transform: scale(1.02); filter: blur(2px); }
+            100% { transform: scale(1); opacity: 1; filter: blur(0); }
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+
+        /* Hiệu ứng Glitch xé hình phức tạp */
+        @keyframes glitch-anim-1 {
+            0% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 2px); }
+            20% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
+            40% { clip-path: inset(40% 0 20% 0); transform: translate(-2px, 2px); }
+            60% { clip-path: inset(90% 0 5% 0); transform: translate(2px, -2px); }
+            80% { clip-path: inset(15% 0 70% 0); transform: translate(-2px, 2px); }
+            100% { clip-path: inset(50% 0 30% 0); transform: translate(2px, -2px); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0% { clip-path: inset(20% 0 60% 0); transform: translate(2px, -2px); }
+            20% { clip-path: inset(60% 0 20% 0); transform: translate(-2px, 2px); }
+            40% { clip-path: inset(10% 0 80% 0); transform: translate(2px, -2px); }
+            60% { clip-path: inset(80% 0 10% 0); transform: translate(-2px, -2px); }
+            80% { clip-path: inset(30% 0 50% 0); transform: translate(2px, -2px); }
+            100% { clip-path: inset(70% 0 15% 0); transform: translate(2px, -2px); }
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 600px) {
+            .error-code { font-size: 90px; }
+            .error-title { font-size: 1.4rem; }
+            .error-desc { font-size: 0.95rem; text-align: left; }
+            .terminal-body { padding: 2rem 1.5rem; }
+            .btn-disconnect { padding: 12px 25px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cyber-grid"></div>
+
+    <div class="laser-defense">
+        <div class="laser laser-h"></div>
+        <div class="laser laser-v"></div>
+    </div>
+
+    <div class="crt-overlay"></div>
+
+    <div class="terminal-card">
+        <div class="terminal-header">
+            <div>SYS.ADM // OVERRIDE_DENIED</div>
+            <span>[REC]</span>
+        </div>
+        
+        <div class="terminal-body">
+            <h1 class="error-code" data-text="403">403</h1>
+            
+            <div class="warning-banner">
+                [⚠] CẢNH BÁO BẢO MẬT [⚠]
+            </div>
+            
+            <h2 class="error-title">Quyền Truy Cập Bị Từ Chối</h2>
+            
+            <p class="error-desc">
+                Giao thức an ninh đã tự động chặn yêu cầu của bạn. Khu vực lưu trữ này được bảo mật cấp độ cao. Yêu cầu chứng thực (Authorization) không hợp lệ hoặc bạn không có đủ thẩm quyền để vượt qua tường lửa.<span class="cursor"></span>
+            </p>
+            
+            <div class="btn-wrap">
+                <a href="{% url 'home' %}" class="btn-disconnect">Bảo Toàn Dữ Liệu & Rút Lui</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

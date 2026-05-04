@@ -29,6 +29,29 @@
         .logout-link:hover {
             color: #ef4444;
         }
+
+        .view-site-btn {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #1d4ed8;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border: 1px solid #bfdbfe;
+        }
+
+        .view-site-btn:hover {
+            background: #1d4ed8;
+            color: white;
+            box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2);
+            transform: translateY(-1px);
+        }
     </style>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -81,7 +104,7 @@
                 <i class="fa-solid fa-list"></i>
                 <span>Danh mục</span>
             </a>
-            {% if user_role == 'Admin' %}
+            {% if user_role == 'Admin' and is_admin_view %}
             <a href="{% url 'nhanvien_list' %}"
                 class="sidebar-item {% if sidebar_active == 'employees' %}active{% endif %}">
                 <i class="fa-solid fa-user-tie"></i>
@@ -94,6 +117,11 @@
                 <i class="fa-solid fa-file-invoice"></i>
                 <span>Nhập kho</span>
             </a>
+            <a href="{% url 'stock_out_list' %}"
+                class="sidebar-item {% if sidebar_active == 'stock_out' %}active{% endif %}">
+                <i class="fa-solid fa-file-export"></i>
+                <span>Xuất kho</span>
+            </a>
             {% endif %}
             <a href="{% url 'inventory_list' %}"
                 class="sidebar-item {% if sidebar_active == 'inventory' %}active{% endif %}">
@@ -103,6 +131,14 @@
             <a href="{% url 'gis_map' %}" class="sidebar-item {% if sidebar_active == 'gis_map' %}active{% endif %}">
                 <i class="fa-solid fa-map-location-dot"></i>
                 <span>Bản đồ GIS</span>
+            </a>
+            <a href="{% url 'order_list' %}" class="sidebar-item {% if sidebar_active == 'orders' %}active{% endif %}">
+                <i class="fa-solid fa-shopping-bag"></i>
+                <span>Đơn hàng</span>
+            </a>
+            <a href="{% url 'return_list' %}" class="sidebar-item {% if sidebar_active == 'returns' %}active{% endif %}">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>Trả hàng</span>
             </a>
             {% if user_role == 'Admin' or user_role == 'Kế Toán' %}
             <a href="{% url 'reports' %}" class="sidebar-item {% if sidebar_active == 'reports' %}active{% endif %}">
@@ -125,7 +161,11 @@
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" placeholder="Tìm kiếm sản phẩm, cửa hàng...">
             </div>
-            <div class="header-actions">
+            <div class="header-actions" style="gap: 1.5rem;">
+                <a href="{% url 'public_home' %}" class="view-site-btn" title="Xem trang người dùng">
+                    <i class="fa-solid fa-earth-asia"></i>
+                    <span>Xem trang chủ</span>
+                </a>
                 <button class="header-icon-btn">
                     <i class="fa-solid fa-bell"></i>
                     <span class="notification-badge">3</span>
@@ -134,7 +174,22 @@
                     <div class="header-user-avatar">
                         <i class="fa-solid fa-user"></i>
                     </div>
-                    <div class="header-user-info">
+                    <div class="header-user-info" style="display: flex; align-items: center; gap: 10px;">
+                        {% if request.session.user_role == 'Admin' %}
+                        <form action="{% url 'switch_view' %}" method="POST" style="margin: 0;">
+                            {% csrf_token %}
+                            <button type="submit" style="background: white; border: 1px solid #e2e8f0; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 5px;">
+                                {% if request.session.is_admin_view %}
+                                    <i class="fa-solid fa-toggle-on" style="color: #3b82f6; font-size: 1.2rem;"></i> 
+                                    <span style="color: #3b82f6;">View: Admin</span>
+                                {% else %}
+                                    <i class="fa-solid fa-toggle-off" style="color: #94a3b8; font-size: 1.2rem;"></i> 
+                                    <span style="color: #64748b;">View: Nhân Viên</span>
+                                {% endif %}
+                            </button>
+                        </form>
+                        {% endif %}
+
                         <span class="user-name">{{ user_name|default:"Admin" }}</span>
                         <a href="{% url 'logout' %}" class="logout-link" title="Đăng xuất">
                             <i class="fa-solid fa-right-from-bracket"></i>

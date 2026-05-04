@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.gis', 
     'django.contrib.postgres', 
     'MyApp',
+    'ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -75,13 +76,18 @@ TEMPLATES = [
 WSGI_APPLICATION = 'WebApp.wsgi.application'
 
 
+# Default primary key field type
+# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis', 
-        'NAME': 'webapp',
+        'NAME': 'webapp_gis',
         'USER': 'postgres',
         'PASSWORD': '123',
         'HOST': 'localhost',
@@ -92,7 +98,7 @@ DATABASES = {
 # Windows GDAL Configuration 
 if os.name == 'nt':
     # Path to the discovered libraries in 'geo_tool' environment
-    VENV_BASE = r"C:\Users\Admin\anaconda3\envs\geo_tool\Library"
+    VENV_BASE = r"C:\Users\Admin\anaconda3\envs\tktmdt\Library"
     VENV_BIN = os.path.join(VENV_BASE, "bin")
     
     # Add bin folder to PATH so dependent DLLs can be found
@@ -128,9 +134,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'vi'  # Sẵn tiện đổi ngôn ngữ hệ thống sang tiếng Việt luôn cho mượt
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Ho_Chi_Minh'  # Đổi sang giờ Việt Nam
 
 USE_I18N = True
 

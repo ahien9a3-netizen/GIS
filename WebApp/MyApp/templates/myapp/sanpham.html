@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Danh sách sản phẩm</h2>
+<ul>
+    {% for p in products %}
+        <li>{{ p.ten }} – Số lượng: {{ p.so_luong }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

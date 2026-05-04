@@ -1,0 +1,183 @@
+{% extends 'MyApp/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    .filter-bar {
+        display: flex;
+        gap: 1rem;
+        background: white;
+        padding: 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        flex: 1;
+        min-width: 200px;
+    }
+    .filter-group label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+    .filter-input {
+        padding: 0.6rem 1rem;
+        border: 1px solid var(--gray-200);
+        border-radius: 8px;
+        font-size: 0.9rem;
+        outline: none;
+        transition: all 0.2s;
+    }
+    .filter-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    .btn-filter {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-clear {
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border: none;
+        padding: 0.6rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+    .status-moi { background: #eff6ff; color: #1d4ed8; }
+    .status-processing { background: #fffbeb; color: #b45309; }
+    .status-shipping { background: #f0fdf4; color: #15803d; }
+    .status-completed { background: #dcfce7; color: #166534; border: 1px solid #166534; }
+    .status-cancelled { background: #fef2f2; color: #b91c1c; }
+</style>
+
+<div class="page-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1>{{ page_title }}</h1>
+            <p>Theo dõi và quản lý các đơn hàng của hệ thống</p>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <!-- Download Template -->
+            <a href="{% url 'export_template' 'DonHang' %}" class="leaflet-analysis-btn" style="text-decoration: none; background: #6366f1;">
+                <i class="fa-solid fa-file-excel"></i> Tải template
+            </a>
+            <!-- Export Button -->
+            <a href="{% url 'export_donhang' %}" class="leaflet-analysis-btn" style="text-decoration: none; background: #10b981;">
+                <i class="fa-solid fa-download"></i> Xuất Excel
+            </a>
+            <!-- Import Button -->
+            <button type="button" class="leaflet-analysis-btn" style="background: #f59e0b;" onclick="document.getElementById('import-file').click();">
+                <i class="fa-solid fa-upload"></i> Nhập Excel
+            </button>
+            <form id="import-form" action="{% url 'bulk_import' 'donhang' %}" method="post" enctype="multipart/form-data" style="display: none;">
+                {% csrf_token %}
+                <input type="file" id="import-file" name="file" accept=".xlsx,.xls" onchange="document.getElementById('import-form').submit();">
+            </form>
+        </div>
+    </div>
+</div>
+
+<form method="get" class="filter-bar">
+    <div class="filter-group">
+        <label>Tìm kiếm</label>
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Mã đơn, tên khách, SĐT..." class="filter-input">
+    </div>
+    <div class="filter-group">
+        <label>Trạng thái</label>
+        <select name="status" class="filter-input">
+            <option value="">-- Tất cả trạng thái --</option>
+            {% for code, name in status_choices %}
+            <option value="{{ code }}" {% if request.GET.status == code %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn-filter">
+        <i class="fa-solid fa-magnifying-glass"></i> Lọc đơn
+    </button>
+    {% if request.GET.q or request.GET.status %}
+    <a href="{% url 'order_list' %}" class="btn-clear" style="line-height: 1;">Xóa lọc</a>
+    {% endif %}
+</form>
+
+<div class="chart-card" style="padding: 1rem;">
+    <table class="crud-table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--gray-200);">
+                <th style="padding: 1rem;">Mã Đơn</th>
+                <th style="padding: 1rem;">Khách hàng</th>
+                <th style="padding: 1rem;">Tổng tiền</th>
+                <th style="padding: 1rem;">Thanh toán</th>
+                <th style="padding: 1rem;">Trạng thái</th>
+                <th style="padding: 1rem;">Ngày đặt</th>
+                <th style="padding: 1rem;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for o in orders %}
+            <tr style="border-bottom: 1px solid var(--gray-100);">
+                <td style="padding: 1rem; font-weight: 800; color: var(--primary);">#{{ o.MaDH }}</td>
+                <td style="padding: 1rem;">
+                    <div style="font-weight: 600;">{{ o.TenNguoiNhan }}</div>
+                    <div style="font-size: 0.8rem; color: #64748b;">{{ o.SDT_Nhan }}</div>
+                </td>
+                <td style="padding: 1rem; font-weight: 700; color: #10b981;">{{ o.TongTien|floatformat:"0" }} <small style="font-size: 0.6rem;">VND</small></td>
+                <td style="padding: 1rem; font-size: 0.85rem; color: #475569;">{{ o.get_PhuongThucThanhToan_display }}</td>
+                <td style="padding: 1rem;">
+                    <span class="status-badge 
+                        {% if o.TrangThai == 'Mới' %}status-moi
+                        {% elif o.TrangThai == 'Đang xử lý' %}status-processing
+                        {% elif o.TrangThai == 'Đang giao' %}status-shipping
+                        {% elif o.TrangThai == 'Đã hoàn thành' %}status-completed
+                        {% else %}status-cancelled{% endif %}">
+                        {{ o.TrangThai }}
+                    </span>
+                </td>
+                <td style="padding: 1rem; font-size: 0.85rem; color: #64748b;">{{ o.NgayTao|date:"d/m/Y H:i" }}</td>
+                <td style="padding: 1rem;">
+                    <div style="display: flex; gap: 0.75rem;">
+                        <a href="{% url 'order_detail' o.MaDH %}" style="color: var(--primary); font-size: 1.1rem;" title="Xem & Xử lý">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                        </a>
+                        <a href="{% url 'public_order_invoice' o.MaDH %}" target="_blank" style="color: #64748b; font-size: 1.1rem;" title="In hóa đơn">
+                            <i class="fa-solid fa-print"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="padding: 3rem; text-align: center; color: var(--gray-400);">Không tìm thấy đơn hàng nào.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include 'MyApp/pagination.html' %}
+{% endblock %}

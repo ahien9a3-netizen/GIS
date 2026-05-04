@@ -145,6 +145,14 @@
             font-size: 0.875rem;
             color: var(--gray-400);
         }
+        .footer-note a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .footer-note a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -187,7 +195,7 @@
         </form>
 
         <div class="footer-note">
-            Liên hệ quản trị viên nếu bạn quên mật khẩu.
+            <a href="{% url 'forgot_password' %}">Quên mật khẩu?</a>
         </div>
     </div>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>

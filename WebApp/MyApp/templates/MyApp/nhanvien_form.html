@@ -16,8 +16,16 @@
             {% csrf_token %}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                 {% for field in form %}
-                <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                    <label style="font-weight: 600; font-size: 0.875rem;">{{ field.label }}</label>
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; {% if field.name == 'MatKhau' %}grid-column: span 2;{% endif %}">
+                    <label style="font-weight: 600; font-size: 0.875rem;">
+                        {% if field.name == 'MaNV' %}Mã nhân viên
+                        {% elif field.name == 'Ten' %}Họ và tên
+                        {% elif field.name == 'SDT' %}Số điện thoại
+                        {% elif field.name == 'Email' %}Địa chỉ Email
+                        {% elif field.name == 'Role' %}Chức vụ
+                        {% elif field.name == 'MatKhau' %}Mật khẩu
+                        {% else %}{{ field.label }}{% endif %}
+                    </label>
                     <div>
                         {{ field }}
                     </div>
