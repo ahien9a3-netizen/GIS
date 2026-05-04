@@ -129,6 +129,15 @@
         .footer-links a:hover { color: white; padding-left: 5px; }
         .footer-bottom { text-align: center; border-top: 1px solid #1e293b; padding-top: 30px; font-size: 0.9rem; }
 
+        /* Footer Extras */
+        .social-links { display: flex; gap: 12px; margin-top: 20px; }
+        .social-links a { width: 40px; height: 40px; background: #1e293b; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; transition: 0.3s; }
+        .social-links a:hover { background: var(--primary); transform: translateY(-3px); }
+        .footer-newsletter { display: flex; margin-top: 15px; }
+        .footer-newsletter input { flex: 1; padding: 12px; border-radius: 8px 0 0 8px; border: 1px solid #1e293b; background: #1e293b; color: white; outline: none; }
+        .footer-newsletter button { padding: 0 20px; border-radius: 0 8px 8px 0; border: none; background: var(--primary); color: white; cursor: pointer; transition: 0.3s; }
+        .footer-newsletter button:hover { background: var(--primary-dark); }
+
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -162,6 +171,7 @@
                             <span class="profile-role">{{ user_role|default:"Khách hàng" }}</span>
                         </div>
                         <a href="{% url 'public_profile' %}" class="dropdown-link"><i class="fa-solid fa-user-gear"></i> Tài khoản cá nhân</a>
+                        <a href="{% url 'public_settings' %}" class="dropdown-link"><i class="fa-solid fa-gear"></i> Cài đặt</a>
                         <a href="{% url 'public_order_history' %}" class="dropdown-link"><i class="fa-solid fa-box-open"></i> Lịch sử đơn hàng</a>
                         <a href="{% url 'view_cart' %}" class="dropdown-link"><i class="fa-solid fa-cart-shopping"></i> Giỏ hàng của tôi</a>
                         {% if user_role == 'Admin' or user_role == 'Nhân Viên' or user_role == 'Kế Toán' %}
@@ -192,31 +202,47 @@
     <footer class="footer">
         <div class="footer-grid">
             <div class="footer-col">
-                <a href="#" class="footer-logo"><i class="fa-solid fa-map-location-dot"></i> SMART MART</a>
+                <a href="{% url 'public_home' %}" class="footer-logo"><i class="fa-solid fa-map-location-dot"></i> SMART MART</a>
                 <p>Nền tảng GIS hàng đầu giúp bạn tìm kiếm và trải nghiệm mua sắm thông minh tại chuỗi cửa hàng SMART MART toàn quốc.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#"><i class="fa-brands fa-youtube"></i></a>
+                </div>
             </div>
             <div class="footer-col">
                 <h4 class="footer-title">Khám Phá</h4>
                 <ul class="footer-links">
                     <li><a href="{% url 'public_home' %}">Trang chủ</a></li>
                     <li><a href="{% url 'public_gis_map' %}">Bản đồ GIS</a></li>
-                    <li><a href="{% url 'public_about' %}">Về chúng tôi</a></li>
+                    <li><a href="{% url 'public_product_list' %}">Tất cả sản phẩm</a></li>
+                    <li><a href="{% url 'public_store_list' %}">Hệ thống cửa hàng</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4 class="footer-title">Hỗ Trợ</h4>
                 <ul class="footer-links">
+                    <li><a href="{% url 'public_about' %}">Về chúng tôi</a></li>
                     <li><a href="#">Điều khoản sử dụng</a></li>
                     <li><a href="#">Câu hỏi thường gặp</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4 class="footer-title">Liên Hệ</h4>
-                <p style="font-size:0.9rem; line-height:1.6;"><i class="fa-solid fa-location-dot" style="color:var(--primary-light); margin-right:10px;"></i> TP. Hồ Chí Minh<br><i class="fa-solid fa-phone" style="color:var(--primary-light); margin-right:10px;"></i> 1900 1234</p>
+                <p style="font-size:0.9rem; line-height:1.6; margin-bottom: 20px;">
+                    <i class="fa-solid fa-location-dot" style="color:var(--primary-light); margin-right:10px;"></i> TP. Hồ Chí Minh, Việt Nam<br>
+                    <i class="fa-solid fa-phone" style="color:var(--primary-light); margin-right:10px;"></i> 1900 1234<br>
+                    <i class="fa-solid fa-envelope" style="color:var(--primary-light); margin-right:10px;"></i> support@smartmart.vn
+                </p>
+                <div class="footer-newsletter">
+                    <input type="email" placeholder="Email của bạn...">
+                    <button><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 Smart Mart Platform.</p>
+            <p>&copy; 2026 Smart Mart GIS Platform. All rights reserved.</p>
         </div>
     </footer>
     {% endif %}

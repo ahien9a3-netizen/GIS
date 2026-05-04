@@ -39,15 +39,72 @@
             </div>
         </div>
 
-        <!-- PHẦN 2: DANH SÁCH SẢN PHẨM (FORMSET) -->
+        <!-- PHẦN 2: IMPORT EXCEL + PREVIEW -->
         <div class="chart-card">
+            <div class="chart-header">
+                <h3><i class="fa-solid fa-file-excel"></i> 2. Import dữ liệu từ Excel</h3>
+            </div>
+            <div style="padding: 1.5rem;">
+                <!-- Hướng dẫn + nút -->
+                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem;">
+                    <a href="{% url 'download_stockin_template' %}" class="btn-action btn-download" title="Tải file mẫu Excel về điền dữ liệu">
+                        <i class="fa-solid fa-download"></i> Tải file mẫu (.xlsx)
+                    </a>
+                    <label for="excel-upload" class="btn-action btn-import" title="Chọn file Excel đã điền để import">
+                        <i class="fa-solid fa-file-arrow-up"></i> Chọn file Excel
+                    </label>
+                    <input type="file" id="excel-upload" accept=".xlsx,.xls" style="display:none;">
+                    <span id="file-name-display" style="font-size:0.85rem; color:var(--gray-500); font-style:italic;"></span>
+                </div>
+
+                <!-- Khu vực Preview (ẩn ban đầu) -->
+                <div id="preview-section" style="display:none;">
+                    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1rem; display:flex; align-items:center; gap:0.75rem;">
+                        <i class="fa-solid fa-circle-check" style="color:#16a34a; font-size:1.1rem;"></i>
+                        <span id="preview-summary" style="font-size:0.9rem; font-weight:600; color:#15803d;"></span>
+                        <span style="font-size:0.82rem; color:#166534; margin-left:auto;">Kiểm tra lại dữ liệu bên dưới, có thể sửa trực tiếp trước khi import.</span>
+                    </div>
+
+                    <div style="overflow-x:auto; border-radius:8px; border:1px solid var(--gray-200);">
+                        <table style="width:100%; border-collapse:collapse; font-size:0.875rem;" id="preview-table">
+                            <thead>
+                                <tr style="background:var(--gray-50);">
+                                    <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; text-transform:uppercase; color:var(--gray-500); white-space:nowrap;">#</th>
+                                    <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; text-transform:uppercase; color:var(--gray-500);">Mã SP</th>
+                                    <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; text-transform:uppercase; color:var(--gray-500);">Tên sản phẩm</th>
+                                    <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; text-transform:uppercase; color:var(--gray-500);">Mã Kho</th>
+                                    <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; text-transform:uppercase; color:var(--gray-500);">Tên kho</th>
+                                    <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; text-transform:uppercase; color:var(--gray-500);">Số lượng</th>
+                                    <th style="padding:0.75rem 1rem; text-align:left; font-size:0.75rem; text-transform:uppercase; color:var(--gray-500);">Ghi chú</th>
+                                    <th style="padding:0.75rem 1rem; text-align:center; font-size:0.75rem; text-transform:uppercase; color:var(--gray-500);">Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="preview-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div style="margin-top:1.25rem; display:flex; justify-content:flex-end; gap:1rem;">
+                        <button type="button" id="btn-cancel-preview" class="btn-cancel-custom">
+                            <i class="fa-solid fa-xmark"></i> Hủy bỏ
+                        </button>
+                        <button type="button" id="btn-confirm-import" class="btn-confirm-import">
+                            <i class="fa-solid fa-check-double"></i> Xác nhận & Áp dụng vào phiếu
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PHẦN 3: DANH SÁCH SẢN PHẨM (FORMSET) -->
+        <div class="chart-card">
+            <div class="chart-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <h3><i class="fa-solid fa-boxes-stacked"></i> 3. Danh sách sản phẩm nhập kho</h3>
+                <button type="button" id="add-item" class="btn-add-secondary">
+                    <i class="fa-solid fa-plus-circle"></i> Thêm dòng thủ công
+                </button>
+            </div>
             <div style="padding: 1rem;">
                 {{ product_formset.management_form }}
-                <div style="margin-bottom: 1rem; display: flex; justify-content: flex-end;">
-                    <button type="button" id="add-item" class="btn-add-secondary">
-                        <i class="fa-solid fa-plus-circle"></i> Thêm sản phẩm mới
-                    </button>
-                </div>
                 <table class="data-table" id="product-table" style="width: 100%;">
                     <thead>
                         <tr style="text-align: left; background: var(--gray-50);">
@@ -60,33 +117,29 @@
                     <tbody id="formset-container">
                         {% for form_item in product_formset %}
                         <tr class="formset-row" style="border-bottom: 1px solid var(--gray-100);">
-                            {% for hidden in form_item.hidden_fields %}
-                                {{ hidden }}
-                            {% endfor %}
+                            {% for hidden in form_item.hidden_fields %}{{ hidden }}{% endfor %}
                             <td style="padding: 0.75rem;">{{ form_item.MaSP }}</td>
                             <td style="padding: 0.75rem;">{{ form_item.MaKho }}</td>
                             <td style="padding: 0.75rem;">{{ form_item.SoLuong }}</td>
                             <td style="padding: 0.75rem; text-align: center;">
-                                {% if product_formset.can_delete %}
-                                    {{ form_item.DELETE }}
-                                {% endif %}
+                                {% if product_formset.can_delete %}{{ form_item.DELETE }}{% endif %}
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-                
-                <!-- Template cho dòng mới (để JS copy) -->
-                <div id="empty-form" style="display: none;">
+
+                <script type="text/template" id="empty-form-template">
                     <tr class="formset-row" style="border-bottom: 1px solid var(--gray-100);">
+                        {{ product_formset.empty_form.hidden_fields }}
                         <td style="padding: 0.75rem;">{{ product_formset.empty_form.MaSP }}</td>
                         <td style="padding: 0.75rem;">{{ product_formset.empty_form.MaKho }}</td>
                         <td style="padding: 0.75rem;">{{ product_formset.empty_form.SoLuong }}</td>
                         <td style="padding: 0.75rem; text-align: center;">
-                             <!-- Ô checkbox xóa ẩn -->
+                            {% if product_formset.can_delete %}{{ product_formset.empty_form.DELETE }}{% endif %}
                         </td>
                     </tr>
-                </div>
+                </script>
             </div>
         </div>
     </div>
@@ -98,7 +151,7 @@
         </a>
         <button type="submit" class="btn-save-custom">
             <div class="inner-btn">
-                <i class="fa-solid fa-floppy-disk"></i> 
+                <i class="fa-solid fa-floppy-disk"></i>
                 <span>Lưu toàn bộ thông tin</span>
             </div>
             <div class="btn-shine"></div>
@@ -107,132 +160,294 @@
 </form>
 
 <style>
-    /* Styling chung cho các nút mới */
+    .btn-action {
+        display: inline-flex; align-items: center; gap: 0.5rem;
+        padding: 0.55rem 1.1rem; border-radius: 8px; font-size: 0.875rem;
+        font-weight: 600; cursor: pointer; text-decoration: none; border: none;
+        transition: all 0.2s;
+    }
+    .btn-download { background: #f0fdf4; color: #16a34a; border: 1.5px solid #86efac; }
+    .btn-download:hover { background: #dcfce7; }
+    .btn-import { background: #eff6ff; color: #2563eb; border: 1.5px solid #bfdbfe; }
+    .btn-import:hover { background: #dbeafe; }
+    .btn-confirm-import {
+        background: linear-gradient(135deg, #16a34a, #15803d); color: white;
+        border: none; padding: 0.7rem 1.75rem; border-radius: 10px;
+        font-weight: 700; font-size: 0.95rem; cursor: pointer;
+        display: inline-flex; align-items: center; gap: 0.6rem;
+        box-shadow: 0 4px 12px rgba(22,163,74,0.3); transition: all 0.25s;
+    }
+    .btn-confirm-import:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(22,163,74,0.4); }
     .btn-add-secondary {
-        background: white;
-        color: var(--primary);
-        border: 2px solid var(--primary);
-        padding: 0.6rem 1.25rem;
-        border-radius: 10px;
-        font-weight: 700;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.3s;
-        font-size: 0.9rem;
+        background: white; color: var(--primary); border: 2px solid var(--primary);
+        padding: 0.5rem 1.1rem; border-radius: 9px; font-weight: 700;
+        cursor: pointer; display: flex; align-items: center; gap: 0.5rem;
+        transition: all 0.25s; font-size: 0.875rem;
     }
-
-    .btn-add-secondary:hover {
-        background: var(--primary);
-        color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-    }
-
+    .btn-add-secondary:hover { background: var(--primary); color: white; transform: translateY(-2px); }
     .btn-cancel-custom {
-        padding: 0.85rem 1.75rem;
-        border-radius: 12px;
-        font-weight: 700;
-        color: #64748b;
-        border: 2px solid #e2e8f0;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        font-size: 0.95rem;
+        padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 700;
+        color: #64748b; border: 2px solid #e2e8f0; display: inline-flex;
+        align-items: center; gap: 0.5rem; transition: all 0.25s; background: white; cursor: pointer;
     }
-
-    .btn-cancel-custom:hover {
-        background: #f1f5f9;
-        border-color: #cbd5e1;
-        color: #1e293b;
-        transform: translateY(-2px);
-    }
-
+    .btn-cancel-custom:hover { background: #f1f5f9; }
     .btn-save-custom {
-        position: relative;
-        overflow: hidden;
+        position: relative; overflow: hidden;
         background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        color: white;
-        border: none;
-        padding: 0.85rem 2.5rem;
-        border-radius: 14px;
-        font-weight: 700;
-        font-size: 1rem;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: white; border: none; padding: 0.85rem 2.5rem;
+        border-radius: 14px; font-weight: 700; font-size: 1rem;
+        cursor: pointer; box-shadow: 0 4px 15px rgba(37,99,235,0.3); transition: all 0.3s;
     }
-
-    .btn-save-custom:hover {
-        transform: translateY(-3px) scale(1.02);
-        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.45);
-        background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-    }
-
-    .inner-btn {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        position: relative;
-        z-index: 2;
-    }
-
+    .btn-save-custom:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(37,99,235,0.45); }
+    .inner-btn { display: flex; align-items: center; gap: 0.75rem; position: relative; z-index: 2; }
     .btn-shine {
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
+        position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
         background: linear-gradient(120deg, transparent, rgba(255,255,255,0.2), transparent);
         transition: all 0.6s;
     }
-
-    .btn-save-custom:hover .btn-shine {
-        left: 100%;
-    }
-
-    input, select, textarea {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border: 1px solid var(--gray-200);
-        border-radius: 8px;
-        font-size: 0.875rem;
-        background: white;
-        transition: all 0.2s;
-    }
-    input:focus, select:focus, textarea:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        outline: none;
-    }
-    .data-table th { font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase; }
-    
-    /* CSS cho checkbox DELETE của Django */
+    .btn-save-custom:hover .btn-shine { left: 100%; }
+    input, select, textarea { width: 100%; padding: 0.7rem 1rem; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 0.875rem; background: white; transition: all 0.2s; }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); outline: none; }
     input[type="checkbox"] { width: auto; }
+    .data-table th { font-size: 0.75rem; color: var(--gray-500); text-transform: uppercase; }
+    .preview-input {
+        width: 100%; padding: 0.4rem 0.6rem; border: 1px solid var(--gray-200);
+        border-radius: 6px; font-size: 0.85rem; background: white;
+    }
+    .preview-input:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 2px rgba(37,99,235,0.15); }
+    .preview-input.sl-input { width: 80px; text-align: center; }
+    .preview-row:hover { background: #f8faff; }
+    .btn-del-row { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; padding: 0.25rem 0.5rem; border-radius: 4px; transition: background 0.2s; }
+    .btn-del-row:hover { background: #fee2e2; }
+    /* Toast */
+    .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+    .toast { background: white; border-left: 4px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 1rem 1.5rem; border-radius: 8px; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 1rem; animation: slideIn 0.3s ease-out forwards; }
+    .toast.error { border-left-color: var(--danger); }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 </style>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const addButton = document.getElementById('add-item');
-        const container = document.getElementById('formset-container');
-        const totalForms = document.getElementById('id_nhapkhochitiet_set-TOTAL_FORMS');
-        const emptyFormHtml = document.getElementById('empty-form').innerHTML;
+<div class="toast-container" id="toast-container"></div>
 
-        addButton.addEventListener('click', function() {
-            const formCount = parseInt(totalForms.value);
-            // Replace __prefix__ with the correct index
-            const newRowHtml = emptyFormHtml.replace(/__prefix__/g, formCount);
-            
-            // Create a temporary table body to hold the new row
-            const tbody = document.createElement('tbody');
-            tbody.innerHTML = newRowHtml;
-            const newRow = tbody.querySelector('tr');
-            
-            container.appendChild(newRow);
-            totalForms.value = formCount + 1;
+<script>
+// ===== TOAST =====
+function showToast(message, type='success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+    toast.innerHTML = `
+        <i class="fa-solid ${type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-check'}"
+           style="color:${type==='error' ? 'var(--danger)' : '#16a34a'}; font-size:1.2rem;"></i>
+        <div style="font-size:0.875rem; font-weight:500; white-space:pre-line;">${message}</div>
+    `;
+    container.appendChild(toast);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        toast.style.transition = 'all 0.3s ease-out';
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const addButton     = document.getElementById('add-item');
+    const container     = document.getElementById('formset-container');
+    const totalForms    = document.querySelector('input[name="nhapkhochitiet_set-TOTAL_FORMS"]');
+    const template      = document.getElementById('empty-form-template').innerHTML;
+    const excelInput    = document.getElementById('excel-upload');
+    const previewSection = document.getElementById('preview-section');
+    const previewBody   = document.getElementById('preview-body');
+    const previewSummary = document.getElementById('preview-summary');
+    const fileDisplay   = document.getElementById('file-name-display');
+
+    // ===== THÊM DÒNG THỦ CÔNG =====
+    function addFormRow() {
+        const formCount = parseInt(totalForms.value);
+        const newRowHtml = template.replace(/__prefix__/g, formCount);
+        const temp = document.createElement('tbody');
+        temp.innerHTML = newRowHtml;
+        const newRow = temp.firstElementChild;
+        container.appendChild(newRow);
+        totalForms.value = formCount + 1;
+        // Khởi tạo Select2 cho dòng vừa thêm
+        if (typeof initSelect2 === 'function') initSelect2(newRow);
+    }
+    addButton.addEventListener('click', function(e) { e.preventDefault(); addFormRow(); });
+
+    // ===== XỬ LÝ EXCEL UPLOAD =====
+    excelInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        fileDisplay.textContent = file.name;
+        showToast('Đang xử lý file Excel, vui lòng chờ...', 'success');
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch("{% url 'parse_stockin_excel' %}", { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                renderPreview(data.data);
+                previewSummary.textContent = `Đọc thành công ${data.total} dòng dữ liệu. Kiểm tra và xác nhận trước khi import.`;
+                previewSection.style.display = 'block';
+                previewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                showToast('Lỗi Import:\n' + data.errors.join('\n'), 'error');
+                previewSection.style.display = 'none';
+            }
+            excelInput.value = '';
+        })
+        .catch(err => {
+            console.error('Fetch error:', err);
+            showToast('Đã xảy ra lỗi hệ thống khi đọc file Excel.', 'error');
+            excelInput.value = '';
         });
     });
+
+    // ===== RENDER BẢNG PREVIEW =====
+    function renderPreview(rows) {
+        previewBody.innerHTML = '';
+        rows.forEach((item, idx) => {
+            const tr = document.createElement('tr');
+            tr.className = 'preview-row';
+            tr.style.borderBottom = '1px solid var(--gray-100)';
+            tr.dataset.idx = idx;
+            tr.innerHTML = `
+                <td style="padding:0.6rem 1rem; color:var(--gray-400); font-weight:600;">${idx + 1}</td>
+                <td style="padding:0.6rem 0.5rem;"><input class="preview-input" data-field="masp" value="${escHtml(item.masp)}" required></td>
+                <td style="padding:0.6rem 0.5rem;"><input class="preview-input" data-field="ten_sp" value="${escHtml(item.ten_sp)}" readonly style="background:#f8fafc; color:var(--gray-500);"></td>
+                <td style="padding:0.6rem 0.5rem;"><input class="preview-input" data-field="makho" value="${escHtml(item.makho)}" required></td>
+                <td style="padding:0.6rem 0.5rem;"><input class="preview-input" data-field="ten_kho" value="${escHtml(item.ten_kho)}" readonly style="background:#f8fafc; color:var(--gray-500);"></td>
+                <td style="padding:0.6rem 0.5rem;"><input class="preview-input sl-input" data-field="soluong" type="number" min="1" value="${item.soluong}" required></td>
+                <td style="padding:0.6rem 0.5rem;"><input class="preview-input" data-field="ghichu" value="${escHtml(item.ghichu)}"></td>
+                <td style="padding:0.6rem 1rem; text-align:center;">
+                    <button type="button" class="btn-del-row" title="Xóa dòng này" onclick="deletePreviewRow(this)">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </td>
+            `;
+            previewBody.appendChild(tr);
+        });
+    }
+
+    function escHtml(str) {
+        return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ===== XÓA DÒNG PREVIEW =====
+    window.deletePreviewRow = function(btn) {
+        const tr = btn.closest('tr');
+        tr.remove();
+        // Cập nhật lại số thứ tự
+        previewBody.querySelectorAll('tr').forEach((row, i) => {
+            row.querySelector('td:first-child').textContent = i + 1;
+        });
+        const remaining = previewBody.querySelectorAll('tr').length;
+        if (remaining === 0) {
+            previewSection.style.display = 'none';
+            showToast('Đã xóa hết dữ liệu preview.', 'error');
+        } else {
+            previewSummary.textContent = `${remaining} dòng dữ liệu. Kiểm tra và xác nhận trước khi import.`;
+        }
+    };
+
+    // ===== HỦY PREVIEW =====
+    document.getElementById('btn-cancel-preview').addEventListener('click', function() {
+        previewSection.style.display = 'none';
+        previewBody.innerHTML = '';
+        fileDisplay.textContent = '';
+    });
+
+    // ===== XÁC NHẬN IMPORT → ĐỔ VÀO FORMSET =====
+    document.getElementById('btn-confirm-import').addEventListener('click', function() {
+        const rows = previewBody.querySelectorAll('tr');
+        if (rows.length === 0) {
+            showToast('Không có dữ liệu để import.', 'error');
+            return;
+        }
+
+        // Validate: tất cả ô required phải có giá trị
+        let hasEmpty = false;
+        rows.forEach((row, idx) => {
+            row.querySelectorAll('input[required]').forEach(inp => {
+                if (!inp.value.trim()) {
+                    inp.style.borderColor = '#ef4444';
+                    hasEmpty = true;
+                } else {
+                    inp.style.borderColor = '';
+                }
+            });
+        });
+        if (hasEmpty) {
+            showToast('Vui lòng điền đầy đủ thông tin bắt buộc ở tất cả các dòng trước khi import.', 'error');
+            return;
+        }
+
+        // Validate: số lượng > 0
+        let hasInvalidQty = false;
+        rows.forEach(row => {
+            const slInp = row.querySelector('input[data-field="soluong"]');
+            if (parseInt(slInp.value) <= 0) {
+                slInp.style.borderColor = '#ef4444';
+                hasInvalidQty = true;
+            }
+        });
+        if (hasInvalidQty) {
+            showToast('Số lượng phải lớn hơn 0 ở tất cả các dòng.', 'error');
+            return;
+        }
+
+        // Đổ dữ liệu từ preview vào formset
+        rows.forEach(row => {
+            const masp  = row.querySelector('[data-field="masp"]').value.trim();
+            const makho = row.querySelector('[data-field="makho"]').value.trim();
+            const sl    = row.querySelector('[data-field="soluong"]').value.trim();
+
+            // Thêm 1 dòng formset mới
+            const formCount = parseInt(totalForms.value);
+            const newRowHtml = template.replace(/__prefix__/g, formCount);
+            const temp = document.createElement('tbody');
+            temp.innerHTML = newRowHtml;
+            const newRow = temp.firstElementChild;
+            container.appendChild(newRow);
+            totalForms.value = formCount + 1;
+            // Gán giá trị vào select/input của formset
+            const maSpSelect  = newRow.querySelector(`select[name="nhapkhochitiet_set-${formCount}-MaSP"]`);
+            const maKhoSelect = newRow.querySelector(`select[name="nhapkhochitiet_set-${formCount}-MaKho"]`);
+            const slInput     = newRow.querySelector(`input[name="nhapkhochitiet_set-${formCount}-SoLuong"]`);
+
+            if (maSpSelect) {
+                // Tìm option khớp với mã SP (value hoặc text chứa mã)
+                Array.from(maSpSelect.options).forEach(opt => {
+                    if (opt.value === masp || opt.text.includes(masp)) {
+                        maSpSelect.value = opt.value;
+                    }
+                });
+                if (typeof jQuery !== 'undefined') jQuery(maSpSelect).trigger('change');
+            }
+            if (maKhoSelect) {
+                Array.from(maKhoSelect.options).forEach(opt => {
+                    if (opt.value === makho || opt.text.includes(makho)) {
+                        maKhoSelect.value = opt.value;
+                    }
+                });
+                if (typeof jQuery !== 'undefined') jQuery(maKhoSelect).trigger('change');
+            }
+            if (slInput) slInput.value = sl;
+
+            // Khởi tạo Select2 cho dòng vừa thêm từ Excel import
+            if (typeof initSelect2 === 'function') initSelect2(newRow);
+        });
+
+        // Ẩn preview, thông báo
+        previewSection.style.display = 'none';
+        previewBody.innerHTML = '';
+        fileDisplay.textContent = '';
+        showToast(`Đã áp dụng ${rows.length} dòng vào phiếu nhập kho. Kiểm tra lại và bấm "Lưu toàn bộ thông tin" để hoàn tất.`, 'success');
+
+        // Scroll xuống formset
+        document.getElementById('product-table').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
 </script>
 {% endblock %}

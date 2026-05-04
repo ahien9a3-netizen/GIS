@@ -70,9 +70,14 @@
             <h1>{{ page_title }}</h1>
             <p>Quản lý các yêu cầu nhập hàng vào kho</p>
         </div>
-        <a href="{% url 'stock_in_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
-            <i class="fa-solid fa-file-circle-plus"></i> Tạo Yêu cầu mới
-        </a>
+        <div style="display: flex; gap: 1rem;">
+            <a href="{% url 'stock_in_export_excel' %}" class="leaflet-analysis-btn" style="text-decoration: none; background: #10b981;">
+                <i class="fa-solid fa-file-excel"></i> Xuất Excel
+            </a>
+            <a href="{% url 'stock_in_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
+                <i class="fa-solid fa-file-circle-plus"></i> Tạo Yêu cầu mới
+            </a>
+        </div>
     </div>
 </div>
 

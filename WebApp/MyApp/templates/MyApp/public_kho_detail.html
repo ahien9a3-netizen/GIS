@@ -236,8 +236,9 @@
     <script>
         AOS.init({ once: true });
 
-        var lat = {{ wh.geom.y|default:10.7769 }};
-        var lon = {{ wh.geom.x|default:106.7009 }};
+        {% load l10n %}
+        var lat = {{ wh.geom.y|default:10.7769|unlocalize }};
+        var lon = {{ wh.geom.x|default:106.7009|unlocalize }};
         var map = L.map('store-map', { scrollWheelZoom: false }).setView([lat, lon], 15);
         L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png').addTo(map);
         L.marker([lat, lon]).addTo(map).bindPopup("<b>{{ wh.Ten }}</b><br>{{ wh.DiaChi }}").openPopup();

@@ -1,0 +1,448 @@
+{% extends 'MyApp/public_base.html' %}
+{% load static %}
+
+{% block title %}Cài đặt tài khoản - SMART MART{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --settings-bg: #f0f4f8;
+        --card-radius: 24px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Override body if needed */
+    body { background-color: var(--settings-bg); }
+
+    /* Premium Hero Section */
+    .settings-hero {
+        position: relative;
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        padding: 80px 0 140px;
+        color: white;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .settings-hero::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -10%;
+        width: 40%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.05);
+        transform: rotate(30deg);
+        pointer-events: none;
+    }
+
+    .settings-hero h1 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 15px;
+        letter-spacing: -1px;
+    }
+
+    .settings-hero p {
+        font-size: 1.15rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Main Container Layout */
+    .settings-wrapper {
+        max-width: 1100px;
+        margin: -80px auto 100px;
+        padding: 0 20px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .settings-grid {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+
+    /* Enhanced Sidebar */
+    .settings-sidebar {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: var(--card-radius);
+        padding: 35px 25px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        border: 1px solid white;
+        position: sticky;
+        top: 100px;
+    }
+
+    .user-profile-preview {
+        text-align: center;
+        margin-bottom: 35px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .sidebar-avatar {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0 auto 15px;
+        box-shadow: 0 10px 20px rgba(29, 78, 216, 0.2);
+        border: 4px solid white;
+    }
+
+    .sidebar-user-name {
+        display: block;
+        font-weight: 800;
+        color: var(--dark);
+        font-size: 1.2rem;
+        margin-bottom: 4px;
+    }
+
+    .sidebar-user-email {
+        font-size: 0.85rem;
+        color: #94a3b8;
+    }
+
+    .sidebar-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 16px 20px;
+        color: #64748b;
+        text-decoration: none;
+        border-radius: 16px;
+        font-weight: 700;
+        transition: var(--transition);
+        margin-bottom: 10px;
+    }
+
+    .sidebar-link i {
+        font-size: 1.2rem;
+        width: 24px;
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .sidebar-link:hover {
+        background: #f8fafc;
+        color: var(--primary);
+        transform: translateX(5px);
+    }
+
+    .sidebar-link.active {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 10px 20px rgba(29, 78, 216, 0.2);
+    }
+
+    .sidebar-link.active i { color: white; }
+
+    /* Content Area */
+    .settings-content-card {
+        background: white;
+        border-radius: var(--card-radius);
+        padding: 50px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        border: 1px solid white;
+    }
+
+    .content-header {
+        margin-bottom: 40px;
+        border-bottom: 2px solid #f8fafc;
+        padding-bottom: 30px;
+    }
+
+    .content-header h2 {
+        font-family: 'Outfit';
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--dark);
+        margin: 0 0 10px 0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .content-header h2 i { color: var(--primary); }
+
+    .content-header p {
+        color: #64748b;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    /* Form Design */
+    .form-section {
+        max-width: 600px;
+    }
+
+    .form-group {
+        margin-bottom: 30px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 12px;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .input-group i {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #cbd5e1;
+        transition: var(--transition);
+        font-size: 1.1rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 16px 20px 16px 55px;
+        background: #f8fafc;
+        border: 2px solid #f1f5f9;
+        border-radius: 16px;
+        font-size: 1rem;
+        color: var(--dark);
+        font-weight: 600;
+        transition: var(--transition);
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .form-control:focus {
+        background: white;
+        border-color: var(--primary-light);
+        box-shadow: 0 15px 30px rgba(59, 130, 246, 0.08);
+    }
+
+    .form-control:focus + i {
+        color: var(--primary);
+    }
+
+    /* Strength Meter Placeholder */
+    .strength-meter {
+        height: 6px;
+        background: #f1f5f9;
+        border-radius: 10px;
+        margin-top: 15px;
+        overflow: hidden;
+        display: flex;
+    }
+    .strength-bar { height: 100%; transition: width 0.5s ease; }
+    .strength-text { font-size: 0.8rem; font-weight: 700; color: #94a3b8; margin-top: 8px; display: block; }
+
+    .btn-update {
+        background: linear-gradient(135deg, var(--primary-light), var(--primary));
+        color: white;
+        border: none;
+        padding: 18px 40px;
+        border-radius: 16px;
+        font-weight: 800;
+        font-family: 'Outfit';
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 15px 30px rgba(29, 78, 216, 0.25);
+    }
+
+    .btn-update:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 20px 40px rgba(29, 78, 216, 0.35);
+    }
+
+    /* Alerts */
+    .custom-alert {
+        padding: 20px 25px;
+        border-radius: 20px;
+        margin-bottom: 40px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-weight: 700;
+        border: 1px solid transparent;
+        animation: slideInUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+    .alert-success { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+    .alert-error { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+
+    @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .breadcrumb-nav {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 25px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    .breadcrumb-nav a {
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: var(--transition);
+    }
+    .breadcrumb-nav a:hover {
+        color: white;
+    }
+    .breadcrumb-nav i {
+        font-size: 0.7rem;
+        color: rgba(255, 255, 255, 0.4);
+    }
+    .breadcrumb-nav span {
+        color: white;
+    }
+
+    @media (max-width: 1024px) {
+        .settings-grid { max-width: 100%; }
+    }
+
+    @media (max-width: 768px) {
+        .settings-hero h1 { font-size: 2.2rem; }
+        .sidebar-menu { grid-template-columns: 1fr; }
+        .settings-content-card { padding: 30px 25px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-hero">
+    <div data-aos="fade-down">
+        <h1>Trung Tâm Cài Đặt</h1>
+        <p>Tùy chỉnh trải nghiệm mua sắm và bảo mật tài khoản của bạn tại Smart Mart.</p>
+    </div>
+</div>
+
+<div class="settings-wrapper">
+    <nav class="breadcrumb-nav" data-aos="fade-right">
+        <a href="{% url 'public_home' %}">Trang chủ</a>
+        <i class="fa-solid fa-chevron-right"></i>
+        <span>Cài đặt</span>
+    </nav>
+    <div class="settings-grid">
+
+        <!-- Main Content Card -->
+        <main class="settings-content-card" data-aos="fade-up" data-aos-delay="100">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="custom-alert alert-{% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                        <i class="fa-solid {% if message.tags == 'error' %}fa-circle-exclamation{% else %}fa-circle-check{% endif %}"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="content-header">
+                <h2><i class="fa-solid fa-lock"></i> Đổi mật khẩu</h2>
+                <p>Chúng tôi khuyên bạn nên sử dụng mật khẩu mạnh mà bạn không sử dụng cho các tài khoản khác để bảo vệ an toàn tối đa.</p>
+            </div>
+
+            <div class="form-section">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="change_password">
+
+                    <div class="form-group">
+                        <label class="form-label">Mật khẩu hiện tại</label>
+                        <div class="input-group">
+                            <input type="password" name="old_password" class="form-control" placeholder="••••••••" required>
+                            <i class="fa-solid fa-shield-keyhole"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Mật khẩu mới</label>
+                        <div class="input-group">
+                            <input type="password" name="new_password" class="form-control" id="pwd_new" placeholder="Nhập ít nhất 6 ký tự" required onkeyup="checkStrength(this.value)">
+                            <i class="fa-solid fa-key-skeleton"></i>
+                        </div>
+                        <div class="strength-meter">
+                            <div id="strength-bar" class="strength-bar" style="width: 0%"></div>
+                        </div>
+                        <span id="strength-text" class="strength-text">Độ mạnh mật khẩu</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Xác nhận mật khẩu mới</label>
+                        <div class="input-group">
+                            <input type="password" name="confirm_password" class="form-control" placeholder="Xác nhận lại mật khẩu mới" required>
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 50px;">
+                        <button type="submit" class="btn-update">
+                            <i class="fa-solid fa-shield-check"></i>
+                            Cập nhật bảo mật
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function checkStrength(pwd) {
+        const bar = document.getElementById('strength-bar');
+        const text = document.getElementById('strength-text');
+        let strength = 0;
+        
+        if (pwd.length >= 6) strength += 25;
+        if (pwd.match(/[a-z]/) && pwd.match(/[A-Z]/)) strength += 25;
+        if (pwd.match(/\d/)) strength += 25;
+        if (pwd.match(/[^a-zA-Z\d]/)) strength += 25;
+        
+        bar.style.width = strength + '%';
+        
+        if (strength <= 25) {
+            bar.style.backgroundColor = '#ef4444';
+            text.innerText = 'Mật khẩu yếu';
+            text.style.color = '#ef4444';
+        } else if (strength <= 50) {
+            bar.style.backgroundColor = '#f59e0b';
+            text.innerText = 'Mật khẩu trung bình';
+            text.style.color = '#f59e0b';
+        } else if (strength <= 75) {
+            bar.style.backgroundColor = '#3b82f6';
+            text.innerText = 'Mật khẩu mạnh';
+            text.style.color = '#3b82f6';
+        } else {
+            bar.style.backgroundColor = '#10b981';
+            text.innerText = 'Mật khẩu cực kỳ an toàn';
+            text.style.color = '#10b981';
+        }
+    }
+</script>
+{% endblock %}

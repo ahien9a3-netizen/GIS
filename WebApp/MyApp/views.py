@@ -10,12 +10,18 @@ from django.core.mail import send_mail
 from django.conf import settings
 import os
 import random
+from django.core.paginator import Paginator
 
 
 from django.db.models import Count, Sum, Q, Avg, Avg as models_Avg
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
-from .models import SanPham, CuaHang, Kho, HangTonKho, NhanVien, YeuCauNhapKho, DanhMuc, DanhGiaCuaHang, PhanBoCungCap, GioHang, ChiTietGioHang, DonHang, ChiTietDonHang, YeuCauTraHang
+from .models import SanPham, CuaHang, Kho, HangTonKho, NhanVien, KhachHang, YeuCauNhapKho, NhapKhoChiTiet, YeuCauXuatKho, XuatKhoChiTiet, DanhMuc, DanhGiaCuaHang, PhanBoCungCap, GioHang, ChiTietGioHang, DonHang, ChiTietDonHang, YeuCauTraHang
+from .forms import (
+    YeuCauNhapKhoForm, YeuCauXuatKhoForm,
+    CuaHangForm, KhoForm, NhanVienForm,
+    SanPhamForm, DanhMucForm, HangTonKhoForm
+)
 
 class MultipleFileInput(ClearableFileInput):
     allow_multiple_selected = True
@@ -42,18 +48,16 @@ class SidebarContextMixin:
         
         # 2. Kiểm tra phân quyền (Role)
         user_role = request.session.get('user_role')
+        
+        # Ngăn chặn hoàn toàn tài khoản Khách hàng truy cập vào các class-based view của trang quản trị
+        if user_role == 'Khách Hàng':
+            return render(request, '403.html', {'message': 'Tài khoản khách hàng không có quyền truy cập trang quản trị!'}, status=403)
+            
         if self.required_roles and user_role not in self.required_roles:
             return render(request, '403.html', {'message': 'Bạn không có quyền truy cập chức năng này!'}, status=403)
             
         return super().dispatch(request, *args, **kwargs)
 
-def _get_cart_context(request):
-    """
-    Hàm bổ trợ lấy số lượng sản phẩm trong giỏ hàng từ session.
-    """
-    cart = request.session.get('cart', {})
-    total_items = sum(cart.values())
-    return {'cart_count': total_items}
 
 
 def role_required(allowed_roles=[]):
@@ -62,6 +66,11 @@ def role_required(allowed_roles=[]):
             if 'user_id' not in request.session:
                 return redirect('login')
             user_role = request.session.get('user_role')
+            
+            # Ngăn chặn hoàn toàn tài khoản Khách hàng truy cập vào các function-based view của trang quản trị
+            if user_role == 'Khách Hàng':
+                return render(request, '403.html', {'message': 'Tài khoản khách hàng không có quyền thực hiện hành động này!'}, status=403)
+                
             if allowed_roles and user_role not in allowed_roles:
                 return render(request, '403.html', {'message': 'Bạn không có quyền thực hiện hành động này!'}, status=403)
             return view_func(request, *args, **kwargs)
@@ -79,15 +88,22 @@ def _get_cart_context(request):
     session_id = request.session.session_key
     if not session_id:
         request.session.create()
+        request.session['init'] = True # Bắt buộc Django gửi Cookie sessionid về Browser
         session_id = request.session.session_key
     
     cart = None
     user_obj = None
     if user_id:
-        # Nếu đã đăng nhập, lấy thông tin NhanVien (bao gồm Email)
-        user_obj = NhanVien.objects.filter(MaNV=user_id).first()
-        if user_obj:
-            cart, _ = GioHang.objects.get_or_create(NguoiDung=user_obj)
+        # Nếu đã đăng nhập, ưu tiên lấy KhachHang, nếu không có thì lấy NhanVien
+        from .models import KhachHang
+        if request.session.get('user_role') == 'Khách Hàng':
+            user_obj = KhachHang.objects.filter(MaKH=user_id).first()
+            if user_obj:
+                cart, _ = GioHang.objects.get_or_create(KhachHang=user_obj)
+        else:
+            user_obj = NhanVien.objects.filter(MaNV=user_id).first()
+            if user_obj:
+                cart, _ = GioHang.objects.get_or_create(NguoiDung=user_obj)
     
     if not cart:
         # Nếu chưa đăng nhập hoặc không tìm thấy user, dùng SessionID
@@ -162,8 +178,13 @@ def public_product_list(request):
             Q(Ten__icontains=search_q) | Q(MieuTa__icontains=search_q)
         )
         
+    products_list = products.order_by('Ten')
+    paginator = Paginator(products_list, 9)  # 9 sản phẩm mỗi trang
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        'products': products.order_by('Ten'),
+        'products': page_obj,  # Thay thế queryset bằng page_obj
         'categories': categories,
         'selected_cat': selected_cat,
         'search_q': search_q,
@@ -185,8 +206,13 @@ def public_store_list(request):
             Q(Ten__icontains=search_q) | Q(DiaChi__icontains=search_q) | Q(Loai__icontains=search_q)
         )
     
+    stores_ordered = stores.order_by('MaCH')
+    paginator = Paginator(stores_ordered, 8)  # 8 cửa hàng mỗi trang
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        'stores_list': stores,
+        'stores_list': page_obj,  # Thay thế queryset bằng page_obj
         'search_q': search_q,
         'page_title': 'Hệ Thống Cửa Hàng - SMART MART',
         'active_nav': 'stores',
@@ -213,9 +239,12 @@ def public_about(request):
 def public_product_detail(request, pk):
     """
     Trang Chi Tiết Sản Phẩm dành cho Khách Hàng (có thể gửi đánh giá)
+    Hỗ trợ: filter theo số sao (?star=1..5) + phân trang (5 review/trang)
     """
     from .models import DanhGia
+    from django.core.paginator import Paginator
     product = get_object_or_404(SanPham, pk=pk)
+    nguoi_dung_name = request.session.get('user_name') or (request.user.username if request.user.is_authenticated else None)
     
     if request.method == 'POST':
         # Đồng bộ field names với HTML form
@@ -224,34 +253,63 @@ def public_product_detail(request, pk):
         binh_luan = request.POST.get('comment')  # form HTML dùng name='comment'
         
         if diem and binh_luan:
-            DanhGia.objects.create(
-                SanPham=product,
-                NguoiDung=nguoi_dung,
-                Diem=int(diem),
-                BinhLuan=binh_luan
-            )
+            # Kiểm tra chống spam: Mỗi người dùng chỉ đánh giá 1 lần cho 1 sản phẩm
+            exists = DanhGia.objects.filter(SanPham=product, NguoiDung=nguoi_dung).exists()
+            if not exists:
+                DanhGia.objects.create(
+                    SanPham=product,
+                    NguoiDung=nguoi_dung,
+                    Diem=int(diem),
+                    BinhLuan=binh_luan
+                )
             return redirect('public_product_detail', pk=pk)
             
-    # List reviews
-    reviews = DanhGia.objects.filter(SanPham=product).order_by('-NgayTao')
+    # ── Tất cả review (để tính thống kê) ──
+    all_reviews = DanhGia.objects.filter(SanPham=product).order_by('-NgayTao')
+    total_reviews = all_reviews.count()
     
-    # Calculate average rating
+    # Tính trung bình sao
     avg_rating = 0
-    if reviews.exists():
-        avg_rating = sum(r.Diem for r in reviews) / reviews.count()
+    if total_reviews > 0:
+        avg_rating = sum(r.Diem for r in all_reviews) / total_reviews
         avg_rating = round(avg_rating, 1)
+
+    # Thống kê phân bổ theo số sao (cho filter bar)
+    rating_dist = {i: all_reviews.filter(Diem=i).count() for i in range(1, 6)}
+    rating_percentages = {i: (count / total_reviews * 100 if total_reviews > 0 else 0) for i, count in rating_dist.items()}
+
+    # ── Filter theo số sao (nếu có) ──
+    star_filter = request.GET.get('star', '')
+    if star_filter and star_filter.isdigit() and 1 <= int(star_filter) <= 5:
+        star_filter = int(star_filter)
+        filtered_reviews = all_reviews.filter(Diem=star_filter)
+    else:
+        star_filter = ''
+        filtered_reviews = all_reviews
+
+    # ── Phân trang: 5 review / trang ──
+    paginator = Paginator(filtered_reviews, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
     context = {
         'product': product,
-        'reviews': reviews,
+        'reviews': page_obj,           # page object (hỗ trợ .has_next, .paginator, ...)
+        'page_obj': page_obj,
         'avg_rating': avg_rating,
+        'total_reviews': total_reviews,
+        'rating_dist': rating_dist,
+        'rating_percentages': rating_percentages,
+        'star_filter': star_filter,    # số sao đang lọc ('' = tất cả)
         'page_title': f'{product.Ten} - SMART MART',
         'customer_name': request.session.get('user_name') or (request.user.username if request.user.is_authenticated else None),
         'user_role': request.session.get('user_role'),
+        'has_reviewed': DanhGia.objects.filter(SanPham=product, NguoiDung=nguoi_dung_name).exists() if nguoi_dung_name else False,
         'active_nav': 'products',
     }
     context.update(_get_cart_context(request))
     return render(request, 'MyApp/public_product_detail.html', context)
+
 
 def public_store_detail(request, pk):
     """
@@ -260,6 +318,7 @@ def public_store_detail(request, pk):
     Cho phép đánh giá và bình luận.
     """
     store = get_object_or_404(CuaHang, MaCH=pk)
+    user_session_name_check = request.session.get('user_name') or (request.user.username if request.user.is_authenticated else None)
     
     if request.method == 'POST':
         user_session_name = request.session.get('user_name')
@@ -271,21 +330,39 @@ def public_store_detail(request, pk):
         comment = request.POST.get('comment', '')
         
         if comment:
-            DanhGiaCuaHang.objects.create(
-                CuaHang=store,
-                NguoiDung=user_name,
-                Diem=int(rating),
-                BinhLuan=comment
-            )
+            # Kiểm tra chống spam: 1 người dùng - 1 cửa hàng - 1 đánh giá
+            exists = DanhGiaCuaHang.objects.filter(CuaHang=store, NguoiDung=user_name).exists()
+            if not exists:
+                DanhGiaCuaHang.objects.create(
+                    CuaHang=store,
+                    NguoiDung=user_name,
+                    Diem=int(rating),
+                    BinhLuan=comment
+                )
             return redirect('public_store_detail', pk=pk)
 
-    reviews = store.danh_gias.all().order_by('-NgayTao')
-    avg_rating = reviews.aggregate(Avg('Diem'))['Diem__avg'] or 0
-    total_reviews = reviews.count()
+    all_reviews = store.danh_gias.all().order_by('-NgayTao')
+    avg_rating = all_reviews.aggregate(Avg('Diem'))['Diem__avg'] or 0
+    total_reviews = all_reviews.count()
     
     # Phân phối đánh giá (Rating distribution)
-    rating_dist = {i: reviews.filter(Diem=i).count() for i in range(1, 6)}
+    rating_dist = {i: all_reviews.filter(Diem=i).count() for i in range(1, 6)}
     rating_percentages = {i: (count / total_reviews * 100 if total_reviews > 0 else 0) for i, count in rating_dist.items()}
+
+    # Filter theo số sao
+    star_filter = request.GET.get('star', '')
+    if star_filter and star_filter.isdigit() and 1 <= int(star_filter) <= 5:
+        star_filter = int(star_filter)
+        filtered_reviews = all_reviews.filter(Diem=star_filter)
+    else:
+        star_filter = ''
+        filtered_reviews = all_reviews
+
+    # Phân trang: 5 review / trang
+    from django.core.paginator import Paginator
+    paginator = Paginator(filtered_reviews, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
 
     # Lấy danh sách sản phẩm tại cửa hàng (thông qua Kho cung cấp)
     warehouse_ids = PhanBoCungCap.objects.filter(cua_hang=store).values_list('kho', flat=True)
@@ -303,16 +380,19 @@ def public_store_detail(request, pk):
     
     context = {
         'store': store,
-        'reviews': reviews,
+        'reviews': page_obj,
+        'page_obj': page_obj,
         'rating_dist': rating_dist,
         'rating_percentages': rating_percentages,
         'avg_rating': round(avg_rating, 1),
         'total_reviews': total_reviews,
+        'star_filter': star_filter,
         'store_products': store_products,
         'is_open': is_open,
         'page_title': f'{store.Ten} - SMART MART',
         'customer_name': request.session.get('user_name') or (request.user.username if request.user.is_authenticated else None),
         'user_role': request.session.get('user_role'),
+        'has_reviewed': store.danh_gias.filter(NguoiDung=user_session_name_check).exists() if user_session_name_check else False,
         'active_nav': 'stores',
     }
     context.update(_get_cart_context(request))
@@ -342,27 +422,20 @@ def public_kho_detail(request, pk):
 
 def public_login(request, next_url=None):
     """
-    Trang đăng nhập dùng chung cho cả Khách hàng và Nhân viên
+    [DEPRECATED] Chuyển hướng về trang login thống nhất.
+    Giữ lại để các link cũ không bị đứt.
     """
-    error = None
-    if request.method == 'POST':
-        login_id = request.POST.get('email') # Có thể là email hoặc sdt
-        password = request.POST.get('password')
-        
-        # Thử đăng nhập bằng Email hoặc SDT trong bảng NhanVien
-        user = NhanVien.objects.filter(Q(Email=login_id) | Q(SDT=login_id), MatKhau=password).first()
-        
-        if user:
-            request.session['user_id'] = user.MaNV
-            request.session['user_name'] = user.Ten
-            request.session['user_role'] = user.Role
-            
-            # Luôn trở về trang người dùng trước theo yêu cầu
-            return redirect('public_home')
-        else:
-            error = "Thông tin đăng nhập không chính xác!"
-            
-    return render(request, 'MyApp/public_login.html', {'error': error, 'page_title': 'Đăng Nhập - SMART MART'})
+    # Nếu đã đăng nhập rồi thì redirect luôn
+    if request.session.get('user_id'):
+        role = request.session.get('user_role', '')
+        if role in ['Admin', 'Nhân Viên', 'Kế Toán']:
+            return redirect('home')
+        return redirect('public_home')
+    # Chưa đăng nhập → về trang login thống nhất
+    next_param = request.GET.get('next', next_url or '')
+    if next_param:
+        return redirect(f"{{% url 'login' %}}?next={next_param}")
+    return redirect('login')
 
 def public_register(request):
     """
@@ -375,108 +448,36 @@ def public_register(request):
         phone = request.POST.get('phone')
         password = request.POST.get('password')
         
-        if NhanVien.objects.filter(Email=email).exists():
+        from .models import KhachHang
+        import re
+        
+        if KhachHang.objects.filter(Email=email).exists():
             error = "Email này đã tồn tại trên hệ thống!"
+        elif phone and not re.match(r'^0\d{9,10}$', phone.strip()):
+            error = "Số điện thoại không hợp lệ (phải bắt đầu bằng 0, 10-11 chữ số)."
         else:
-            # Tạo mã định danh MaNV cho người dùng mới
-            manv = f"USER{random.randint(10000, 99999)}"
-            while NhanVien.objects.filter(MaNV=manv).exists():
-                manv = f"USER{random.randint(10000, 99999)}"
+            # Tạo mã định danh MaKH cho người dùng mới
+            makh = f"KH{random.randint(10000, 99999)}"
+            while KhachHang.objects.filter(MaKH=makh).exists():
+                makh = f"KH{random.randint(10000, 99999)}"
             
-            NhanVien.objects.create(
-                MaNV=manv,
+            KhachHang.objects.create(
+                MaKH=makh,
                 Ten=name,
                 Email=email,
                 SDT=phone,
-                MatKhau=password,
-                Role='User' # Luôn mặc định là User
+                MatKhau=password
             )
             return redirect('public_login')
             
     return render(request, 'MyApp/public_register.html', {'error': error, 'page_title': 'Đăng Ký - SMART MART'})
 
 def public_logout(request):
+    """
+    Đăng xuất thống nhất – dùng chung logic với logout_view.
+    """
     request.session.flush()
-    return redirect('public_home')
-
-def customer_forgot_password_view(request):
-    """
-    Yêu cầu gửi mã OTP để đặt lại mật khẩu
-    """
-    error = None
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        user = NhanVien.objects.filter(Email=email).first()
-        
-        if user:
-            # Tạo OTP 6 số
-            otp = str(random.randint(100000, 999999))
-            print(f"DEBUG: OTP for {email} is {otp}")
-            request.session['reset_otp'] = otp
-            request.session['reset_email'] = email
-            
-            # Gửi Email qua Mailtrap
-            subject = 'Mã xác thực Đặt lại mật khẩu - SMART MART'
-            message = f'Chào {user.Ten},\n\nMã OTP để đặt lại mật khẩu của bạn là: {otp}\n\nMã này sẽ hết hạn sau khi sử dụng.'
-            
-            try:
-                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
-                return redirect('customer_verify_otp')
-            except Exception as e:
-                error = f"Lỗi gửi mail: {str(e)}"
-        else:
-            error = "Email này không tồn tại trong hệ thống!"
-            
-    return render(request, 'MyApp/public_forgot_password.html', {'error': error, 'page_title': 'Quên mật khẩu'})
-
-def customer_verify_otp_view(request):
-    """
-    Trang nhập và kiểm tra mã OTP
-    """
-    if 'reset_otp' not in request.session:
-        return redirect('customer_forgot_password')
-        
-    error = None
-    if request.method == 'POST':
-        otp_input = request.POST.get('otp')
-        if otp_input == request.session.get('reset_otp'):
-            request.session['otp_verified'] = True
-            return redirect('customer_reset_password')
-        else:
-            error = "Mã OTP không chính xác. Vui lòng thử lại."
-            
-    return render(request, 'MyApp/public_verify_otp.html', {'error': error, 'page_title': 'Xác thực OTP'})
-
-def customer_reset_password_view(request):
-    """
-    Trang nhập mật khẩu mới sau khi xác thực OTP thành công
-    """
-    if not request.session.get('otp_verified'):
-        return redirect('customer_forgot_password')
-        
-    error = None
-    if request.method == 'POST':
-        new_password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
-        
-        if new_password == confirm_password:
-            email = request.session.get('reset_email')
-            user = NhanVien.objects.filter(Email=email).first()
-            if user:
-                user.MatKhau = new_password
-                user.save()
-                
-                # Xóa dấu vết session
-                del request.session['reset_otp']
-                del request.session['reset_email']
-                del request.session['otp_verified']
-                
-                messages.success(request, 'Đặt lại mật khẩu thành công! Vui lòng đăng nhập với mật khẩu mới.')
-                return redirect('public_login')
-        else:
-            error = "Mật khẩu xác nhận không khớp!"
-            
-    return render(request, 'MyApp/public_reset_password.html', {'error': error, 'page_title': 'Đặt lại mật khẩu'})
+    return redirect('login')
 
 def view_cart(request):
     """
@@ -489,10 +490,13 @@ def view_cart(request):
         
     cart_context = _get_cart_context(request)
     cart = cart_context['cart_obj']
-    items = cart.items.all().select_related('SanPham') if cart else []
+    items = list(cart.items.all().select_related('SanPham')) if cart else []
     
-    total_price = sum(item.SanPham.Gia * item.SoLuong for item in items)
-    
+    total_price = 0
+    for item in items:
+        item.total_price = item.SanPham.Gia * item.SoLuong
+        total_price += item.total_price
+        
     context = {
         'items': items,
         'total_price': total_price,
@@ -583,7 +587,14 @@ def public_checkout(request):
     
     # Nếu đã đăng nhập, lấy thông tin mặc định
     user_id = request.session.get('user_id')
-    user = NhanVien.objects.filter(MaNV=user_id).first() if user_id else None
+    user_role = request.session.get('user_role')
+    user = None
+    if user_id:
+        from .models import KhachHang
+        if user_role == 'Khách Hàng':
+            user = KhachHang.objects.filter(MaKH=user_id).first()
+        else:
+            user = NhanVien.objects.filter(MaNV=user_id).first()
     
     context = {
         'items': items,
@@ -613,9 +624,14 @@ def create_order(request):
     diachi = data.get('address')
     ghichu = data.get('note', '')
     pt_thanhtoan = data.get('payment_method', 'COD')
+    lat = data.get('lat')
+    lng = data.get('lng')
     
     if not all([ten, sdt, diachi]):
         return JsonResponse({'success': False, 'message': 'Vui lòng nhập đầy đủ thông tin nhận hàng.'})
+        
+    if not lat or not lng:
+        return JsonResponse({'success': False, 'message': 'Hệ thống cần tọa độ để tìm Kho hàng gần nhất.'})
         
     cart_data = _get_cart_context(request)
     cart = cart_data['cart_obj']
@@ -624,6 +640,31 @@ def create_order(request):
     if items.count() == 0:
         return JsonResponse({'success': False, 'message': 'Giỏ hàng đang trống.'})
         
+    # --- LOGIC GIS TÌM KHO VÀ TRỪ TỒN KHO ---
+    from django.contrib.gis.geos import Point
+    from django.contrib.gis.db.models.functions import Distance
+    from .models import Kho, HangTonKho, KhachHang, NhanVien, DonHang, ChiTietDonHang
+    import random
+    from django.db import transaction
+    
+    user_location = Point(float(lng), float(lat), srid=4326)
+    
+    # Tìm các kho có đủ số lượng cho TẤT CẢ sản phẩm trong giỏ
+    available_khos = Kho.objects.all()
+    for item in items:
+        # Lọc ra những kho có đủ hàng cho item này
+        khos_with_item = HangTonKho.objects.filter(
+            MaSP=item.SanPham,
+            SoLuong__gte=item.SoLuong
+        ).values_list('MaKho', flat=True)
+        available_khos = available_khos.filter(MaKho__in=khos_with_item)
+        
+    if not available_khos.exists():
+        return JsonResponse({'success': False, 'message': 'Không có Cửa hàng/Kho nào đủ hàng cho tất cả sản phẩm trong giỏ. Vui lòng giảm số lượng!'})
+        
+    # Lấy Kho gần nhất
+    nearest_kho = available_khos.annotate(distance=Distance('geom', user_location)).order_by('distance').first()
+    
     # Tính tổng tiền
     total = sum(i.SanPham.Gia * i.SoLuong for i in items)
     
@@ -633,24 +674,36 @@ def create_order(request):
         madh = f"DH{random.randint(100000, 999999)}"
         
     user_id = request.session.get('user_id')
-    user = NhanVien.objects.filter(MaNV=user_id).first() if user_id else None
+    user_role = request.session.get('user_role')
     
-    from django.db import transaction
+    khachhang = None
+    nhanvien = None
+    if user_id:
+        if user_role == 'Khách Hàng':
+            khachhang = KhachHang.objects.filter(MaKH=user_id).first()
+        else:
+            nhanvien = NhanVien.objects.filter(MaNV=user_id).first()
+    
+    # Ghi chú thêm Kho xuất hàng
+    ghichu_final = f"{ghichu} | Xuất từ: {nearest_kho.Ten}" if ghichu else f"Xuất từ: {nearest_kho.Ten}"
+    
     try:
         with transaction.atomic():
             # 1. Tạo đơn hàng
             order = DonHang.objects.create(
                 MaDH=madh,
-                NguoiDung=user,
+                NguoiDung=nhanvien,
+                KhachHang=khachhang,
                 TenNguoiNhan=ten,
                 SDT_Nhan=sdt,
                 DiaChi_Nhan=diachi,
                 TongTien=total,
-                GhiChu=ghichu,
-                TrangThai='Mới'
+                GhiChu=ghichu_final,
+                PhuongThucThanhToan=pt_thanhtoan,
+                TrangThai='Đang xử lý'
             )
             
-            # 2. Tạo chi tiết đơn hàng
+            # 2. Tạo chi tiết đơn hàng & Trừ Tồn Kho
             for item in items:
                 ChiTietDonHang.objects.create(
                     DonHang=order,
@@ -658,6 +711,11 @@ def create_order(request):
                     SoLuong=item.SoLuong,
                     GiaBan=item.SanPham.Gia
                 )
+                
+                # Trừ tồn kho
+                htk = HangTonKho.objects.get(MaKho=nearest_kho, MaSP=item.SanPham)
+                htk.SoLuong -= item.SoLuong
+                htk.save()
                 
             # 3. Xóa giỏ hàng
             items.delete()
@@ -677,7 +735,7 @@ def home(request):
     if 'user_id' not in request.session:
         return redirect('login')
         
-    if request.session.get('user_role') == 'User':
+    if request.session.get('user_role') not in ['Admin', 'Nhân Viên', 'Kế Toán']:
         return render(request, '403.html', {'message': 'Tài khoản khách hàng không có quyền truy cập trang quản trị!'}, status=403)
 
     total_stores = CuaHang.objects.count()
@@ -740,6 +798,8 @@ def report_view(request):
     """
     if 'user_id' not in request.session:
         return redirect('login')
+    
+    # --- CÁC THỐNG KÊ CŨ ---
     # 1. Thống kê sản phẩm theo danh mục
     category_stats = DanhMuc.objects.annotate(total_products=Count('sanpham')).values('Ten', 'total_products')
     
@@ -751,6 +811,56 @@ def report_view(request):
     
     # 4. Thống kê nhân viên theo vai trò
     employee_roles = NhanVien.objects.values('Role').annotate(count=Count('MaNV'))
+
+    # --- THỐNG KÊ ĐỊA LÝ MỚI ---
+    # 5. Tổng số cửa hàng và kho
+    total_stores = CuaHang.objects.count()
+    total_warehouses = Kho.objects.count()
+    
+    # 6. Thống kê cửa hàng theo loại
+    stores_by_type = CuaHang.objects.values('Loai').annotate(count=Count('MaCH'))
+    
+    # 7. Thống kê kho theo loại
+    warehouses_by_type = Kho.objects.values('Loai').annotate(count=Count('MaKho'))
+    
+    # 8. Tìm các cặp tọa độ gần nhau (để cảnh báo) - kiểm tra 2m
+    min_dist = 0.00002
+    nearby_pairs = []
+    
+    # Kiểm tra giữa các cửa hàng
+    stores = list(CuaHang.objects.all())
+    for i in range(len(stores)):
+        for j in range(i+1, len(stores)):
+            if stores[i].geom and stores[j].geom and stores[i].geom.distance(stores[j].geom) < min_dist:
+                nearby_pairs.append({
+                    'type': 'Cửa hàng - Cửa hàng',
+                    'name1': stores[i].Ten,
+                    'name2': stores[j].Ten,
+                    'distance': round(stores[i].geom.distance(stores[j].geom) * 111000, 2)
+                })
+    
+    # Kiểm tra giữa các kho
+    warehouses = list(Kho.objects.all())
+    for i in range(len(warehouses)):
+        for j in range(i+1, len(warehouses)):
+            if warehouses[i].geom and warehouses[j].geom and warehouses[i].geom.distance(warehouses[j].geom) < min_dist:
+                nearby_pairs.append({
+                    'type': 'Kho - Kho',
+                    'name1': warehouses[i].Ten,
+                    'name2': warehouses[j].Ten,
+                    'distance': round(warehouses[i].geom.distance(warehouses[j].geom) * 111000, 2)
+                })
+    
+    # Kiểm tra giữa cửa hàng và kho
+    for store in stores:
+        for wh in warehouses:
+            if store.geom and wh.geom and store.geom.distance(wh.geom) < min_dist:
+                nearby_pairs.append({
+                    'type': 'Cửa hàng - Kho',
+                    'name1': store.Ten,
+                    'name2': wh.Ten,
+                    'distance': round(store.geom.distance(wh.geom) * 111000, 2)
+                })
 
     import json
     
@@ -771,6 +881,14 @@ def report_view(request):
         'labels': [item['Role'] for item in employee_roles],
         'values': [int(item['count']) for item in employee_roles]
     }
+    stores_type_json = {
+        'labels': [item['Loai'] for item in stores_by_type],
+        'values': [int(item['count']) for item in stores_by_type]
+    }
+    warehouses_type_json = {
+        'labels': [item['Loai'] for item in warehouses_by_type],
+        'values': [int(item['count']) for item in warehouses_by_type]
+    }
 
     context = {
         'sidebar_active': 'reports',
@@ -779,47 +897,101 @@ def report_view(request):
         'inv_json': json.dumps(inv_json),
         'st_json': json.dumps(st_json),
         'em_json': json.dumps(em_json),
+        'stores_type_json': json.dumps(stores_type_json),
+        'warehouses_type_json': json.dumps(warehouses_type_json),
         'user_name': request.session.get('user_name', 'Khách'),
-        'user_role': request.session.get('user_role', '')
+        'user_role': request.session.get('user_role', ''),
+        'total_stores': total_stores,
+        'total_warehouses': total_warehouses,
+        'stores_by_type': stores_by_type,
+        'warehouses_by_type': warehouses_by_type,
+        'nearby_pairs': nearby_pairs
     }
     return render(request, 'MyApp/reports.html', context)
 
 def login_view(request):
     """
-    Xử lý đăng nhập thủ công từ bảng NhanVien sử dụng SDT
+    LOGIN THỐNG NHẤT – Dùng chung cho Nhân viên & Khách hàng.
+    Nhận: SDT hoặc Email + Mật khẩu.
+    Redirect: Admin/NV/KeToan → /dashboard/ | Khách Hàng → trang chủ storefront.
     """
+    # Nếu đã đăng nhập rồi thì redirect luôn
+    if request.session.get('user_id'):
+        role = request.session.get('user_role', '')
+        if role in ['Admin', 'Nhân Viên', 'Kế Toán']:
+            return redirect('home')
+        return redirect('public_home')
+
     error = None
     if request.method == 'POST':
-        sdt = request.POST.get('sdt')
-        matkhau = request.POST.get('matkhau')
-        
-        
-        nv_list = list(NhanVien.objects.raw(
-            "SELECT * FROM nhanvien WHERE sdt = %s AND matkhau = %s", 
-            [sdt, matkhau]
-        ))
-        
-        if nv_list:
-            nv = nv_list[0]
-            
-            request.session['user_id'] = nv.MaNV
+        login_id = request.POST.get('login_id', '').strip()   # SDT hoặc Email
+        matkhau  = request.POST.get('matkhau', '').strip()
+        next_url = request.POST.get('next', '')
+
+        from .models import KhachHang, GioHang
+
+        # ── 1. Kiểm tra Nhân viên (SDT hoặc Email) ──────────────────
+        nv = NhanVien.objects.filter(
+            Q(SDT=login_id) | Q(Email__iexact=login_id)
+        ).first()
+
+        if nv and nv.MatKhau == matkhau:
+            request.session['user_id']   = nv.MaNV
             request.session['user_name'] = nv.Ten
             request.session['user_role'] = nv.Role
-            return redirect('home')
-        else:
-            error = "Số điện thoại hoặc mật khẩu không đúng!"
-            
-    return render(request, 'MyApp/login.html', {'error': error})
+            # Nhân viên/Admin → trang quản trị
+            if nv.Role in ['Admin', 'Nhân Viên', 'Kế Toán']:
+                return redirect(next_url or 'home')
+            # NV có role khác (ví dụ Khách Hàng được lưu trong NhanVien) → storefront
+            return redirect(next_url or 'public_home')
+
+        # ── 2. Kiểm tra Khách hàng (Email hoặc SDT) ─────────────────
+        kh = KhachHang.objects.filter(
+            Q(Email__iexact=login_id) | Q(SDT=login_id)
+        ).first()
+
+        if kh and kh.MatKhau == matkhau:
+            request.session['user_id']   = kh.MaKH
+            request.session['user_name'] = kh.Ten
+            request.session['user_role'] = 'Khách Hàng'
+
+            # Gộp giỏ hàng session → tài khoản
+            session_key = request.session.session_key
+            if session_key:
+                session_cart = GioHang.objects.filter(SessionID=session_key).first()
+                user_cart, _ = GioHang.objects.get_or_create(KhachHang=kh)
+                if session_cart and session_cart != user_cart:
+                    for item in session_cart.items.all():
+                        existing = user_cart.items.filter(SanPham=item.SanPham).first()
+                        if existing:
+                            existing.SoLuong += item.SoLuong
+                            existing.save()
+                        else:
+                            item.GioHang = user_cart
+                            item.save()
+                    session_cart.delete()
+
+            return redirect(next_url or 'public_home')
+
+        # ── 3. Sai thông tin ────────────────────────────────────────
+        error = "Số điện thoại / Email hoặc mật khẩu không chính xác!"
+
+    next_url = request.GET.get('next', '')
+    return render(request, 'MyApp/login.html', {
+        'error': error,
+        'next': next_url,
+        'page_title': 'Đăng nhập – SMART MART',
+    })
 
 def logout_view(request):
     """
-    Đăng xuất - Xóa session
+    ĐĂNG XUẤT THỐNG NHẤT – Xóa session, redirect về trang login chung.
     """
-    if 'user_id' in request.session:
-        del request.session['user_id']
-    if 'user_name' in request.session:
-        del request.session['user_name']
+    request.session.flush()
+    messages.success(request, "Đã đăng xuất thành công!")
     return redirect('login')
+
+
 
 def forgot_password_view(request):
     """
@@ -831,32 +1003,52 @@ def forgot_password_view(request):
         sdt = request.POST.get('sdt')
         email_input = request.POST.get('email')
         try:
-            nv = NhanVien.objects.get(SDT=sdt)
+            user = None
+            user_type = None
             
-            # Kiểm tra Email nhập vào có khớp với Database không
-            db_email = getattr(nv, 'Email', None)
-            if not db_email or db_email.lower() != email_input.lower():
-                error = "Email không khớp với thông tin đã đăng ký cho số điện thoại này."
+            # 1. Tìm trong KhachHang trước
+            from .models import KhachHang
+            kh = KhachHang.objects.filter(SDT=sdt).first()
+            if kh:
+                user = kh
+                user_type = 'khachhang'
             else:
-                # Tạo mã OTP 6 số ngẫu nhiên
-                otp = str(random.randint(100000, 999999))
-                
-                # Lưu OTP và MaNV vào Session
-                request.session['reset_otp'] = otp
-                request.session['reset_manv'] = nv.MaNV
-                request.session.set_expiry(600)
-                
-                # Gửi mã OTP
-                send_mail(
-                    'Mã xác thực đặt lại mật khẩu - SMART MART',
-                    f'Chào {nv.Ten},\n\nMã xác thực (OTP) của bạn là: {otp}\n\nMã này có hiệu lực trong 10 phút.',
-                    getattr(settings, 'DEFAULT_FROM_EMAIL', 'support@smartmart.com'),
-                    [db_email],
-                    fail_silently=False,
-                )
-                return redirect('verify_otp')
-        except NhanVien.DoesNotExist:
-            error = "Số điện thoại không tồn tại trong hệ thống."
+                # 2. Tìm trong NhanVien
+                nv = NhanVien.objects.filter(SDT=sdt).first()
+                if nv:
+                    user = nv
+                    user_type = 'nhanvien'
+                    
+            if not user:
+                error = "Số điện thoại không tồn tại trong hệ thống."
+            else:
+                # Kiểm tra Email nhập vào có khớp với Database không
+                db_email = getattr(user, 'Email', None)
+                if not db_email or db_email.lower() != email_input.lower():
+                    error = "Email không khớp với thông tin đã đăng ký cho số điện thoại này."
+                else:
+                    # Tạo mã OTP 6 số ngẫu nhiên
+                    otp = str(random.randint(100000, 999999))
+                    
+                    # Lưu OTP và user ID vào Session
+                    request.session['reset_otp'] = otp
+                    request.session['reset_user_type'] = user_type
+                    if user_type == 'nhanvien':
+                        request.session['reset_user_id'] = user.MaNV
+                    else:
+                        request.session['reset_user_id'] = user.MaKH
+                        
+                    request.session.set_expiry(600)
+                    
+                    # Gửi mã OTP
+                    send_mail(
+                        'Mã xác thực đặt lại mật khẩu - SMART MART',
+                        f'Chào {user.Ten},\n\nMã xác thực (OTP) của bạn là: {otp}\n\nMã này có hiệu lực trong 10 phút.',
+                        getattr(settings, 'DEFAULT_FROM_EMAIL', 'support@smartmart.com'),
+                        [db_email],
+                        fail_silently=False,
+                    )
+                    return redirect('verify_otp')
         except Exception as e:
             error = f"Có lỗi xảy ra: {str(e)}"
             
@@ -894,8 +1086,18 @@ def reset_password_view(request):
     if not request.session.get('otp_verified'):
         return redirect('forgot_password')
         
-    ma_nv = request.session.get('reset_manv')
-    nv = get_object_or_404(NhanVien, MaNV=ma_nv)
+    user_type = request.session.get('reset_user_type')
+    user_id = request.session.get('reset_user_id')
+    user = None
+    
+    if user_type == 'nhanvien':
+        user = get_object_or_404(NhanVien, MaNV=user_id)
+    elif user_type == 'khachhang':
+        from .models import KhachHang
+        user = get_object_or_404(KhachHang, MaKH=user_id)
+    else:
+        return redirect('forgot_password')
+        
     error = None
     
     if request.method == 'POST':
@@ -906,13 +1108,14 @@ def reset_password_view(request):
             error = "Mật khẩu xác nhận không khớp."
         else:
             # Cập nhật thành công
-            nv.MatKhau = new_pass
-            nv.save()
+            user.MatKhau = new_pass
+            user.save()
             # Xóa session reset
-            del request.session['reset_otp']
-            del request.session['reset_manv']
-            del request.session['otp_verified']
-            return render(request, 'MyApp/reset_password.html', {'success': 'Mật khẩu đã được đổi thành công.'})
+            if 'reset_otp' in request.session: del request.session['reset_otp']
+            if 'reset_user_id' in request.session: del request.session['reset_user_id']
+            if 'reset_user_type' in request.session: del request.session['reset_user_type']
+            if 'otp_verified' in request.session: del request.session['otp_verified']
+            return render(request, 'MyApp/reset_password.html', {'success': 'Mật khẩu đã được đổi thành công.', 'is_customer': user_type == 'khachhang'})
 
     return render(request, 'MyApp/reset_password.html', {'error': error})
 
@@ -949,18 +1152,11 @@ def settings_view(request):
             old_pass = request.POST.get('old_password')
             new_pass = request.POST.get('new_password')
             confirm_pass = request.POST.get('confirm_password')
-            
-            
-            from django.db import connection
-            is_correct = False
-            with connection.cursor() as cursor:
-                cursor.execute("SELECT (matkhau = %s) FROM nhanvien WHERE manv = %s", [old_pass, user.MaNV])
-                row = cursor.fetchone()
-                if row:
-                    is_correct = row[0]
 
-            if not is_correct:
+            if user.MatKhau != old_pass:
                 error_msg = "Mật khẩu hiện tại không chính xác!"
+            elif len(new_pass) < 6:
+                error_msg = "Mật khẩu mới phải có ít nhất 6 ký tự!"
             elif new_pass != confirm_pass:
                 error_msg = "Mật khẩu mới không khớp nhau!"
             else:
@@ -986,7 +1182,7 @@ def gis_map(request):
     if 'user_id' not in request.session:
         return redirect('login')
         
-    if request.session.get('user_role') == 'User':
+    if request.session.get('user_role') == 'Khách Hàng':
         return redirect('public_gis_map')
 
     context = {
@@ -1061,7 +1257,7 @@ class CuaHangListView(SidebarContextMixin, ListView):
 
 class CuaHangCreateView(SidebarContextMixin, CreateView):
     model = CuaHang
-    fields = ['MaCH', 'Ten', 'Loai', 'DiaChi', 'SDT', 'TrangThai', 'geom', 'MoTa']
+    form_class = CuaHangForm
     template_name = 'MyApp/store_form.html'
     success_url = reverse_lazy('store_list')
     sidebar_active = 'stores'
@@ -1098,7 +1294,7 @@ class CuaHangCreateView(SidebarContextMixin, CreateView):
 
 class CuaHangUpdateView(SidebarContextMixin, UpdateView):
     model = CuaHang
-    fields = ['Ten', 'Loai', 'DiaChi', 'SDT', 'TrangThai', 'geom', 'MoTa']
+    form_class = CuaHangForm
     template_name = 'MyApp/store_form.html'
     success_url = reverse_lazy('store_list')
     sidebar_active = 'stores'
@@ -1155,6 +1351,7 @@ def store_image_check_view(request, pk):
 class CuaHangDeleteView(SidebarContextMixin, DeleteView):
     model = CuaHang
     success_url = reverse_lazy('store_list')
+    required_roles = ['Admin']
 
 #  SẢN PHẨM 
 class SanPhamListView(SidebarContextMixin, ListView):
@@ -1192,14 +1389,14 @@ class SanPhamDetailView(SidebarContextMixin, DetailView):
 
 class SanPhamCreateView(SidebarContextMixin, CreateView):
     model = SanPham
-    fields = ['MaSP', 'Ten', 'Image', 'DanhMuc', 'MieuTa', 'TrangThai']
+    form_class = SanPhamForm  # Dùng form có validation đầy đủ
     template_name = 'MyApp/product_form.html'
     success_url = reverse_lazy('product_list')
     sidebar_active = 'products'
 
 class SanPhamUpdateView(SidebarContextMixin, UpdateView):
     model = SanPham
-    fields = ['Ten', 'Image', 'DanhMuc', 'MieuTa', 'TrangThai']
+    form_class = SanPhamForm  # MaSP sẽ bị disabled khi edit
     template_name = 'MyApp/product_form.html'
     success_url = reverse_lazy('product_list')
     sidebar_active = 'products'
@@ -1207,6 +1404,7 @@ class SanPhamUpdateView(SidebarContextMixin, UpdateView):
 class SanPhamDeleteView(SidebarContextMixin, DeleteView):
     model = SanPham
     success_url = reverse_lazy('product_list')
+    required_roles = ['Admin']
 
 #  DANH MỤC 
 class DanhMucListView(SidebarContextMixin, ListView):
@@ -1228,7 +1426,7 @@ class DanhMucListView(SidebarContextMixin, ListView):
 
 class DanhMucCreateView(SidebarContextMixin, CreateView):
     model = DanhMuc
-    fields = ['MaDM', 'Ten']
+    form_class = DanhMucForm  # Dùng form có validation đầy đủ
     template_name = 'MyApp/danhmuc_form.html'
     success_url = reverse_lazy('danhmuc_list')
     sidebar_active = 'categories'
@@ -1236,7 +1434,7 @@ class DanhMucCreateView(SidebarContextMixin, CreateView):
 
 class DanhMucUpdateView(SidebarContextMixin, UpdateView):
     model = DanhMuc
-    fields = ['Ten']
+    form_class = DanhMucForm  # MaDM sẽ bị disabled khi edit
     template_name = 'MyApp/danhmuc_form.html'
     success_url = reverse_lazy('danhmuc_list')
     sidebar_active = 'categories'
@@ -1245,6 +1443,7 @@ class DanhMucUpdateView(SidebarContextMixin, UpdateView):
 class DanhMucDeleteView(SidebarContextMixin, DeleteView):
     model = DanhMuc
     success_url = reverse_lazy('danhmuc_list')
+    required_roles = ['Admin']
 
 #  TỒN KHO
 class HangTonKhoListView(SidebarContextMixin, ListView):
@@ -1275,7 +1474,7 @@ class HangTonKhoListView(SidebarContextMixin, ListView):
 
 class HangTonKhoCreateView(SidebarContextMixin, CreateView):
     model = HangTonKho
-    fields = ['MaKho', 'MaSP', 'SoLuong']
+    form_class = HangTonKhoForm  # Dùng form có validation: không trùng, không âm
     template_name = 'MyApp/inventory_form.html'
     success_url = reverse_lazy('inventory_list')
     sidebar_active = 'inventory'
@@ -1283,7 +1482,7 @@ class HangTonKhoCreateView(SidebarContextMixin, CreateView):
 
 class HangTonKhoUpdateView(SidebarContextMixin, UpdateView):
     model = HangTonKho
-    fields = ['SoLuong']
+    form_class = HangTonKhoForm  # Dùng form có validation: SoLuong không âm
     template_name = 'MyApp/inventory_form.html'
     success_url = reverse_lazy('inventory_list')
     sidebar_active = 'inventory'
@@ -1295,6 +1494,7 @@ class HangTonKhoUpdateView(SidebarContextMixin, UpdateView):
 class HangTonKhoDeleteView(SidebarContextMixin, DeleteView):
     model = HangTonKho
     success_url = reverse_lazy('inventory_list')
+    required_roles = ['Admin', 'Kế Toán']
 
     def get_object(self, queryset=None):
         return get_object_or_404(HangTonKho, MaKho=self.kwargs['makho'], MaSP=self.kwargs['masp'])
@@ -1330,7 +1530,7 @@ class KhoListView(SidebarContextMixin, ListView):
 
 class KhoCreateView(SidebarContextMixin, CreateView):
     model = Kho
-    fields = ['MaKho', 'Ten', 'Loai', 'DiaChi', 'geom', 'MoTa']
+    form_class = KhoForm
     template_name = 'MyApp/kho_form.html'
     success_url = reverse_lazy('kho_list')
     sidebar_active = 'warehouses'
@@ -1364,7 +1564,7 @@ class KhoCreateView(SidebarContextMixin, CreateView):
 
 class KhoUpdateView(SidebarContextMixin, UpdateView):
     model = Kho
-    fields = ['Ten', 'Loai', 'DiaChi', 'geom', 'MoTa']
+    form_class = KhoForm
     template_name = 'MyApp/kho_form.html'
     success_url = reverse_lazy('kho_list')
     sidebar_active = 'warehouses'
@@ -1410,6 +1610,7 @@ def kho_detail_view(request, pk):
 class KhoDeleteView(SidebarContextMixin, DeleteView):
     model = Kho
     success_url = reverse_lazy('kho_list')
+    required_roles = ['Admin']
 
 #  NHÂN VIÊN 
 class NhanVienListView(SidebarContextMixin, ListView):
@@ -1441,7 +1642,7 @@ class NhanVienListView(SidebarContextMixin, ListView):
 
 class NhanVienCreateView(SidebarContextMixin, CreateView):
     model = NhanVien
-    fields = ['MaNV', 'Ten', 'SDT', 'Email', 'Role', 'MatKhau']
+    form_class = NhanVienForm
     template_name = 'MyApp/nhanvien_form.html'
     success_url = reverse_lazy('nhanvien_list')
     sidebar_active = 'employees'
@@ -1449,7 +1650,7 @@ class NhanVienCreateView(SidebarContextMixin, CreateView):
 
 class NhanVienUpdateView(SidebarContextMixin, UpdateView):
     model = NhanVien
-    fields = ['Ten', 'SDT', 'Email', 'Role', 'MatKhau']
+    form_class = NhanVienForm
     template_name = 'MyApp/nhanvien_form.html'
     success_url = reverse_lazy('nhanvien_list')
     sidebar_active = 'employees'
@@ -1459,6 +1660,458 @@ class NhanVienDeleteView(SidebarContextMixin, DeleteView):
     model = NhanVien
     success_url = reverse_lazy('nhanvien_list')
     required_roles = ['Admin']
+
+
+# --- Export Excel ---
+def export_nhapkho_excel(request):
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, Border, Side, PatternFill, Alignment
+    from openpyxl.utils import get_column_letter
+    from datetime import datetime
+    from django.http import HttpResponse
+    import time
+
+    # Start time logging
+    start_time = time.time()
+
+    # Get all YeuCauNhapKho and their items
+    nhapkho_list = YeuCauNhapKho.objects.all().order_by('Ngay')
+    
+    if not nhapkho_list.exists():
+        messages.warning(request, "Không có dữ liệu để xuất Excel!")
+        return redirect('stock_in_list')
+    
+    # Create a workbook and worksheet
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Phiếu nhập kho"
+
+    # Setup styles
+    header_font = Font(bold=True, color="FFFFFF", size=12)
+    header_fill = PatternFill(start_color="4F46E5", end_color="4F46E5", fill_type="solid")  # Blue for stock in
+    thin_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    center_alignment = Alignment(horizontal='center', vertical='center')
+    left_alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
+
+    # Write header row
+    headers = [
+        "STT",
+        "Mã phiếu",
+        "Ngày nhập",
+        "Nhà cung cấp",
+        "Danh sách sản phẩm",
+        "Tổng số lượng",
+        "Tổng thành tiền",
+        "Trạng thái"
+    ]
+    
+    for col_idx, header in enumerate(headers, start=1):
+        cell = ws.cell(row=1, column=col_idx, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.border = thin_border
+        cell.alignment = center_alignment
+
+    # Step 1: Group items by MaYC (Mã yêu cầu nhập kho) and log raw count
+    grouped_data = {}
+    raw_row_count = 0
+    
+    for yeucau in nhapkho_list:
+        chitiet_list = NhapKhoChiTiet.objects.filter(MaYC=yeucau.MaYC)
+        items_info = []
+        total_soluong = 0
+        total_thanhtien = 0
+        
+        for chitiet in chitiet_list:
+            raw_row_count +=1
+            sanpham = chitiet.MaSP
+            gia = sanpham.Gia
+            soluong = chitiet.SoLuong
+            thanhtien = soluong * gia
+            total_soluong += soluong
+            total_thanhtien += thanhtien
+            items_info.append({
+                "masp": sanpham.MaSP,
+                "tensp": sanpham.Ten,
+                "soluong": soluong,
+                "gia": gia,
+                "thanhtien": thanhtien
+            })
+        
+        grouped_data[yeucau.MaYC] = {
+            "yeucau": yeucau,
+            "items": items_info,
+            "total_soluong": total_soluong,
+            "total_thanhtien": total_thanhtien
+        }
+
+    # Step 2: Write data to Excel
+    current_row = 2
+    stt = 0
+
+    for mayc, data in grouped_data.items():
+        stt +=1
+        yeucau = data["yeucau"]
+        items = data["items"]
+        total_soluong = data["total_soluong"]
+        total_thanhtien = data["total_thanhtien"]
+        num_items = len(items)
+        
+        # Get NCC (placeholder)
+        ncc = ""
+        
+        # Build products string
+        products_str = ""
+        for idx, item in enumerate(items):
+            products_str += f"{item['tensp']} ({item['masp']})\n"
+            products_str += f"Số lượng: {item['soluong']} - Đơn giá: {item['gia']:,} - Thành tiền: {item['thanhtien']:,}"
+            if idx < num_items - 1:
+                products_str += "\n\n"
+        
+        # Determine number of rows needed
+        merge_end_row = current_row + num_items -1
+        
+        # Write STT
+        cell = ws.cell(row=current_row, column=1, value=stt)
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        if num_items > 1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=1, end_column=1)
+        
+        # Write Mã phiếu
+        cell = ws.cell(row=current_row, column=2, value=mayc)
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=2, end_column=2)
+        
+        # Write Ngày nhập
+        cell = ws.cell(row=current_row, column=3, value=yeucau.Ngay.strftime('%d/%m/%Y'))
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=3, end_column=3)
+        
+        # Write Nhà cung cấp
+        cell = ws.cell(row=current_row, column=4, value=ncc)
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=4, end_column=4)
+        
+        # Write Danh sách sản phẩm
+        cell = ws.cell(row=current_row, column=5, value=products_str)
+        cell.border = thin_border
+        cell.alignment = left_alignment
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=5, end_column=5)
+        
+        # Write Tổng số lượng
+        cell = ws.cell(row=current_row, column=6, value=total_soluong)
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=6, end_column=6)
+        
+        # Write Tổng thành tiền
+        cell = ws.cell(row=current_row, column=7, value=total_thanhtien)
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        cell.number_format = '#,##0'
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=7, end_column=7)
+        
+        # Write Trạng thái
+        cell = ws.cell(row=current_row, column=8, value=yeucau.TrangThai)
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=8, end_column=8)
+        
+        # Set row heights
+        for row in range(current_row, merge_end_row + 1):
+            ws.row_dimensions[row].height = 20
+        
+        current_row = merge_end_row + 1
+
+    # Auto adjust column widths
+    ws.column_dimensions[get_column_letter(1)].width = 8  # STT
+    ws.column_dimensions[get_column_letter(2)].width = 15 # Mã phiếu
+    ws.column_dimensions[get_column_letter(3)].width = 15 # Ngày
+    ws.column_dimensions[get_column_letter(4)].width = 20 # NCC
+    ws.column_dimensions[get_column_letter(5)].width = 60 # Sản phẩm
+    ws.column_dimensions[get_column_letter(6)].width = 18 # Tổng SL
+    ws.column_dimensions[get_column_letter(7)].width = 20 # Tổng tiền
+    ws.column_dimensions[get_column_letter(8)].width = 15 # Trạng thái
+
+    # End time logging
+    end_time = time.time()
+    export_duration = round(end_time - start_time, 2)
+    merged_row_count = len(grouped_data)
+    print(f"[EXPORT NHAP KHO] Raw rows: {raw_row_count}, Merged rows: {merged_row_count}, Duration: {export_duration}s")
+
+    # Create response
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"PhieuNhapKho_{timestamp}.xlsx"
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    wb.save(response)
+    return response
+
+
+# --- Export Stock Out ---
+def export_stockout_excel(request):
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, Border, Side, PatternFill, Alignment
+    from openpyxl.utils import get_column_letter
+    from datetime import datetime
+    from django.http import HttpResponse
+    import time
+
+    # Start time logging
+    start_time = time.time()
+
+    # Get all YeuCauXuatKho and their items
+    stockout_list = YeuCauXuatKho.objects.all().order_by('Ngay')
+    
+    if not stockout_list.exists():
+        messages.warning(request, "Không có dữ liệu để xuất Excel!")
+        return redirect('stock_out_list')
+    
+    # Create a workbook and worksheet
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Phiếu xuất kho"
+
+    # Setup styles
+    header_font = Font(bold=True, color="FFFFFF", size=12)
+    header_fill = PatternFill(start_color="EF4444", end_color="EF4444", fill_type="solid")  # Red for stock out (without #)
+    thin_border = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+    center_alignment = Alignment(horizontal='center', vertical='center')
+    top_alignment = Alignment(horizontal='center', vertical='top')
+    left_alignment = Alignment(horizontal='left', vertical='top', wrap_text=True)
+
+    # Write header row
+    headers = [
+        "STT",
+        "Mã phiếu",
+        "Ngày xuất",
+        "Lý do xuất",
+        "Khách hàng (nếu có)",
+        "Danh sách sản phẩm",
+        "Trạng thái"
+    ]
+    
+    for col_idx, header in enumerate(headers, start=1):
+        cell = ws.cell(row=1, column=col_idx, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.border = thin_border
+        cell.alignment = center_alignment
+
+    # Step 1: Group items by MaPX (Mã yêu cầu xuất kho) and log raw count
+    grouped_data = {}
+    raw_row_count = 0
+    
+    for phieuxuat in stockout_list:
+        chitiet_list = XuatKhoChiTiet.objects.filter(PhieuXuat=phieuxuat.MaPX)
+        items_info = []
+        
+        for chitiet in chitiet_list:
+            raw_row_count +=1
+            sanpham = chitiet.MaSP
+            gia = sanpham.Gia
+            soluong = chitiet.SoLuong
+            thanhtien = soluong * gia
+            items_info.append({
+                "masp": sanpham.MaSP,
+                "tensp": sanpham.Ten,
+                "soluong": soluong,
+                "gia": gia,
+                "thanhtien": thanhtien
+            })
+        
+        grouped_data[phieuxuat.MaPX] = {
+            "phieuxuat": phieuxuat,
+            "items": items_info
+        }
+
+    # Step 2: Write data to Excel
+    current_row = 2
+    stt = 0
+
+    for mapx, data in grouped_data.items():
+        stt +=1
+        phieuxuat = data["phieuxuat"]
+        items = data["items"]
+        num_items = len(items)
+        
+        # Get customer name
+        khach_hang = ""
+        if phieuxuat.DonHang and phieuxuat.DonHang.TenNguoiNhan:
+            khach_hang = phieuxuat.DonHang.TenNguoiNhan
+        
+        # Build products string
+        products_str = ""
+        for idx, item in enumerate(items):
+            products_str += f"{item['tensp']} ({item['masp']})\n"
+            products_str += f"Số lượng: {item['soluong']} - Đơn giá: {item['gia']:,} - Thành tiền: {item['thanhtien']:,}"
+            if idx < num_items - 1:
+                products_str += "\n\n"
+        
+        # Determine number of rows needed
+        merge_end_row = current_row + num_items -1
+        
+        # Write STT
+        cell = ws.cell(row=current_row, column=1, value=stt)
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        if num_items > 1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=1, end_column=1)
+        
+        # Write Mã phiếu
+        cell = ws.cell(row=current_row, column=2, value=mapx)
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=2, end_column=2)
+        
+        # Write Ngày xuất
+        cell = ws.cell(row=current_row, column=3, value=phieuxuat.Ngay.strftime('%d/%m/%Y'))
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=3, end_column=3)
+        
+        # Write Lý do xuất
+        cell = ws.cell(row=current_row, column=4, value=phieuxuat.LyDo)
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=4, end_column=4)
+        
+        # Write Khách hàng
+        cell = ws.cell(row=current_row, column=5, value=khach_hang)
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=5, end_column=5)
+        
+        # Write Danh sách sản phẩm
+        cell = ws.cell(row=current_row, column=6, value=products_str)
+        cell.border = thin_border
+        cell.alignment = left_alignment
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=6, end_column=6)
+        
+        # Write Trạng thái
+        cell = ws.cell(row=current_row, column=7, value=phieuxuat.TrangThai)
+        cell.border = thin_border
+        cell.alignment = center_alignment
+        if num_items >1:
+            ws.merge_cells(start_row=current_row, end_row=merge_end_row, start_column=7, end_column=7)
+        
+        # Set row heights (optional, adjust as needed)
+        for row in range(current_row, merge_end_row + 1):
+            ws.row_dimensions[row].height = 20
+        
+        current_row = merge_end_row + 1
+
+    # Auto adjust column widths
+    ws.column_dimensions[get_column_letter(1)].width = 8  # STT
+    ws.column_dimensions[get_column_letter(2)].width = 15 # Mã phiếu
+    ws.column_dimensions[get_column_letter(3)].width = 15 # Ngày
+    ws.column_dimensions[get_column_letter(4)].width = 20 # Lý do
+    ws.column_dimensions[get_column_letter(5)].width = 25 # Khách hàng
+    ws.column_dimensions[get_column_letter(6)].width = 60 # Sản phẩm
+    ws.column_dimensions[get_column_letter(7)].width = 15 # Trạng thái
+
+    # End time logging
+    end_time = time.time()
+    export_duration = round(end_time - start_time, 2)
+    merged_row_count = len(grouped_data)
+    print(f"[EXPORT XUAT KHO] Raw rows: {raw_row_count}, Merged rows: {merged_row_count}, Duration: {export_duration}s")
+
+    # Create response
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"PhieuXuatKho_{timestamp}.xlsx"
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+    wb.save(response)
+    return response
+
+
+# --- API Endpoints ---
+@csrf_exempt
+def check_coordinates(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    
+    import json
+    try:
+        data = json.loads(request.body)
+        lat = float(data.get('lat'))
+        lng = float(data.get('lng'))
+        exclude_id = data.get('exclude_id')
+        exclude_type = data.get('exclude_type')
+    except (ValueError, json.JSONDecodeError) as e:
+        return JsonResponse({'error': 'Invalid parameters'}, status=400)
+    
+    from django.contrib.gis.geos import Point
+    point = Point(lng, lat, srid=4326)
+    
+    # ±0.0001 degrees tolerance (~11 meters)
+    min_dist = 0.0001
+    nearby = []
+    
+    # Check warehouses
+    kho_query = Kho.objects.filter(geom__dwithin=(point, min_dist))
+    if exclude_id and exclude_type == 'kho':
+        kho_query = kho_query.exclude(MaKho=exclude_id)
+    for k in kho_query:
+        nearby.append({
+            'type': 'kho',
+            'id': k.MaKho,
+            'name': k.Ten,
+            'address': k.DiaChi,
+            'lat': k.geom.y,
+            'lng': k.geom.x
+        })
+    
+    # Check stores
+    cuahang_query = CuaHang.objects.filter(geom__dwithin=(point, min_dist))
+    if exclude_id and exclude_type == 'cuahang':
+        cuahang_query = cuahang_query.exclude(MaCH=exclude_id)
+    for c in cuahang_query:
+        nearby.append({
+            'type': 'cuahang',
+            'id': c.MaCH,
+            'name': c.Ten,
+            'address': c.DiaChi,
+            'lat': c.geom.y,
+            'lng': c.geom.x
+        })
+    
+    return JsonResponse({
+        'has_duplicate': len(nearby) > 0,
+        'nearby': nearby
+    })
 
 #  NHẬP KHO 
 class StockInListView(SidebarContextMixin, ListView):
@@ -1514,8 +2167,6 @@ StockInDetailFormSet = inlineformset_factory(
     can_delete=True
 )
 
-from .forms import YeuCauNhapKhoForm
-
 class StockInCreateView(SidebarContextMixin, CreateView):
     model = YeuCauNhapKho
     form_class = YeuCauNhapKhoForm
@@ -1536,12 +2187,42 @@ class StockInCreateView(SidebarContextMixin, CreateView):
     def form_valid(self, form):
         context = self.get_context_data()
         product_formset = context['product_formset']
-        
+
         if product_formset.is_valid():
+            # --- VALIDATE: Formset phải có ít nhất 1 dòng sản phẩm hợp lệ ---
+            filled_forms = [
+                f for f in product_formset
+                if f.cleaned_data and not f.cleaned_data.get('DELETE', False)
+            ]
+            if not filled_forms:
+                messages.error(self.request, "Phiếu nhập kho phải có ít nhất 1 sản phẩm. Vui lòng thêm dòng sản phẩm trước khi lưu.")
+                return self.render_to_response(self.get_context_data(form=form))
+
+            # --- VALIDATE: SoLuong > 0 từng dòng ---
+            invalid_qty = False
+            for f in filled_forms:
+                sl = f.cleaned_data.get('SoLuong')
+                if sl is not None and sl <= 0:
+                    messages.error(self.request, "Số lượng mỗi sản phẩm trong phiếu nhập phải lớn hơn 0.")
+                    invalid_qty = True
+                    break
+            if invalid_qty:
+                return self.render_to_response(self.get_context_data(form=form))
+
+            # Tự động gán nhân viên đang đăng nhập làm người tạo phiếu
+            user_id = self.request.session.get('user_id')
+            if user_id:
+                from .models import NhanVien
+                try:
+                    nv = NhanVien.objects.get(MaNV=user_id)
+                    form.instance.MaNV = nv
+                except NhanVien.DoesNotExist:
+                    pass
+
             self.object = form.save()
             product_formset.instance = self.object
             product_formset.save()
-            
+
             # CẬP NHẬT TỒN KHO KHI TẠO MỚI PHIẾU ĐÃ DUYỆT LUÔN
             if self.object.TrangThai == 'Đã duyệt':
                 from .models import HangTonKho, NhapKhoChiTiet
@@ -1552,7 +2233,8 @@ class StockInCreateView(SidebarContextMixin, CreateView):
                     )
                     inventory.SoLuong += item.SoLuong
                     inventory.save()
-                    
+
+            messages.success(self.request, f"Đã tạo phiếu nhập kho {self.object.MaYC} thành công!")
             return redirect(self.success_url)
         else:
             return self.render_to_response(self.get_context_data(form=form))
@@ -1565,6 +2247,18 @@ class StockInUpdateView(SidebarContextMixin, UpdateView):
     sidebar_active = 'stock_in'
     required_roles = ['Admin', 'Kế Toán']
     page_title = 'Chỉnh sửa Phiếu nhập kho'
+
+    def dispatch(self, request, *args, **kwargs):
+        """Khóa phiếu khi đã ở trạng thái 'Đã duyệt' — không cho sửa nữa."""
+        response = super().dispatch(request, *args, **kwargs)
+        obj = self.get_object()
+        if obj.TrangThai == 'Đã duyệt':
+            messages.error(
+                request,
+                f"Phiếu nhập '{obj.MaYC}' đã ở trạng thái 'Đã duyệt'. Không thể chỉnh sửa!"
+            )
+            return redirect(self.success_url)
+        return response
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -1586,8 +2280,9 @@ class StockInUpdateView(SidebarContextMixin, UpdateView):
             product_formset.instance = self.object
             product_formset.save()
             
-            # LOGIC CẬP NHẬT TỒN KHO KHI CHUYỂN SANG ĐÃ DUYỆT
             new_status = self.object.TrangThai
+            
+            # CỘNG tồn kho khi chuyển sang Đã duyệt
             if old_status != 'Đã duyệt' and new_status == 'Đã duyệt':
                 from .models import HangTonKho, NhapKhoChiTiet
                 items = NhapKhoChiTiet.objects.filter(MaYC=self.object)
@@ -1597,6 +2292,21 @@ class StockInUpdateView(SidebarContextMixin, UpdateView):
                     )
                     inventory.SoLuong += item.SoLuong
                     inventory.save()
+            
+            # TRỪ lại tồn kho khi chuyển ngược từ Đã duyệt về Chờ duyệt
+            elif old_status == 'Đã duyệt' and new_status != 'Đã duyệt':
+                from .models import HangTonKho, NhapKhoChiTiet
+                items = NhapKhoChiTiet.objects.filter(MaYC=self.object)
+                for item in items:
+                    try:
+                        inventory = HangTonKho.objects.get(MaKho=item.MaKho, MaSP=item.MaSP)
+                        inventory.SoLuong -= item.SoLuong
+                        if inventory.SoLuong <= 0:
+                            inventory.delete()
+                        else:
+                            inventory.save()
+                    except HangTonKho.DoesNotExist:
+                        pass
                     
             return redirect(self.success_url)
         else:
@@ -1683,11 +2393,25 @@ def public_order_invoice(request, order_id):
     
     # Bảo mật: Kiểm tra quyền truy cập
     user_id = request.session.get('user_id')
-    user_obj = NhanVien.objects.filter(MaNV=user_id).first() if user_id else None
     user_role = request.session.get('user_role')
+    
+    user_obj = None
+    if user_id:
+        if user_role == 'Khách Hàng':
+            user_obj = KhachHang.objects.filter(MaKH=user_id).first()
+        else:
+            user_obj = NhanVien.objects.filter(MaNV=user_id).first()
+
     is_staff = user_role in ['Admin', 'Nhân Viên', 'Kế Toán']
     
-    if not is_staff and order.NguoiDung != user_obj:
+    # Check ownership
+    is_owner = False
+    if user_role == 'Khách Hàng' and order.KhachHang == user_obj:
+        is_owner = True
+    elif user_role != 'Khách Hàng' and order.NguoiDung == user_obj:
+        is_owner = True
+        
+    if not is_staff and not is_owner:
         return render(request, '403.html', {'message': 'Bạn không có quyền xem hóa đơn này!'}, status=403)
 
     # Sử dụng related_name='items' từ model ChiTietDonHang
@@ -1718,10 +2442,23 @@ def public_return_request(request, order_id):
         
     order = get_object_or_404(DonHang.objects.prefetch_related('return_requests'), MaDH=order_id)
     user_id = request.session.get('user_id')
-    user_obj = NhanVien.objects.filter(MaNV=user_id).first()
+    user_role = request.session.get('user_role')
+    
+    user_obj = None
+    if user_id:
+        if user_role == 'Khách Hàng':
+            user_obj = KhachHang.objects.filter(MaKH=user_id).first()
+        else:
+            user_obj = NhanVien.objects.filter(MaNV=user_id).first()
     
     # Kiểm tra quyền (chỉ chủ đơn hàng mới được yêu cầu trả)
-    if order.NguoiDung != user_obj and request.session.get('user_role') not in ['Admin', 'Nhân Viên']:
+    is_owner = False
+    if user_role == 'Khách Hàng' and order.KhachHang == user_obj:
+        is_owner = True
+    elif user_role != 'Khách Hàng' and order.NguoiDung == user_obj:
+        is_owner = True
+
+    if not is_owner and user_role not in ['Admin', 'Nhân Viên', 'Kế Toán']:
         return render(request, '403.html', status=403)
 
     # Nếu đã có yêu cầu xử lý rồi thì không cho tạo thêm
@@ -1753,7 +2490,7 @@ def public_return_request(request, order_id):
             AnhHoaDon=anh_hd,
             AnhMinhChung=anh_mc,
             SoTienHoan=order.TongTien,
-            TrangThai='Mới'
+            TrangThai='Đang xử lý'
         )
         messages.success(request, "Gửi yêu cầu trả hàng thành công. Smart Mart sẽ kiểm tra và phản hồi sớm nhất!")
         return redirect('public_order_history')
@@ -1764,6 +2501,7 @@ def public_return_request(request, order_id):
         'page_title': f'Trả hàng / Hoàn tiền {order.MaDH} - SMART MART',
         'customer_name': user_obj.Ten if user_obj else None,
         'customer_email': user_obj.Email if user_obj else None,
+        'customer_phone': user_obj.SDT if user_obj else None,
         'cart_count': cart_data.get('cart_count', 0),
         'user_role': request.session.get('user_role'),
     }
@@ -1777,11 +2515,20 @@ def public_order_history(request):
         return redirect('public_login')
         
     user_id = request.session.get('user_id')
-    user_obj = NhanVien.objects.filter(MaNV=user_id).first() if user_id else None
+    user_role = request.session.get('user_role')
+    user_obj = None
+    if user_id:
+        if user_role == 'Khách Hàng':
+            user_obj = KhachHang.objects.filter(MaKH=user_id).first()
+        else:
+            user_obj = NhanVien.objects.filter(MaNV=user_id).first()
     
     orders = []
     if user_obj:
-        orders = DonHang.objects.filter(NguoiDung=user_obj).prefetch_related('return_requests').order_by('-NgayTao')
+        if user_role == 'Khách Hàng':
+            orders = DonHang.objects.filter(KhachHang=user_obj).prefetch_related('return_requests').order_by('-NgayTao')
+        else:
+            orders = DonHang.objects.filter(NguoiDung=user_obj).prefetch_related('return_requests').order_by('-NgayTao')
         
     # Lấy thông tin giỏ hàng cho Header
     cart_data = _get_cart_context(request)
@@ -1804,7 +2551,11 @@ def public_profile(request):
         return redirect('public_login')
         
     user_id = request.session.get('user_id')
-    user = get_object_or_404(NhanVien, MaNV=user_id)
+    user_role = request.session.get('user_role')
+    if user_role == 'Khách Hàng':
+        user = get_object_or_404(KhachHang, MaKH=user_id)
+    else:
+        user = get_object_or_404(NhanVien, MaNV=user_id)
     
     if request.method == 'POST':
         action = request.POST.get('action')
@@ -1837,10 +2588,13 @@ def public_profile(request):
     cart_data = _get_cart_context(request)
     
     # Lấy thống kê đơn hàng
-    orders_query = DonHang.objects.filter(NguoiDung=user)
+    if request.session.get('user_role') == 'Khách Hàng':
+        orders_query = DonHang.objects.filter(KhachHang=user)
+    else:
+        orders_query = DonHang.objects.filter(NguoiDung=user)
     total_orders = orders_query.count()
-    pending_orders = orders_query.filter(TrangThai__in=['Mới', 'Đang xử lý']).count()
-    completed_orders = orders_query.filter(TrangThai='Đã hoàn thành').count()
+    pending_orders = orders_query.filter(TrangThai='Đang xử lý').count()
+    completed_orders = orders_query.filter(TrangThai='Hoàn thành').count()
     recent_orders = orders_query.order_by('-NgayTao')[:3]
 
     context = {
@@ -1857,6 +2611,50 @@ def public_profile(request):
     }
     context.update(cart_data)
     return render(request, 'MyApp/public_profile.html', context)
+
+def public_settings(request):
+    """
+    Trang cài đặt của khách hàng (Storefront Settings)
+    """
+    if not request.session.get('user_id'):
+        return redirect('public_login')
+    
+    user_id = request.session.get('user_id')
+    user_role = request.session.get('user_role')
+    if user_role == 'Khách Hàng':
+        user = get_object_or_404(KhachHang, MaKH=user_id)
+    else:
+        user = get_object_or_404(NhanVien, MaNV=user_id)
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'change_password':
+            old_pass = request.POST.get('old_password')
+            new_pass = request.POST.get('new_password')
+            confirm_pass = request.POST.get('confirm_password')
+            
+            if user.MatKhau == old_pass:
+                if new_pass == confirm_pass:
+                    user.MatKhau = new_pass
+                    user.save()
+                    messages.success(request, "Đổi mật khẩu thành công!")
+                else:
+                    messages.error(request, "Mật khẩu xác nhận không khớp!")
+            else:
+                messages.error(request, "Mật khẩu cũ không chính xác!")
+            
+            return redirect('public_settings')
+
+    context = {
+        'page_title': 'Cài đặt tài khoản - SMART MART',
+        'user': user,
+        'customer_name': user.Ten,
+        'customer_email': user.Email,
+        'user_role': request.session.get('user_role'),
+    }
+    context.update(_get_cart_context(request))
+    return render(request, 'MyApp/public_settings.html', context)
 
 def submit_return_request(request, order_id):
     """
@@ -1882,7 +2680,7 @@ def submit_return_request(request, order_id):
             DonHang=order,
             LyDo=ly_do,
             SoTienHoan=order.TongTien, # Mặc định hoàn toàn bộ
-            TrangThai='Mới'
+            TrangThai='Đang xử lý'
         )
         messages.success(request, f"Đã gửi yêu cầu trả hàng cho đơn {order_id}. Chúng tôi sẽ xử lý sớm nhất!")
         
@@ -2081,25 +2879,67 @@ class StockOutCreateView(SidebarContextMixin, CreateView):
     def form_valid(self, form):
         context = self.get_context_data()
         product_formset = context['product_formset']
+
         if product_formset.is_valid():
+            # --- VALIDATE: Formset phải có ít nhất 1 dòng sản phẩm hợp lệ ---
+            filled_forms = [
+                f for f in product_formset
+                if f.cleaned_data and not f.cleaned_data.get('DELETE', False)
+            ]
+            if not filled_forms:
+                messages.error(self.request, "Phiếu xuất kho phải có ít nhất 1 sản phẩm. Vui lòng thêm dòng sản phẩm trước khi lưu.")
+                return self.render_to_response(self.get_context_data(form=form))
+
+            # --- VALIDATE: SoLuong > 0 từng dòng ---
+            for f in filled_forms:
+                sl = f.cleaned_data.get('SoLuong')
+                if sl is not None and sl <= 0:
+                    messages.error(self.request, "Số lượng mỗi sản phẩm trong phiếu xuất phải lớn hơn 0.")
+                    return self.render_to_response(self.get_context_data(form=form))
+
+            # --- VALIDATE TRƯỚC: Kiểm tra tồn kho đủ nếu trạng thái là Đã xuất ---
+            from .models import HangTonKho
+            if form.cleaned_data.get('TrangThai') == 'Đã xuất':
+                for f in filled_forms:
+                    makho = f.cleaned_data.get('MaKho')
+                    masp = f.cleaned_data.get('MaSP')
+                    sl = f.cleaned_data.get('SoLuong')
+                    if makho and masp and sl:
+                        htk = HangTonKho.objects.filter(MaKho=makho, MaSP=masp).first()
+                        if not htk:
+                            messages.error(self.request, f"Không có tồn kho cho '{masp}' tại kho '{makho}'. Phiếu không thể xuất.")
+                            return self.render_to_response(self.get_context_data(form=form))
+                        if htk.SoLuong < sl:
+                            messages.error(
+                                self.request,
+                                f"Không đủ tồn kho cho '{masp.Ten}' tại kho '{makho.Ten}'. "
+                                f"Tồn hiện tại: {htk.SoLuong}, Yêu cầu xuất: {sl}."
+                            )
+                            return self.render_to_response(self.get_context_data(form=form))
+
+            # Tự động gán nhân viên đang đăng nhập làm người tạo phiếu xuất
+            user_id = self.request.session.get('user_id')
+            if user_id:
+                from .models import NhanVien
+                try:
+                    nv = NhanVien.objects.get(MaNV=user_id)
+                    form.instance.MaNV = nv
+                except NhanVien.DoesNotExist:
+                    pass
+
             self.object = form.save()
             product_formset.instance = self.object
             product_formset.save()
-            
-            # GIẢM TỒN KHO KHI XUẤT 
+
+            # GIẢM TỒN KHO KHI XUẤT
             if self.object.TrangThai == 'Đã xuất':
-                from .models import HangTonKho
                 items = self.object.items.all()
                 for item in items:
-                    try:
-                        inventory = HangTonKho.objects.get(MaKho=item.MaKho, MaSP=item.MaSP)
-                        inventory.SoLuong -= item.SoLuong
-                        inventory.save()
-                    except HangTonKho.DoesNotExist:
-                        # Nếu ko có tồn kho thì để âm hoặc báo lỗi (tùy nghiệp vụ, ở đây ta cứ trừ)
-                        HangTonKho.objects.create(MaKho=item.MaKho, MaSP=item.MaSP, SoLuong=-item.SoLuong)
-            
-            messages.success(self.request, f"Đã tạo phiếu xuất {self.object.MaPX}")
+                    inventory = HangTonKho.objects.get(MaKho=item.MaKho, MaSP=item.MaSP)
+                    inventory.SoLuong -= item.SoLuong
+                    inventory.save()
+
+            messages.success(self.request, f"Đã tạo phiếu xuất {self.object.MaPX} thành công!")
             return redirect(self.success_url)
         else:
             return self.render_to_response(self.get_context_data(form=form))
@@ -2112,6 +2952,18 @@ class StockOutUpdateView(SidebarContextMixin, UpdateView):
     sidebar_active = 'stock_out'
     required_roles = ['Admin', 'Kế Toán']
     page_title = 'Chỉnh sửa Phiếu xuất kho'
+
+    def dispatch(self, request, *args, **kwargs):
+        """Khóa phiếu khi đã ở trạng thái 'Đã xuất' — không cho sửa nữa."""
+        response = super().dispatch(request, *args, **kwargs)
+        obj = self.get_object()
+        if obj.TrangThai == 'Đã xuất':
+            messages.error(
+                request,
+                f"Phiếu xuất '{obj.MaPX}' đã ở trạng thái 'Đã xuất'. Không thể chỉnh sửa!"
+            )
+            return redirect(self.success_url)
+        return response
 
     def get_context_data(self, **kwargs):
         data = super().get_context_data(**kwargs)
@@ -2135,10 +2987,24 @@ class StockOutUpdateView(SidebarContextMixin, UpdateView):
             if self.object.TrangThai == 'Đã xuất' and old_status != 'Đã xuất':
                 from .models import HangTonKho
                 items = self.object.items.all()
+                # Kiểm tra tồn kho đủ trước khi xuất
                 for item in items:
-                    inventory, created = HangTonKho.objects.get_or_create(
-                        MaKho=item.MaKho, MaSP=item.MaSP, defaults={'SoLuong': 0}
-                    )
+                    try:
+                        inventory = HangTonKho.objects.get(MaKho=item.MaKho, MaSP=item.MaSP)
+                        if inventory.SoLuong < item.SoLuong:
+                            messages.error(self.request, f"Không đủ tồn kho cho '{item.MaSP.Ten}' tại kho '{item.MaKho.Ten}'. Tồn: {inventory.SoLuong}, Yêu cầu: {item.SoLuong}")
+                            self.object.TrangThai = old_status
+                            self.object.save()
+                            return redirect(self.success_url)
+                    except HangTonKho.DoesNotExist:
+                        messages.error(self.request, f"Không có tồn kho cho '{item.MaSP.Ten}' tại kho '{item.MaKho.Ten}'.")
+                        self.object.TrangThai = old_status
+                        self.object.save()
+                        return redirect(self.success_url)
+                
+                # Nếu đủ hàng, thực hiện trừ
+                for item in items:
+                    inventory = HangTonKho.objects.get(MaKho=item.MaKho, MaSP=item.MaSP)
                     inventory.SoLuong -= item.SoLuong
                     inventory.save()
             
@@ -2151,3 +3017,146 @@ class StockOutDeleteView(SidebarContextMixin, DeleteView):
     model = YeuCauXuatKho
     success_url = reverse_lazy('stock_out_list')
     required_roles = ['Admin']
+
+import openpyxl
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+def download_stockin_template(request):
+    """
+    Tải file mẫu Excel nhập kho.
+    Sheet 1: File mẫu để điền dữ liệu.
+    Sheet 2 & 3: Danh sách Mã SP và Mã Kho hợp lệ trong hệ thống để tham khảo.
+    """
+    from openpyxl.styles import Font, PatternFill, Alignment
+
+    wb = openpyxl.Workbook()
+
+    # ===== SHEET 1: Mẫu nhập liệu =====
+    ws = wb.active
+    ws.title = "Nhap_Kho_Mau"
+    headers = ["Mã Sản Phẩm (*)", "Mã Kho (*)", "Số Lượng (*)", "Ghi Chú"]
+    ws.append(headers)
+    header_font  = Font(bold=True, color="FFFFFF")
+    header_fill  = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
+    center_align = Alignment(horizontal="center", vertical="center")
+    for col_num in range(1, len(headers) + 1):
+        cell = ws.cell(row=1, column=col_num)
+        cell.font       = header_font
+        cell.fill       = header_fill
+        cell.alignment  = center_align
+        ws.column_dimensions[openpyxl.utils.get_column_letter(col_num)].width = 22
+    # Dữ liệu mẫu minh hoạ
+    ws.append(["SP001", "KHO01", 50, "Nhập lô hàng mới"])
+    ws.append(["SP002", "KHO01", 100, ""])
+
+    # ===== SHEET 2: Danh sách Sản phẩm tham khảo =====
+    ws2 = wb.create_sheet("DS_San_Pham_Tham_Khao")
+    ws2.append(["Mã SP", "Tên sản phẩm", "Trạng thái"])
+    for col, w in zip([1, 2, 3], [15, 40, 15]):
+        cell = ws2.cell(row=1, column=col)
+        cell.font  = Font(bold=True, color="FFFFFF")
+        cell.fill  = PatternFill(start_color="10B981", end_color="10B981", fill_type="solid")
+        ws2.column_dimensions[openpyxl.utils.get_column_letter(col)].width = w
+    for sp in SanPham.objects.all().order_by('MaSP'):
+        ws2.append([sp.MaSP, sp.Ten, sp.TrangThai])
+
+    # ===== SHEET 3: Danh sách Kho tham khảo =====
+    ws3 = wb.create_sheet("DS_Kho_Tham_Khao")
+    ws3.append(["Mã Kho", "Tên kho", "Loại", "Địa chỉ"])
+    for col, w in zip([1, 2, 3, 4], [15, 35, 15, 40]):
+        cell = ws3.cell(row=1, column=col)
+        cell.font  = Font(bold=True, color="FFFFFF")
+        cell.fill  = PatternFill(start_color="6366F1", end_color="6366F1", fill_type="solid")
+        ws3.column_dimensions[openpyxl.utils.get_column_letter(col)].width = w
+    for kho in Kho.objects.all().order_by('MaKho'):
+        ws3.append([kho.MaKho, kho.Ten, kho.Loai, kho.DiaChi or ''])
+
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="Mau_Nhap_Kho.xlsx"'
+    wb.save(response)
+    return response
+
+@csrf_exempt
+def parse_stockin_excel(request):
+    """
+    Parse file Excel nhập kho, validate từng dòng, trả về JSON.
+    Logic: chỉ đưa dòng vào data khi KHÔNG có lỗi nào.
+    """
+    if request.method == 'POST' and request.FILES.get('file'):
+        excel_file = request.FILES['file']
+        try:
+            wb = openpyxl.load_workbook(excel_file, data_only=True)
+            ws = wb.active
+
+            data = []
+            errors = []
+
+            for row_idx, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=2):
+                # Bỏ qua dòng trống hoàn toàn
+                if not any(row):
+                    continue
+
+                ma_sp = str(row[0]).strip() if row[0] is not None else None
+                ma_kho = str(row[1]).strip() if row[1] is not None else None
+                so_luong_raw = row[2]
+                ghi_chu = str(row[3]).strip() if len(row) > 3 and row[3] is not None else ''
+
+                row_has_error = False
+
+                # Kiểm tra trường bắt buộc
+                if not ma_sp or not ma_kho or so_luong_raw is None:
+                    errors.append(f"Dòng {row_idx}: Thiếu thông tin bắt buộc (Mã SP, Mã Kho, Số lượng).")
+                    continue
+
+                # Kiểm tra số lượng hợp lệ
+                try:
+                    so_luong = int(so_luong_raw)
+                    if so_luong <= 0:
+                        errors.append(f"Dòng {row_idx}: Số lượng phải lớn hơn 0.")
+                        row_has_error = True
+                except (ValueError, TypeError):
+                    errors.append(f"Dòng {row_idx}: Số lượng '{so_luong_raw}' không hợp lệ, phải là số nguyên.")
+                    continue
+
+                # Kiểm tra Sản phẩm tồn tại trong DB
+                ten_sp = ma_sp
+                sp_obj = SanPham.objects.filter(MaSP=ma_sp).first()
+                if not sp_obj:
+                    errors.append(f"Dòng {row_idx}: Không tìm thấy Sản phẩm mã '{ma_sp}'.")
+                    row_has_error = True
+                else:
+                    ten_sp = sp_obj.Ten
+
+                # Kiểm tra Kho tồn tại trong DB
+                ten_kho = ma_kho
+                kho_obj = Kho.objects.filter(MaKho=ma_kho).first()
+                if not kho_obj:
+                    errors.append(f"Dòng {row_idx}: Không tìm thấy Kho mã '{ma_kho}'.")
+                    row_has_error = True
+                else:
+                    ten_kho = kho_obj.Ten
+
+                # Chỉ thêm vào data nếu dòng này KHÔNG có lỗi nào
+                if not row_has_error:
+                    data.append({
+                        'masp': ma_sp,
+                        'ten_sp': ten_sp,
+                        'makho': ma_kho,
+                        'ten_kho': ten_kho,
+                        'soluong': so_luong,
+                        'ghichu': ghi_chu,
+                    })
+
+            if errors:
+                return JsonResponse({'success': False, 'errors': errors})
+
+            if not data:
+                return JsonResponse({'success': False, 'errors': ["File Excel không có dữ liệu hợp lệ nào."]})
+
+            return JsonResponse({'success': True, 'data': data, 'total': len(data)})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'errors': [f"Lỗi định dạng file Excel: {str(e)}"]})
+
+    return JsonResponse({'success': False, 'errors': ["Không tìm thấy file tải lên hợp lệ."]})

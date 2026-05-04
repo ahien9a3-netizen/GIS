@@ -70,9 +70,14 @@
             <h1>{{ page_title }}</h1>
             <p>Quản lý các yêu cầu xuất hàng khỏi kho</p>
         </div>
-        <a href="{% url 'stock_out_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
-            <i class="fa-solid fa-file-circle-minus"></i> Tạo Phiếu xuất mới
-        </a>
+        <div style="display: flex; gap: 1rem;">
+            <a href="{% url 'stock_out_export_excel' %}" class="leaflet-analysis-btn" style="text-decoration: none; background: #10b981;">
+                <i class="fa-solid fa-file-excel"></i> Xuất Excel
+            </a>
+            <a href="{% url 'stock_out_add' %}" class="leaflet-analysis-btn" style="text-decoration: none;">
+                <i class="fa-solid fa-file-circle-minus"></i> Tạo Phiếu xuất mới
+            </a>
+        </div>
     </div>
 </div>
 
@@ -135,7 +140,7 @@
                             <i class="fa-solid fa-eye"></i>
                         </a>
                         
-                        {% if px.TrangThai == 'Mới' %}
+                        {% if px.TrangThai == 'Đang xử lý' %}
                             <a href="{% url 'stock_out_edit' px.pk %}" style="color: var(--primary);" title="Chỉnh sửa">
                                 <i class="fa-solid fa-file-pen"></i>
                             </a>

@@ -14,6 +14,14 @@
     <div style="padding: 2rem;">
         <form method="post">
             {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div style="background: #fff1f2; border: 1px solid #fecdd3; padding: 1rem; border-radius: 12px; color: #9f1239; font-size: 0.9rem; font-weight: 500; margin-bottom: 1.5rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                {% for error in form.non_field_errors %}
+                <p style="margin: 0.25rem 0;">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
             <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
                 {% for field in form %}
                 <div style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -25,6 +33,9 @@
                     <div>
                         {{ field }}
                     </div>
+                    {% for error in field.errors %}
+                    <small style="color: var(--danger); font-weight: 500;">{{ error }}</small>
+                    {% endfor %}
                 </div>
                 {% endfor %}
             </div>

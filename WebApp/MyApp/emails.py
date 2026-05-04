@@ -9,13 +9,22 @@ def send_refund_notification(return_request):
     """
     subject = f'Thông báo hoàn tiền đơn hàng #{return_request.DonHang.MaDH}'
     from_email = f'Smart Mart Team <no-reply@smartmart.vn>'
-    to = return_request.DonHang.NguoiDung.Email
+    to = return_request.EmailLienHe
+    user_name = return_request.DonHang.TenNguoiNhan
+    
+    if not to and return_request.DonHang.KhachHang:
+        to = return_request.DonHang.KhachHang.Email
+        user_name = return_request.DonHang.KhachHang.Ten
+        
+    if not to and return_request.DonHang.NguoiDung:
+        to = return_request.DonHang.NguoiDung.Email
+        user_name = return_request.DonHang.NguoiDung.Ten
     
     if not to:
         return False
 
     context = {
-        'user_name': return_request.DonHang.NguoiDung.Ten,
+        'user_name': user_name,
         'order_id': return_request.DonHang.MaDH,
         'request_id': return_request.MaYCTH,
         'amount': return_request.SoTienHoan,

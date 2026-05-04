@@ -132,8 +132,7 @@
                 <td style="padding: 1rem; font-size: 0.85rem; color: #475569;">{{ o.get_PhuongThucThanhToan_display }}</td>
                 <td style="padding: 1rem;">
                     <span class="status-badge 
-                        {% if o.TrangThai == 'Mới' %}status-moi
-                        {% elif o.TrangThai == 'Đang xử lý' %}status-processing
+                        {% if o.TrangThai == 'Đang xử lý' %}status-processing
                         {% elif o.TrangThai == 'Đang giao' %}status-shipping
                         {% elif o.TrangThai == 'Đã hoàn thành' %}status-completed
                         {% else %}status-cancelled{% endif %}">

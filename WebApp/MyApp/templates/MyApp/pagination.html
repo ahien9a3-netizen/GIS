@@ -1,10 +1,10 @@
 {% if page_obj %}
 <div class="pagination-container" data-aos="fade-up">
     {% if page_obj.has_previous %}
-    <a href="?page=1" class="pagination-link" title="Trang đầu">
+    <a href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page=1" class="pagination-link" title="Trang đầu">
         <i class="fa-solid fa-angles-left"></i>
     </a>
-    <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link" title="Trang trước">
+    <a href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" class="pagination-link" title="Trang trước">
         <i class="fa-solid fa-chevron-left"></i>
     </a>
     {% else %}
@@ -17,10 +17,10 @@
     </span>
 
     {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}" class="pagination-link" title="Trang sau">
+    <a href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" class="pagination-link" title="Trang sau">
         <i class="fa-solid fa-chevron-right"></i>
     </a>
-    <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link" title="Trang cuối">
+    <a href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}" class="pagination-link" title="Trang cuối">
         <i class="fa-solid fa-angles-right"></i>
     </a>
     {% else %}

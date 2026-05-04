@@ -82,6 +82,54 @@
             </table>
         </div>
 
+        <div class="chart-card" style="padding: 25px; background: white; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 30px;">
+            <h3 class="card-title"><i class="fa-solid fa-credit-card" style="color: #10b981;"></i> Thông tin hoàn tiền</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                <div>
+                    <div class="info-row">
+                        <span class="info-label">Số tài khoản NH:</span>
+                        <span class="info-value">{{ ret.SoTaiKhoanNH|default:"Không cung cấp" }}</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="info-row">
+                        <span class="info-label">Số tài khoản MoMo:</span>
+                        <span class="info-value">{{ ret.SoTaiKhoanMoMo|default:"Không cung cấp" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-card" style="padding: 25px; background: white; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 30px;">
+            <h3 class="card-title"><i class="fa-solid fa-images" style="color: #f59e0b;"></i> Chứng từ hình ảnh</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div style="text-align: center;">
+                    <div class="info-label" style="margin-bottom: 10px; text-align: left;">Ảnh hóa đơn:</div>
+                    {% if ret.AnhHoaDon %}
+                        <a href="{{ ret.AnhHoaDon.url }}" target="_blank">
+                            <img src="{{ ret.AnhHoaDon.url }}" style="max-height: 250px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; max-width: 100%;">
+                        </a>
+                    {% else %}
+                        <div style="height: 150px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                            Không có ảnh hóa đơn
+                        </div>
+                    {% endif %}
+                </div>
+                <div style="text-align: center;">
+                    <div class="info-label" style="margin-bottom: 10px; text-align: left;">Ảnh minh chứng sản phẩm:</div>
+                    {% if ret.AnhMinhChung %}
+                        <a href="{{ ret.AnhMinhChung.url }}" target="_blank">
+                            <img src="{{ ret.AnhMinhChung.url }}" style="max-height: 250px; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; max-width: 100%;">
+                        </a>
+                    {% else %}
+                        <div style="height: 150px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                            Không có ảnh minh chứng
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
         <div class="chart-card" style="padding: 25px; background: white; border-radius: 12px; box-shadow: var(--shadow);">
             <h3 class="card-title"><i class="fa-solid fa-user-tag" style="color: #6366f1;"></i> Thông tin khách hàng</h3>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
@@ -91,14 +139,24 @@
                         <span class="info-value">{{ ret.DonHang.TenNguoiNhan }}</span>
                     </div>
                     <div class="info-row">
-                        <span class="info-label">Số điện thoại:</span>
-                        <span class="info-value">{{ ret.DonHang.SDT_Nhan }}</span>
+                        <span class="info-label">Số điện thoại liên hệ:</span>
+                        <span class="info-value">{{ ret.SdtLienHe|default:ret.DonHang.SDT_Nhan }}</span>
                     </div>
                 </div>
                 <div>
                     <div class="info-row">
                         <span class="info-label">Email:</span>
-                        <span class="info-value">{{ ret.DonHang.NguoiDung.Email|default:"Không có" }}</span>
+                        <span class="info-value">
+                            {% if ret.EmailLienHe %}
+                                {{ ret.EmailLienHe }}
+                            {% elif ret.DonHang.KhachHang and ret.DonHang.KhachHang.Email %}
+                                {{ ret.DonHang.KhachHang.Email }}
+                            {% elif ret.DonHang.NguoiDung and ret.DonHang.NguoiDung.Email %}
+                                {{ ret.DonHang.NguoiDung.Email }}
+                            {% else %}
+                                Không có
+                            {% endif %}
+                        </span>
                     </div>
                     <div class="info-row">
                         <span class="info-label">Ngày yêu cầu:</span>

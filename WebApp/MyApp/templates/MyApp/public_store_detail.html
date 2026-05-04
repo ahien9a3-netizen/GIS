@@ -46,7 +46,7 @@
         /* Carousel Improved */
         .gallery-container { margin-bottom: 40px; }
         .main-img-box { width: 100%; height: 500px; border-radius: 20px; overflow: hidden; background: #e2e8f0; position: relative; margin-bottom: 15px; }
-        .main-img-box img { width: 100%; height: 100%; object-fit: cover; }
+        .main-img-box img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease-in-out; opacity: 1; }
         .thumb-grid { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
         .thumb-item { width: 100px; height: 70px; border-radius: 10px; overflow: hidden; cursor: pointer; border: 2px solid transparent; flex-shrink: 0; }
         .thumb-item.active { border-color: var(--primary); }
@@ -174,6 +174,51 @@
         .social-links a:hover { background: var(--primary); transform: translateY(-3px); }
         @media (max-width: 968px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
         @media (max-width: 640px) { .footer-grid { grid-template-columns: 1fr; } }
+
+        /* ═══ RESPONSIVE ═══ */
+        @media (max-width: 968px) {
+            .navbar { padding: 0 3%; }
+            .user-name-text { display: none; }
+            .store-header-box { padding: 25px; }
+            .store-title-main { font-size: 1.6rem; }
+            .info-cards-grid { grid-template-columns: 1fr; }
+            .rating-summary-grid { grid-template-columns: 1fr; gap: 30px; }
+            .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .main-img-box { height: 350px; }
+            .rating-box { padding: 25px; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            .main-container { padding-left: 12px; padding-right: 12px; padding-top: 75px; }
+            .navbar { height: 60px; }
+            .nav-brand { font-size: 1.2rem; }
+            .store-header-box { padding: 18px; border-radius: 18px; }
+            .store-title-main { font-size: 1.3rem; }
+            .main-img-box { height: 220px; border-radius: 14px; }
+            .thumb-grid { gap: 6px; }
+            .thumb-item { width: 70px; height: 50px; border-radius: 8px; }
+            .info-cards-grid { gap: 12px; }
+            .info-card-item { padding: 15px; border-radius: 12px; }
+            .action-row { flex-direction: column; gap: 10px; }
+            .btn-action-outline, .btn-action-fill { font-size: 0.9rem; padding: 12px; }
+            #store-map { height: 250px; border-radius: 14px; }
+            .rating-box { padding: 18px; border-radius: 18px; }
+            .big-num { font-size: 2.8rem; }
+            .big-stars { font-size: 1.2rem; }
+            .review-input-box { padding: 20px; border-radius: 16px; }
+            .interactive-stars label { font-size: 1.8rem; }
+            .form-control { padding: 12px 14px; }
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            .mini-p-img { height: 130px; }
+            .mini-p-info { padding: 10px; }
+            .dropdown-menu { width: 260px; right: -30px; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .footer { padding: 50px 4% 20px; }
+        }
+
+        /* Fallback: nếu AOS không load được, vẫn hiển thị content */
+        [data-aos] { opacity: 1 !important; transform: none !important; transition: none !important; }
     </style>
 </head>
 <body>
@@ -349,56 +394,76 @@
             </div>
 
             <div class="review-input-box">
-                <h4 style="margin-top:0; font-size:1.3rem; margin-bottom:8px; color:var(--dark);">Gửi đánh giá của bạn</h4>
-                <p style="font-size:0.95rem; color:#64748b; margin-bottom:25px;">Hãy chia sẻ trải nghiệm của bạn với chi nhánh để giúp chúng tôi phục vụ tốt hơn.</p>
-                
-                <form method="POST" class="modern-review-form">
-                    {% csrf_token %}
+                {% if not has_reviewed %}
+                    <h4 style="margin-top:0; font-size:1.3rem; margin-bottom:8px; color:var(--dark);">Gửi đánh giá của bạn</h4>
+                    <p style="font-size:0.95rem; color:#64748b; margin-bottom:25px;">Hãy chia sẻ trải nghiệm của bạn với chi nhánh để giúp chúng tôi phục vụ tốt hơn.</p>
                     
-                    {% if customer_name %}
-                        <div style="display:flex; align-items:center; gap:12px; background:#eff6ff; border: 1px solid #bfdbfe; border-radius:12px; padding:15px; margin-bottom:10px;">
-                            <i class="fa-solid fa-circle-user" style="color:var(--primary); font-size:1.8rem;"></i>
-                            <div>
-                                <div style="font-size:0.8rem; color:#64748b; font-weight:600; text-transform:uppercase;">Đánh giá với tư cách</div>
-                                <div style="font-size:1.05rem; font-weight:700; color:var(--primary-dark);">{{ customer_name }}</div>
+                    <form method="POST" class="modern-review-form">
+                        {% csrf_token %}
+                        
+                        {% if customer_name %}
+                            <div style="display:flex; align-items:center; gap:12px; background:#eff6ff; border: 1px solid #bfdbfe; border-radius:12px; padding:15px; margin-bottom:10px;">
+                                <i class="fa-solid fa-circle-user" style="color:var(--primary); font-size:1.8rem;"></i>
+                                <div>
+                                    <div style="font-size:0.8rem; color:#64748b; font-weight:600; text-transform:uppercase;">Đánh giá với tư cách</div>
+                                    <div style="font-size:1.05rem; font-weight:700; color:var(--primary-dark);">{{ customer_name }}</div>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div class="form-row" style="margin-bottom: 5px;">
+                            <label class="form-label">Mức độ hài lòng của bạn</label>
+                            <div class="interactive-stars">
+                                <input type="radio" name="rating" id="star5" value="5" checked><label for="star5"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" name="rating" id="star4" value="4"><label for="star4"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" name="rating" id="star3" value="3"><label for="star3"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" name="rating" id="star2" value="2"><label for="star2"><i class="fa-solid fa-star"></i></label>
+                                <input type="radio" name="rating" id="star1" value="1"><label for="star1"><i class="fa-solid fa-star"></i></label>
                             </div>
                         </div>
-                    {% endif %}
 
-                    <div class="form-row" style="margin-bottom: 5px;">
-                        <label class="form-label">Mức độ hài lòng của bạn</label>
-                        <div class="interactive-stars">
-                            <input type="radio" name="rating" id="star5" value="5" checked><label for="star5"><i class="fa-solid fa-star"></i></label>
-                            <input type="radio" name="rating" id="star4" value="4"><label for="star4"><i class="fa-solid fa-star"></i></label>
-                            <input type="radio" name="rating" id="star3" value="3"><label for="star3"><i class="fa-solid fa-star"></i></label>
-                            <input type="radio" name="rating" id="star2" value="2"><label for="star2"><i class="fa-solid fa-star"></i></label>
-                            <input type="radio" name="rating" id="star1" value="1"><label for="star1"><i class="fa-solid fa-star"></i></label>
+                        <div class="form-row">
+                            <label class="form-label">Nhận xét chi tiết</label>
+                            <textarea name="comment" class="form-control" placeholder="Nhân viên thân thiện, không gian sạch sẽ, vị trí dễ tìm..." required></textarea>
                         </div>
-                    </div>
 
-                    <div class="form-row">
-                        <label class="form-label">Nhận xét chi tiết</label>
-                        <textarea name="comment" class="form-control" placeholder="Nhân viên thân thiện, không gian sạch sẽ, vị trí dễ tìm..." required></textarea>
+                        <div style="margin-top: 15px;">
+                            <button type="submit" class="btn-action-fill" style="width: auto; border:none; padding:16px 35px; border-radius: 12px; font-size:1.05rem; cursor:pointer;"><i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i> Hoàn tất đánh giá</button>
+                        </div>
+                    </form>
+                {% else %}
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="fa-solid fa-certificate" style="color: #f59e0b; font-size: 3.5rem; margin-bottom: 15px;"></i>
+                        <h4 style="margin: 0 0 10px 0; font-size: 1.4rem; color: var(--dark);">Bạn đã để lại lời nhắn cho chi nhánh này</h4>
+                        <p style="color: #64748b; font-size: 0.95rem; max-width: 500px; margin: 0 auto;">Cảm ơn bạn đã đóng góp ý kiến để SMART MART ngày càng hoàn thiện hơn. Mỗi khách hàng chỉ có thể đánh giá một lần duy nhất cho mỗi chi nhánh.</p>
                     </div>
-
-                    <div style="margin-top: 15px;">
-                        <button type="submit" class="btn-action-fill" style="width: auto; border:none; padding:16px 35px; border-radius: 12px; font-size:1.05rem; cursor:pointer;"><i class="fa-solid fa-paper-plane" style="margin-right:8px;"></i> Hoàn tất đánh giá</button>
-                    </div>
-                </form>
+                {% endif %}
             </div>
 
-            <div style="margin-top:50px;">
-                <h3 style="font-size:1.2rem; margin-bottom:25px;">Nhận xét gần đây về chi nhánh</h3>
-                <div class="review-list-header">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <i class="fa-solid fa-filter" style="color:var(--primary);"></i>
-                        <select style="border:none; background:none; font-weight:700; color:var(--dark); outline:none;">
-                            <option>Tất cả ({{ total_reviews }})</option>
-                            <option>5 sao</option>
-                            <option>4 sao</option>
-                        </select>
-                    </div>
+            <div style="margin-top:50px;" id="reviews">
+                <h3 style="font-size:1.2rem; margin-bottom:15px;">Nhận xét gần đây về chi nhánh</h3>
+                
+                <!-- Filter Chips -->
+                <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;">
+                    <a href="?#reviews" style="display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:50px; background:{% if not star_filter %}#eff6ff{% else %}#f1f5f9{% endif %}; color:{% if not star_filter %}var(--primary){% else %}#475569{% endif %}; text-decoration:none; font-weight:600; font-size:0.85rem; border:1.5px solid {% if not star_filter %}var(--primary-light){% else %}transparent{% endif %};">
+                        Tất cả <span style="background:rgba(0,0,0,0.06); padding:2px 8px; border-radius:50px; font-size:0.75rem; font-weight:700;">{{ total_reviews }}</span>
+                    </a>
+                    {% for i in "54321" %}
+                    <a href="?star={{ i }}#reviews" style="display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:50px; background:{% if star_filter|stringformat:'s' == i %}#eff6ff{% else %}#f1f5f9{% endif %}; color:{% if star_filter|stringformat:'s' == i %}var(--primary){% else %}#475569{% endif %}; text-decoration:none; font-weight:600; font-size:0.85rem; border:1.5px solid {% if star_filter|stringformat:'s' == i %}var(--primary-light){% else %}transparent{% endif %};">
+                        {{ i }} <i class="fa-solid fa-star" style="font-size:0.7rem; color:#f59e0b;"></i>
+                        <span style="background:rgba(0,0,0,0.06); padding:2px 8px; border-radius:50px; font-size:0.75rem; font-weight:700;">{% if i == '5' %}{{ rating_dist.5 }}{% elif i == '4' %}{{ rating_dist.4 }}{% elif i == '3' %}{{ rating_dist.3 }}{% elif i == '2' %}{{ rating_dist.2 }}{% elif i == '1' %}{{ rating_dist.1 }}{% endif %}</span>
+                    </a>
+                    {% endfor %}
                 </div>
+
+                {% if star_filter %}
+                <div style="margin-bottom:18px; font-size:0.9rem; color:#64748b;">
+                    <i class="fa-solid fa-filter"></i>
+                    Đang lọc: <strong style="color:#f59e0b;">{{ star_filter }} sao</strong>
+                    — {{ page_obj.paginator.count }} kết quả
+                    <a href="?#reviews" style="color:var(--primary); font-weight:700; margin-left:10px;">✕ Bỏ lọc</a>
+                </div>
+                {% endif %}
 
                 <div class="reviews-list">
                     {% for r in reviews %}
@@ -417,9 +482,37 @@
                             <div style="color:#475569; padding-left:55px;">{{ r.BinhLuan }}</div>
                         </div>
                     {% empty %}
-                        <p style="text-align:center; color:#94a3b8; padding:30px;">Chưa có nhận xét nào.</p>
+                        <p style="text-align:center; color:#94a3b8; padding:30px;">
+                            {% if star_filter %}Không có đánh giá {{ star_filter }} sao nào.{% else %}Chưa có nhận xét nào.{% endif %}
+                        </p>
                     {% endfor %}
                 </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <div style="display:flex; justify-content:center; align-items:center; gap:6px; margin-top:25px; flex-wrap:wrap;">
+                    {% if page_obj.has_previous %}
+                    <a href="?{% if star_filter %}star={{ star_filter }}&{% endif %}page={{ page_obj.previous_page_number }}#reviews" style="display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:36px; border-radius:10px; background:#f1f5f9; color:#475569; text-decoration:none; font-weight:700; font-size:0.85rem;">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </a>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span style="display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:36px; border-radius:10px; background:var(--primary); color:white; font-weight:700; font-size:0.85rem; box-shadow:0 4px 12px rgba(29,78,216,0.25);">{{ num }}</span>
+                        {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+                            <a href="?{% if star_filter %}star={{ star_filter }}&{% endif %}page={{ num }}#reviews" style="display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:36px; border-radius:10px; background:#f1f5f9; color:#475569; text-decoration:none; font-weight:700; font-size:0.85rem;">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                    <a href="?{% if star_filter %}star={{ star_filter }}&{% endif %}page={{ page_obj.next_page_number }}#reviews" style="display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:36px; border-radius:10px; background:#f1f5f9; color:#475569; text-decoration:none; font-weight:700; font-size:0.85rem;">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </a>
+                    {% endif %}
+                    <span style="color:#94a3b8; font-size:0.8rem; margin-left:10px;">
+                        Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                    </span>
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -464,7 +557,12 @@
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        AOS.init({ once: true });
+        AOS.init({ once: true, duration: 600, offset: 0, startEvent: 'DOMContentLoaded' });
+        
+        // Bắt đầu auto-slide khi tải xong trang
+        document.addEventListener('DOMContentLoaded', () => {
+            startAutoSlide();
+        });
 
         function addToCart(pk, productName) {
             fetch(`/api/cart/add/${pk}/`, {
@@ -518,18 +616,59 @@
             }, 3000);
         }
 
-        function changeImg(src, thumb) {
-            document.getElementById('main-gallery-img').src = src;
+        let autoSlideInterval;
+
+        function changeImg(src, thumb, isAuto = false) {
+            const mainImg = document.getElementById('main-gallery-img');
+            
+            // Chỉ chạy hiệu ứng nếu ảnh thực sự thay đổi
+            if (!mainImg.src.endsWith(src)) {
+                mainImg.style.opacity = '0.5';
+                setTimeout(() => {
+                    mainImg.src = src;
+                    mainImg.style.opacity = '1';
+                }, 150);
+            }
+
             document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
             thumb.classList.add('active');
+            
+            // Restart timer if user manually clicked an image
+            if (!isAuto) {
+                clearInterval(autoSlideInterval);
+                startAutoSlide();
+            }
         }
 
-        // Mini Map
-        var lat = {{ store.geom.y }};
-        var lon = {{ store.geom.x }};
-        var map = L.map('store-map', { zoomControl: false }).setView([lat, lon], 16);
-        L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png').addTo(map);
-        L.marker([lat, lon]).addTo(map).bindPopup("<b>{{ store.Ten }}</b>");
+        function startAutoSlide() {
+            const thumbs = document.querySelectorAll('.thumb-item');
+            if (thumbs.length <= 1) return;
+            
+            autoSlideInterval = setInterval(() => {
+                let activeIndex = Array.from(thumbs).findIndex(t => t.classList.contains('active'));
+                let nextIndex = (activeIndex + 1) % thumbs.length;
+                let nextThumb = thumbs[nextIndex];
+                let nextSrc = nextThumb.querySelector('img').src;
+                
+                changeImg(nextSrc, nextThumb, true);
+            }, 4000); // Tự động chuyển đổi sau mỗi 4 giây
+        }
+
+        // Mini Map — chỉ khởi tạo nếu cửa hàng có tọa độ hợp lệ
+        {% if store.geom %}
+        {% load l10n %}
+        var lat = {{ store.geom.y|unlocalize }};
+        var lon = {{ store.geom.x|unlocalize }};
+        if (!isNaN(lat) && !isNaN(lon)) {
+            var map = L.map('store-map', { zoomControl: false }).setView([lat, lon], 16);
+            L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png').addTo(map);
+            L.marker([lat, lon]).addTo(map).bindPopup("<b>{{ store.Ten }}</b>");
+        } else {
+            document.getElementById('store-map').style.display = 'none';
+        }
+        {% else %}
+        document.getElementById('store-map').style.display = 'none';
+        {% endif %}
     </script>
 </body>
 </html>

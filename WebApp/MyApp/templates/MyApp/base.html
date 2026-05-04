@@ -63,19 +63,79 @@
 
     <link rel="stylesheet" href="{% static 'MyApp/style.css' %}">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <style>
+        .select2-container--default .select2-selection--single {
+            height: auto;
+            padding: 0.7rem 1rem;
+            border: 1px solid var(--gray-200, #e5e7eb);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: white;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            padding: 0;
+            line-height: normal;
+            color: #1e293b;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 100%;
+            top: 0;
+            right: 10px;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: var(--primary, #2563eb);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+
+        .select2-container {
+            width: 100% !important;
+        }
+
+        .select2-dropdown {
+            border: 1px solid var(--primary, #2563eb);
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+        }
+
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--gray-200, #e5e7eb);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: var(--primary, #2563eb);
+        }
+
+        .select2-container--default .select2-results__option {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 
 <body class="dashboard-layout">
 
-    
+
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="sidebar-logo">
                 <i class="fa-solid fa-store"></i>
                 <span>SMART MART</span>
             </div>
-            <button class="sidebar-toggle">
+            <button class="sidebar-toggle" id="mobile-sidebar-toggle">
                 <i class="fa-solid fa-bars"></i>
             </button>
         </div>
@@ -132,14 +192,17 @@
                 <i class="fa-solid fa-map-location-dot"></i>
                 <span>Bản đồ GIS</span>
             </a>
+            {% if user_role == 'Admin' or user_role == 'Nhân Viên' or user_role == 'Kế Toán' %}
             <a href="{% url 'order_list' %}" class="sidebar-item {% if sidebar_active == 'orders' %}active{% endif %}">
                 <i class="fa-solid fa-shopping-bag"></i>
                 <span>Đơn hàng</span>
             </a>
-            <a href="{% url 'return_list' %}" class="sidebar-item {% if sidebar_active == 'returns' %}active{% endif %}">
+            <a href="{% url 'return_list' %}"
+                class="sidebar-item {% if sidebar_active == 'returns' %}active{% endif %}">
                 <i class="fa-solid fa-rotate-left"></i>
                 <span>Trả hàng</span>
             </a>
+            {% endif %}
             {% if user_role == 'Admin' or user_role == 'Kế Toán' %}
             <a href="{% url 'reports' %}" class="sidebar-item {% if sidebar_active == 'reports' %}active{% endif %}">
                 <i class="fa-solid fa-chart-bar"></i>
@@ -154,9 +217,12 @@
 
     </aside>
 
-    
+
     <div class="main-content">
         <header class="dashboard-header">
+            <button class="sidebar-toggle-mobile" id="header-sidebar-toggle">
+                <i class="fa-solid fa-bars"></i>
+            </button>
             <div class="header-search">
                 <i class="fa-solid fa-magnifying-glass"></i>
                 <input type="text" placeholder="Tìm kiếm sản phẩm, cửa hàng...">
@@ -184,13 +250,13 @@
             </div>
         </header>
 
-       
+
         <div class="page-content">
             {% block content %}
             {% endblock %}
         </div>
 
-        
+
         <footer class="dashboard-footer">
             <div class="footer-content">
                 <div class="footer-col">
@@ -230,9 +296,10 @@
 
     {% block extra_js %}{% endblock %}
 
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
-        // Initialize AOS
         AOS.init({
             duration: 800,
             easing: 'ease-in-out',
@@ -240,8 +307,41 @@
             mirror: false
         });
 
-        document.querySelector('.sidebar-toggle')?.addEventListener('click', function () {
+        document.getElementById('mobile-sidebar-toggle')?.addEventListener('click', function () {
             document.querySelector('.sidebar').classList.toggle('collapsed');
+        });
+
+        document.getElementById('header-sidebar-toggle')?.addEventListener('click', function () {
+            document.querySelector('.sidebar').classList.toggle('open');
+        });
+
+        document.addEventListener('click', function (e) {
+            const sidebar = document.querySelector('.sidebar');
+            const headerToggle = document.getElementById('header-sidebar-toggle');
+
+            if (window.innerWidth <= 768 &&
+                sidebar.classList.contains('open') &&
+                !sidebar.contains(e.target) &&
+                !headerToggle.contains(e.target)) {
+                sidebar.classList.remove('open');
+            }
+        });
+
+        function initSelect2(scope) {
+            var ctx = scope ? $(scope) : $(document);
+            ctx.find('select').not('.no-select2').not('.select2-hidden-accessible').select2({
+                placeholder: '-- Chọn --',
+                allowClear: true,
+                width: '100%',
+                language: {
+                    noResults: function () { return 'Không tìm thấy kết quả'; },
+                    searching: function () { return 'Đang tìm kiếm...'; }
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            initSelect2();
         });
     </script>
 </body>

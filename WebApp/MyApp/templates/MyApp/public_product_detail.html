@@ -130,6 +130,80 @@
         .breadcrumb i { font-size: 0.65rem; color: #cbd5e1; }
         .breadcrumb span { color: #94a3b8; font-weight: 500; }
 
+        /* Filter Chips */
+        .filter-chip {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 18px; border-radius: 50px;
+            background: #f1f5f9; color: #475569;
+            text-decoration: none; font-weight: 600; font-size: 0.85rem;
+            border: 1.5px solid transparent;
+            transition: all 0.2s;
+        }
+        .filter-chip:hover { background: #e2e8f0; color: var(--dark); }
+        .filter-chip.active {
+            background: #eff6ff; color: var(--primary);
+            border-color: var(--primary-light);
+            box-shadow: 0 2px 8px rgba(59,130,246,0.12);
+        }
+        .chip-count {
+            background: rgba(0,0,0,0.06); padding: 2px 8px;
+            border-radius: 50px; font-size: 0.75rem; font-weight: 700;
+        }
+        .filter-chip.active .chip-count { background: rgba(29,78,216,0.12); }
+
+        /* Pagination */
+        .page-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            min-width: 36px; height: 36px; padding: 0 10px;
+            border-radius: 10px; background: #f1f5f9; color: #475569;
+            text-decoration: none; font-weight: 700; font-size: 0.85rem;
+            transition: all 0.2s; border: 1.5px solid transparent;
+        }
+        .page-btn:hover { background: #e2e8f0; color: var(--dark); }
+        .page-btn.active {
+            background: var(--primary); color: white;
+            box-shadow: 0 4px 12px rgba(29,78,216,0.25);
+        }
+
+        /* ═══ RESPONSIVE ═══ */
+        @media (max-width: 968px) {
+            .navbar { padding: 0 3%; }
+            .nav-links { gap: 12px; }
+            .nav-links a { font-size: 0.85rem; }
+            .user-name-text { display: none; }
+            .product-hero { flex-direction: column; }
+            .product-hero-img { min-width: 100%; height: 350px; }
+            .product-hero-content { padding: 30px; }
+            .product-name { font-size: 2rem; }
+            .reviews-grid { grid-template-columns: 1fr; gap: 30px; }
+            .review-form { position: static; }
+        }
+
+        @media (max-width: 640px) {
+            .main-container { padding-left: 15px; padding-right: 15px; padding-top: 80px; }
+            .navbar { height: 60px; }
+            .nav-brand { font-size: 1.2rem; }
+            .nav-links a:not(.cart-btn) { display: none; }
+            .product-hero-img { height: 260px; min-width: 100%; }
+            .product-hero-content { padding: 20px; }
+            .product-name { font-size: 1.5rem; }
+            .product-desc { font-size: 0.95rem; margin-bottom: 20px; }
+            .btn-buy { width: 100%; justify-content: center; padding: 15px; font-size: 1rem; }
+            .detail-section { padding: 20px; border-radius: 20px; }
+            .section-title { font-size: 1.2rem; }
+            .filter-bar { gap: 6px !important; }
+            .filter-chip { padding: 6px 12px; font-size: 0.78rem; }
+            .review-card { padding: 18px; }
+            .review-user { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .review-form { padding: 20px; border-radius: 18px; }
+            .star-label { font-size: 1.5rem; }
+            .rating-summary { flex-wrap: wrap; gap: 8px; }
+            .rating-avg { font-size: 1rem; }
+            .cat-tag { font-size: 0.7rem; }
+            .dropdown-menu { width: 260px; right: -50px; }
+            .page-btn { min-width: 32px; height: 32px; font-size: 0.8rem; }
+        }
+
         /* Review Section Modernization */
         .footer { background: #0f172a; color: #94a3b8; padding: 80px 5% 30px; margin-top: 80px; position: relative; overflow: hidden; border-top: 2px solid var(--primary-light); }
         .footer-grid-main { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 50px; margin-bottom: 60px; max-width: 1200px; margin-left: auto; margin-right: auto; }
@@ -242,8 +316,8 @@
                             {% endif %}
                         {% endfor %}
                     </div>
-                    <span class="rating-avg">{{ avg_rating|default:"5.0" }}</span>
-                    <span style="color:#94a3b8; font-size:0.9rem;">({{ reviews.count }} đánh giá)</span>
+                    <span class="rating-avg">{% if total_reviews > 0 %}{{ avg_rating|floatformat:1 }}{% else %}0.0{% endif %}</span>
+                    <span style="color:#94a3b8; font-size:0.9rem;">({{ total_reviews }} đánh giá)</span>
                 </div>
 
                 <div class="product-desc">
@@ -260,7 +334,7 @@
                     <div class="status-badge">{{ product.TrangThai }}</div>
                 </div>
 
-                <button class="btn-buy" onclick="showToast('Đã thêm {{ product.Ten|escapejs }} vào giỏ hàng!')">
+                <button class="btn-buy" onclick="addToCart('{{ product.MaSP }}', '{{ product.Ten|escapejs }}')">
                     <i class="fa-solid fa-cart-plus"></i> THÊM VÀO GIỎ HÀNG
                 </button>
             </div>
@@ -268,11 +342,33 @@
 
         <div class="detail-section" data-aos="fade-up">
             <h2 class="section-title"><i class="fa-solid fa-star"></i> Đánh giá khách hàng</h2>
-            
-            <div class="reviews-grid">
+
+            <!-- ═══ THANH LỌC THEO SAO ═══ -->
+            <div class="filter-bar" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:25px;">
+                <a href="?#reviews" class="filter-chip {% if not star_filter %}active{% endif %}">
+                    Tất cả <span class="chip-count">{{ total_reviews }}</span>
+                </a>
+                {% for i in "54321" %}
+                <a href="?star={{ i }}#reviews" class="filter-chip {% if star_filter|stringformat:'s' == i %}active{% endif %}">
+                    {{ i }} <i class="fa-solid fa-star" style="font-size:0.7rem;"></i>
+                    <span class="chip-count">{% if i == '5' %}{{ rating_dist.5 }}{% elif i == '4' %}{{ rating_dist.4 }}{% elif i == '3' %}{{ rating_dist.3 }}{% elif i == '2' %}{{ rating_dist.2 }}{% elif i == '1' %}{{ rating_dist.1 }}{% endif %}</span>
+                </a>
+                {% endfor %}
+            </div>
+
+            {% if star_filter %}
+            <div style="margin-bottom:18px; font-size:0.9rem; color:#64748b;">
+                <i class="fa-solid fa-filter"></i>
+                Đang lọc: <strong style="color:#f59e0b;">{{ star_filter }} sao</strong>
+                — {{ page_obj.paginator.count }} kết quả
+                <a href="?#reviews" style="color:var(--primary); font-weight:700; margin-left:10px;">✕ Bỏ lọc</a>
+            </div>
+            {% endif %}
+
+            <div class="reviews-grid" id="reviews">
                 <div class="reviews-list">
                     {% for r in reviews %}
-                        <div class="review-card">
+                        <div class="review-card" data-star="{{ r.Diem }}">
                             <div class="review-user">
                                 <span class="user-info"><i class="fa-solid fa-user-circle"></i> {{ r.NguoiDung }}</span>
                                 <span class="review-date">{{ r.NgayTao|date:"d/m/Y H:i" }}</span>
@@ -287,43 +383,85 @@
                     {% empty %}
                         <div style="text-align: center; padding: 50px; color: #94a3b8;">
                             <i class="fa-solid fa-comment-slash" style="font-size: 3rem; margin-bottom: 15px; display: block;"></i>
-                            Chưa có nhận xét nào. Hãy trở thành người đầu tiên đánh giá sản phẩm này!
+                            {% if star_filter %}
+                                Không có đánh giá {{ star_filter }} sao nào.
+                            {% else %}
+                                Chưa có nhận xét nào. Hãy trở thành người đầu tiên đánh giá sản phẩm này!
+                            {% endif %}
                         </div>
                     {% endfor %}
+
+                    <!-- ═══ PHÂN TRANG ═══ -->
+                    {% if page_obj.has_other_pages %}
+                    <div class="pagination-bar" style="display:flex; justify-content:center; align-items:center; gap:6px; margin-top:25px; flex-wrap:wrap;">
+                        {% if page_obj.has_previous %}
+                        <a href="?{% if star_filter %}star={{ star_filter }}&{% endif %}page={{ page_obj.previous_page_number }}#reviews" class="page-btn">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </a>
+                        {% endif %}
+
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="page-btn active">{{ num }}</span>
+                            {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+                                <a href="?{% if star_filter %}star={{ star_filter }}&{% endif %}page={{ num }}#reviews" class="page-btn">{{ num }}</a>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if page_obj.has_next %}
+                        <a href="?{% if star_filter %}star={{ star_filter }}&{% endif %}page={{ page_obj.next_page_number }}#reviews" class="page-btn">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </a>
+                        {% endif %}
+
+                        <span style="color:#94a3b8; font-size:0.8rem; margin-left:10px;">
+                            Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                        </span>
+                    </div>
+                    {% endif %}
                 </div>
 
                 <div class="review-form">
-                    <h3 style="color:var(--primary-dark); margin-bottom:25px;">Gửi đánh giá của bạn</h3>
-                    <form method="POST">
-                        {% csrf_token %}
-                        {% if customer_name %}
-                            <p style="margin-bottom:20px; color:#475569; font-size:0.9rem;">
-                                <i class="fa-solid fa-circle-user" style="color:var(--primary);"></i>
-                                Đánh giá với tài khoản: <strong>{{ customer_name }}</strong>
-                            </p>
-                        {% endif %}
+                    {% if not has_reviewed %}
+                        <h3 style="color:var(--primary-dark); margin-bottom:25px;">Gửi đánh giá của bạn</h3>
+                        <form method="POST">
+                            {% csrf_token %}
+                            {% if customer_name %}
+                                <p style="margin-bottom:20px; color:#475569; font-size:0.9rem;">
+                                    <i class="fa-solid fa-circle-user" style="color:var(--primary);"></i>
+                                    Đánh giá với tài khoản: <strong>{{ customer_name }}</strong>
+                                </p>
+                            {% endif %}
 
-                        <div class="form-group">
-                            <label>Hài lòng của bạn</label>
-                            <div class="star-input">
-                                <input type="radio" name="rating" id="star5" value="5" class="star-radio" checked><label for="star5" class="star-label"><i class="fa-solid fa-star"></i></label>
-                                <input type="radio" name="rating" id="star4" value="4" class="star-radio"><label for="star4" class="star-label"><i class="fa-solid fa-star"></i></label>
-                                <input type="radio" name="rating" id="star3" value="3" class="star-radio"><label for="star3" class="star-label"><i class="fa-solid fa-star"></i></label>
-                                <input type="radio" name="rating" id="star2" value="2" class="star-radio"><label for="star2" class="star-label"><i class="fa-solid fa-star"></i></label>
-                                <input type="radio" name="rating" id="star1" value="1" class="star-radio"><label for="star1" class="star-label"><i class="fa-solid fa-star"></i></label>
+                            <div class="form-group">
+                                <label>Hài lòng của bạn</label>
+                                <div class="star-input">
+                                    <input type="radio" name="rating" id="star5" value="5" class="star-radio" checked><label for="star5" class="star-label"><i class="fa-solid fa-star"></i></label>
+                                    <input type="radio" name="rating" id="star4" value="4" class="star-radio"><label for="star4" class="star-label"><i class="fa-solid fa-star"></i></label>
+                                    <input type="radio" name="rating" id="star3" value="3" class="star-radio"><label for="star3" class="star-label"><i class="fa-solid fa-star"></i></label>
+                                    <input type="radio" name="rating" id="star2" value="2" class="star-radio"><label for="star2" class="star-label"><i class="fa-solid fa-star"></i></label>
+                                    <input type="radio" name="rating" id="star1" value="1" class="star-radio"><label for="star1" class="star-label"><i class="fa-solid fa-star"></i></label>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label>Bình luận</label>
-                            <textarea name="comment" rows="5" placeholder="Bạn thấy sản phẩm này thế nào?" required></textarea>
-                        </div>
+                            <div class="form-group">
+                                <label>Bình luận</label>
+                                <textarea name="comment" rows="5" placeholder="Bạn thấy sản phẩm này thế nào?" required></textarea>
+                            </div>
 
-                        <button type="submit" class="btn-submit">GỬI NHẬN XÉT</button>
-                    </form>
+                            <button type="submit" class="btn-submit">GỬI NHẬN XÉT</button>
+                        </form>
+                    {% else %}
+                        <div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 16px; padding: 40px; text-align: center;">
+                            <i class="fa-solid fa-circle-check" style="color: #10b981; font-size: 3rem; margin-bottom: 20px;"></i>
+                            <h3 style="color: var(--dark); margin-bottom: 10px;">Bạn đã đánh giá sản phẩm này</h3>
+                            <p style="color: #64748b; font-size: 0.95rem;">Cảm ơn bạn đã chia sẻ ý kiến quý báu. Mỗi khách hàng chỉ có thể gửi một đánh giá duy nhất cho mỗi sản phẩm.</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
+
     </main>
 
     <footer class="footer">

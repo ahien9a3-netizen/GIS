@@ -93,7 +93,6 @@
         <label>Trạng thái</label>
         <select name="status" class="filter-input">
             <option value="">-- Tất cả trạng thái --</option>
-            <option value="Mới" {% if request.GET.status == 'Mới' %}selected{% endif %}>Yêu yêu cầu mới</option>
             <option value="Đang xử lý" {% if request.GET.status == 'Đang xử lý' %}selected{% endif %}>Đang xử lý</option>
             <option value="Đã hoàn tiền" {% if request.GET.status == 'Đã hoàn tiền' %}selected{% endif %}>Đã hoàn tiền</option>
             <option value="Từ chối" {% if request.GET.status == 'Từ chối' %}selected{% endif %}>Từ chối</option>
@@ -131,8 +130,7 @@
                 <td style="padding: 1rem; font-weight: 700; color: #ef4444;">{{ ret.SoTienHoan|floatformat:"0" }} <small>VND</small></td>
                 <td style="padding: 1rem;">
                     <span class="status-badge 
-                        {% if ret.TrangThai == 'Mới' %}status-moi
-                        {% elif ret.TrangThai == 'Đang xử lý' %}status-processing
+                        {% if ret.TrangThai == 'Đang xử lý' %}status-processing
                         {% elif ret.TrangThai == 'Đã hoàn tiền' %}status-completed
                         {% else %}status-cancelled{% endif %}">
                         {{ ret.TrangThai }}

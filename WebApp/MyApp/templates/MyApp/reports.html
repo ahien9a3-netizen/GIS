@@ -51,6 +51,58 @@
     <p>Phân tích dữ liệu vận hành, nhân sự và hàng hóa theo thời gian thực</p>
 </div>
 
+<!-- --- THỐNG KÊ TỔNG QUAN ĐỊA LÝ --- -->
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem;">
+    <div class="report-card">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 50px; height: 50px; background: #eff6ff; color: #3b82f6; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-store fa-xl"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Tổng Cửa hàng</div>
+                <div style="font-size: 2rem; font-weight: 800; color: #1e293b;">{{ total_stores }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="report-card">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 50px; height: 50px; background: #fef2f2; color: #ef4444; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-warehouse fa-xl"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Tổng Kho</div>
+                <div style="font-size: 2rem; font-weight: 800; color: #1e293b;">{{ total_warehouses }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-card">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 50px; height: 50px; background: #ecfdf5; color: #10b981; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-map-check fa-xl"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Tọa độ hợp lệ</div>
+                <div style="font-size: 2rem; font-weight: 800; color: #1e293b;">{{ total_stores|add:total_warehouses }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-card">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 50px; height: 50px; background: #fffbeb; color: #f59e0b; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-triangle-exclamation fa-xl"></i>
+            </div>
+            <div>
+                <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 600;">Cảnh báo gần nhau</div>
+                <div style="font-size: 2rem; font-weight: 800; color: #1e293b;">{{ nearby_pairs|length }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- --- Biểu đồ cũ --- -->
 <div class="reports-grid">
     <div class="report-card">
         <h3><i class="fa-solid fa-list"></i> Sản phẩm theo Danh mục</h3>
@@ -68,11 +120,49 @@
         <h3><i class="fa-solid fa-user-tie"></i> Phân bổ Nhân sự theo Vai trò</h3>
         <div class="chart-container"><canvas id="employeeRoleChart"></canvas></div>
     </div>
+    <div class="report-card">
+        <h3><i class="fa-solid fa-store"></i> Cửa hàng theo Loại</h3>
+        <div class="chart-container"><canvas id="storesTypeChart"></canvas></div>
+    </div>
+    <div class="report-card">
+        <h3><i class="fa-solid fa-warehouse"></i> Kho hàng theo Loại</h3>
+        <div class="chart-container"><canvas id="warehousesTypeChart"></canvas></div>
+    </div>
 </div>
 
+<!-- --- DANH SÁCH CẢNH BÁO --- -->
+{% if nearby_pairs %}
+<div class="report-card" style="margin-top: 1.5rem;">
+    <h3><i class="fa-solid fa-exclamation-triangle" style="color: #f59e0b;"></i> Danh sách cặp vị trí quá gần nhau (&lt; 2m)</h3>
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="text-align: left; padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">Loại</th>
+                    <th style="text-align: left; padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">Đối tượng 1</th>
+                    <th style="text-align: left; padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">Đối tượng 2</th>
+                    <th style="text-align: left; padding: 0.75rem; border-bottom: 1px solid #e2e8f0;">Khoảng cách</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pair in nearby_pairs %}
+                <tr>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #f1f5f9;">
+                        <span style="background: #fef3c7; color: #92400e; padding: 0.25rem 0.75rem; border-radius: 100px; font-size: 0.75rem; font-weight: 700;">{{ pair.type }}</span>
+                    </td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #f1f5f9; font-weight: 600;">{{ pair.name1 }}</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #f1f5f9; font-weight: 600;">{{ pair.name2 }}</td>
+                    <td style="padding: 0.75rem; border-bottom: 1px solid #f1f5f9; color: #ef4444; font-weight: 800;">{{ pair.distance }} m</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
 
 <div id="report-data" data-cat='{{ cat_json|safe }}' data-inv='{{ inv_json|safe }}' data-st='{{ st_json|safe }}'
-    data-em='{{ em_json|safe }}' style="display: none;"></div>
+    data-em='{{ em_json|safe }}' data-st-type='{{ stores_type_json|safe }}' data-wh-type='{{ warehouses_type_json|safe }}' style="display: none;"></div>
 {% endblock %}
 
 {% block extra_js %}
@@ -86,10 +176,12 @@
         const invData = JSON.parse(dataWrap.dataset.inv);
         const stData = JSON.parse(dataWrap.dataset.st);
         const emData = JSON.parse(dataWrap.dataset.em);
+        const stTypeData = JSON.parse(dataWrap.dataset.stType);
+        const whTypeData = JSON.parse(dataWrap.dataset.whType);
 
         const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899'];
 
-        
+        // --- Biểu đồ cũ ---
         new Chart(document.getElementById('categoryChart'), {
             type: 'bar',
             data: {
@@ -99,7 +191,6 @@
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
 
-        
         new Chart(document.getElementById('inventoryChart'), {
             type: 'pie',
             data: {
@@ -109,7 +200,6 @@
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        
         new Chart(document.getElementById('storeStatusChart'), {
             type: 'doughnut',
             data: {
@@ -119,7 +209,6 @@
             options: { responsive: true, maintainAspectRatio: false }
         });
 
-        
         new Chart(document.getElementById('employeeRoleChart'), {
             type: 'bar',
             data: {
@@ -128,6 +217,30 @@
             },
             options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
+
+        // --- Biểu đồ mới: Cửa hàng theo loại ---
+        if (stTypeData && stTypeData.labels && stTypeData.labels.length > 0) {
+            new Chart(document.getElementById('storesTypeChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: stTypeData.labels,
+                    datasets: [{ data: stTypeData.values, backgroundColor: [colors[0], colors[1], colors[2]] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        // --- Biểu đồ mới: Kho theo loại ---
+        if (whTypeData && whTypeData.labels && whTypeData.labels.length > 0) {
+            new Chart(document.getElementById('warehousesTypeChart'), {
+                type: 'bar',
+                data: {
+                    labels: whTypeData.labels,
+                    datasets: [{ label: 'Số lượng', data: whTypeData.values, backgroundColor: colors[3] }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            });
+        }
     });
 </script>
 {% endblock %}

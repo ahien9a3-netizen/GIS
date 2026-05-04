@@ -15,6 +15,20 @@
         <form method="post">
             {% csrf_token %}
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                {% if form.non_field_errors %}
+                <div style="grid-column: span 2; background: #fff1f2; border: 1px solid #fecdd3; padding: 1.25rem; border-radius: 12px; display: flex; align-items: flex-start; gap: 12px; color: #9f1239; font-size: 0.95rem; font-weight: 500;">
+                    <i class="fa-solid fa-triangle-exclamation" style="margin-top: 3px; font-size: 1.1rem;"></i>
+                    <div style="flex: 1;">
+                        <p style="margin: 0; font-weight: 700;">Yêu cầu kiểm tra lại dữ liệu:</p>
+                        <ul style="margin: 0.4rem 0 0 0; padding-left: 1.25rem; line-height: 1.5;">
+                            {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+                
                 {% for field in form %}
                 <div style="display: flex; flex-direction: column; gap: 0.5rem; {% if field.name == 'MatKhau' %}grid-column: span 2;{% endif %}">
                     <label style="font-weight: 600; font-size: 0.875rem;">
@@ -29,6 +43,12 @@
                     <div>
                         {{ field }}
                     </div>
+                    {% if field.help_text %}
+                    <small style="color: var(--gray-400)">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                    <small style="color: var(--danger); font-weight: 500;">{{ error }}</small>
+                    {% endfor %}
                 </div>
                 {% endfor %}
             </div>

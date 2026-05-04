@@ -156,12 +156,18 @@
                     {% else %}
                         <input type="text" value="{{ object.MaSP }}" disabled style="background: #f1f5f9; cursor: not-allowed;">
                     {% endif %}
+                    {% for error in form.MaSP.errors %}
+                    <small style="color: var(--danger); font-weight: 500;">{{ error }}</small>
+                    {% endfor %}
                 </div>
 
                 <!-- Tên SP -->
                 <div class="field-group">
                     <label>Tên sản phẩm</label>
                     {{ form.Ten }}
+                    {% for error in form.Ten.errors %}
+                    <small style="color: var(--danger); font-weight: 500;">{{ error }}</small>
+                    {% endfor %}
                 </div>
             </div>
 
@@ -179,11 +185,32 @@
                 </div>
             </div>
 
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                <!-- Giá bán -->
+                <div class="field-group">
+                    <label>Giá bán (VND)</label>
+                    {{ form.Gia }}
+                    {% for error in form.Gia.errors %}
+                    <small style="color: var(--danger); font-weight: 500;">{{ error }}</small>
+                    {% endfor %}
+                </div>
+                <div></div>
+            </div>
+
             <!-- Mô tả -->
             <div class="field-group">
                 <label>Mô tả chi tiết</label>
                 {{ form.MieuTa }}
             </div>
+
+            {% if form.non_field_errors %}
+            <div style="background: #fff1f2; border: 1px solid #fecdd3; padding: 1rem; border-radius: 12px; color: #9f1239; font-size: 0.9rem; font-weight: 500; margin-bottom: 1rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                {% for error in form.non_field_errors %}
+                <p style="margin: 0.25rem 0;">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
 
             <div class="btn-group">
                 <a href="{% url 'product_list' %}" class="btn-cancel-custom">

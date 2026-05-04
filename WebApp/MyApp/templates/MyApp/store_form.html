@@ -12,6 +12,33 @@
         margin-bottom: 0.5rem;
         z-index: 1;
     }
+    .duplicate-warning {
+        background: #fef3c7;
+        border: 1px solid #fcd34d;
+        padding: 1rem;
+        border-radius: 10px;
+        color: #92400e;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        display: none;
+    }
+    .duplicate-warning.show {
+        display: block;
+    }
+    .duplicate-warning i {
+        margin-right: 0.5rem;
+        font-size: 1.1rem;
+    }
+    .nearby-list {
+        margin-top: 0.5rem;
+        padding-left: 1.25rem;
+    }
+    .nearby-item {
+        padding: 0.25rem 0;
+    }
+    .nearby-item strong {
+        color: #7c2d12;
+    }
 </style>
 {% endblock %}
 
@@ -59,9 +86,30 @@
                     </label>
 
                     {% if field.name == 'geom' %}
+                    <div id="duplicate-warning" class="duplicate-warning">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span id="warning-text"></span>
+                        <ul id="nearby-list" class="nearby-list"></ul>
+                    </div>
                     <div id="map-picker"></div>
                     <div style="font-size: 0.8rem; color: var(--gray-500); margin-bottom: 0.5rem;">
                         Vị trí đã chọn (Lat, Lng): <strong id="coords-display">Chưa chọn</strong>
+                    </div>
+                    <!-- Địa chỉ gợi ý từ bản đồ (KHÔNG tự ghi đè ô Địa chỉ) -->
+                    <div id="address-suggestion" style="display:none; background:#eff6ff; border:1px solid #93c5fd; border-radius:10px; padding:0.75rem 1rem; margin-bottom:0.5rem; font-size:0.85rem; color:#1e40af; animation: fadeIn 0.3s;">
+                        <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem;">
+                            <i class="fa-solid fa-map-pin"></i>
+                            <strong>Địa chỉ gợi ý từ bản đồ:</strong>
+                        </div>
+                        <div id="suggestion-text" style="margin-bottom:0.6rem; line-height:1.4; color:#1e3a8a;"></div>
+                        <div style="display:flex; gap:0.5rem;">
+                            <button type="button" id="btn-use-suggestion" style="background:#1d4ed8; color:white; border:none; padding:0.4rem 1rem; border-radius:6px; font-size:0.8rem; cursor:pointer; font-weight:600; transition:background 0.2s;">
+                                <i class="fa-solid fa-check"></i> Sử dụng địa chỉ này
+                            </button>
+                            <button type="button" id="btn-dismiss-suggestion" style="background:#e2e8f0; color:#475569; border:none; padding:0.4rem 0.75rem; border-radius:6px; font-size:0.8rem; cursor:pointer; font-weight:600;">
+                                Bỏ qua
+                            </button>
+                        </div>
                     </div>
                     <div style="display: none;">{{ field }}</div>
                     {% else %}
@@ -291,6 +339,8 @@
 
         var geomInput = document.querySelector('[name="geom"]');
         var geomValue = geomInput.value;
+        var diaChiInput = document.querySelector('[name="DiaChi"]');
+        var hasDuplicate = false;
 
         if (geomValue && geomValue.includes('POINT')) {
             var coords = geomValue.match(/POINT\s*\(([-\d.]+)\s+([-\d.]+)\)/);
@@ -304,6 +354,122 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
+
+        // --- Check Coordinates Function ---
+        async function checkCoordinates(lat, lng) {
+            const warningDiv = document.getElementById('duplicate-warning');
+            const warningText = document.getElementById('warning-text');
+            const nearbyList = document.getElementById('nearby-list');
+            const submitBtn = document.querySelector('button[type="submit"]');
+            
+            try {
+                const response = await fetch('/api/check-coordinates/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        lat: lat,
+                        lng: lng,
+                        exclude_id: "{{ form.instance.MaCH }}",
+                        exclude_type: "cuahang"
+                    })
+                });
+                
+                if (!response.ok) {
+                    console.error('API error');
+                    return;
+                }
+                
+                const data = await response.json();
+                if (data.has_duplicate) {
+                    hasDuplicate = true;
+                    warningText.textContent = 'Tọa độ này đã được sử dụng bởi các địa điểm sau. Vui lòng chọn vị trí khác trên bản đồ:';
+                    nearbyList.innerHTML = '';
+                    data.nearby.forEach(item => {
+                        const li = document.createElement('li');
+                        li.className = 'nearby-item';
+                        li.innerHTML = `<strong>${item.type === 'kho' ? 'Kho' : 'Cửa hàng'}: ${item.name}</strong> (${item.address})`;
+                        nearbyList.appendChild(li);
+                    });
+                    warningDiv.classList.add('show');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.style.opacity = '0.5';
+                        submitBtn.style.cursor = 'not-allowed';
+                    }
+                } else {
+                    hasDuplicate = false;
+                    warningDiv.classList.remove('show');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.style.opacity = '1';
+                        submitBtn.style.cursor = 'pointer';
+                    }
+                }
+            } catch (error) {
+                console.error('Check coordinates error:', error);
+                hasDuplicate = false;
+                warningDiv.classList.remove('show');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                }
+            }
+        }
+
+        // --- Hiển thị địa chỉ gợi ý (KHÔNG tự ghi đè ô Địa chỉ) ---
+        function showSuggestion(address) {
+            const sugDiv = document.getElementById('address-suggestion');
+            const sugText = document.getElementById('suggestion-text');
+            if (sugDiv && sugText) {
+                sugText.textContent = address;
+                sugDiv.style.display = 'block';
+            }
+        }
+
+        // Nút "Sử dụng địa chỉ này"
+        document.getElementById('btn-use-suggestion').addEventListener('click', function() {
+            const sugText = document.getElementById('suggestion-text');
+            if (diaChiInput && sugText) {
+                diaChiInput.value = sugText.textContent;
+                diaChiInput.focus();
+                diaChiInput.style.background = '#eff6ff';
+                setTimeout(() => diaChiInput.style.background = '', 1500);
+            }
+        });
+
+        // Nút "Bỏ qua"
+        document.getElementById('btn-dismiss-suggestion').addEventListener('click', function() {
+            document.getElementById('address-suggestion').style.display = 'none';
+        });
+
+        // --- Reverse Geocoding → Chỉ gợi ý, không ghi đè ---
+        let debounceTimer = null;
+
+        async function reverseGeocode(lat, lng) {
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+                    {
+                        headers: {
+                            'Accept': 'application/json',
+                            'User-Agent': 'SmartMart-GIS-App'
+                        }
+                    }
+                );
+                if (!response.ok) throw new Error('Geocoding error');
+                const data = await response.json();
+                if (data && data.display_name) {
+                    showSuggestion(data.display_name);
+                    return data.display_name;
+                }
+            } catch (error) {
+                console.error('Reverse geocoding error:', error);
+            }
+        }
 
         L.Control.geocoder({
             defaultMarkGeocode: false,
@@ -326,12 +492,27 @@
                         var lng = pos.lng.toFixed(6);
                         geomInput.value = 'SRID=4326;POINT(' + lng + ' ' + lat + ')';
                         document.getElementById('coords-display').innerText = lat + ', ' + lng;
+                        
+                        // Check for duplicates
+                        checkCoordinates(pos.lat, pos.lng);
+                        
+                        // Debounce reverse geocoding on drag end
+                        clearTimeout(debounceTimer);
+                        debounceTimer = setTimeout(() => reverseGeocode(lat, lng), 300);
                     });
                 }
                 marker.bindPopup(e.geocode.name).openPopup();
 
                 geomInput.value = 'SRID=4326;POINT(' + lng + ' ' + lat + ')';
                 document.getElementById('coords-display').innerText = lat + ', ' + lng;
+                
+                // Check for duplicates
+                checkCoordinates(latlng.lat, latlng.lng);
+                
+                // Hiển thị địa chỉ gợi ý khi search (không ghi đè ô Địa chỉ)
+                if (e.geocode && e.geocode.name) {
+                    showSuggestion(e.geocode.name);
+                }
             })
             .addTo(map);
 
@@ -343,6 +524,13 @@
                 var lng = pos.lng.toFixed(6);
                 geomInput.value = 'SRID=4326;POINT(' + lng + ' ' + lat + ')';
                 document.getElementById('coords-display').innerText = lat + ', ' + lng;
+                
+                // Check for duplicates
+                checkCoordinates(pos.lat, pos.lng);
+                
+                // Debounce reverse geocoding on drag end
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(() => reverseGeocode(lat, lng), 300);
             });
             document.getElementById('coords-display').innerText = defaultLat + ', ' + defaultLng;
         }
@@ -350,12 +538,6 @@
         map.on('click', function (e) {
             var lat = e.latlng.lat.toFixed(6);
             var lng = e.latlng.lng.toFixed(6);
-
-            // Kiểm tra thực tế xem có gần điểm nào không (UX Warning)
-            if (isTooClose(e.latlng)) {
-                alert("Cảnh báo: Vị trí này rất gần với một điểm đã có sẵn. Vui lòng chọn vị trí khác để tránh chồng lấn.");
-                return;
-            }
 
             if (marker) {
                 marker.setLatLng(e.latlng);
@@ -367,10 +549,23 @@
                     var lng = pos.lng.toFixed(6);
                     geomInput.value = 'SRID=4326;POINT(' + lng + ' ' + lat + ')';
                     document.getElementById('coords-display').innerText = lat + ', ' + lng;
+                    
+                    // Check for duplicates
+                    checkCoordinates(pos.lat, pos.lng);
+                    
+                    // Debounce reverse geocoding on drag end
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => reverseGeocode(lat, lng), 300);
                 });
             }
             geomInput.value = 'SRID=4326;POINT(' + lng + ' ' + lat + ')';
             document.getElementById('coords-display').innerText = lat + ', ' + lng;
+            
+            // Check for duplicates
+            checkCoordinates(e.latlng.lat, e.latlng.lng);
+            
+            // Call reverse geocoding on map click
+            reverseGeocode(lat, lng);
         });
 
         // --- Fetch & Show Existing Locations ---
@@ -436,7 +631,12 @@
         const submitBtn = mainForm.querySelector('button[type="submit"]');
 
         if (mainForm) {
-            mainForm.addEventListener('submit', function () {
+            mainForm.addEventListener('submit', function (e) {
+                if (hasDuplicate) {
+                    e.preventDefault();
+                    alert('Vui lòng chọn vị trí khác trước khi lưu cửa hàng!');
+                    return;
+                }
                 if (submitBtn) {
                     submitBtn.disabled = true;
                     submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang lưu...';

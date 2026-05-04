@@ -1,0 +1,139 @@
+{% extends 'MyApp/public_base.html' %}
+{% load static %}
+
+{% block title %}Yêu cầu đổi / trả hàng #{{ order.MaDH }} - SMART MART{% endblock %}
+
+{% block extra_css %}
+<style>
+    .main-wrapper { padding: 120px 5% 80px; max-width: 800px; margin: 0 auto; min-height: 80vh; }
+
+    .page-header { text-align: center; margin-bottom: 40px; }
+    .page-header h1 { font-family: 'Outfit'; font-size: 2.2rem; font-weight: 800; color: #111827; margin: 0; }
+    .page-header p { color: #6b7280; font-size: 0.95rem; margin: 5px 0 0; }
+
+    .return-form-card { background: white; border-radius: 20px; padding: 40px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); }
+    .return-notice { background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px 20px; border-radius: 8px; margin-bottom: 30px; }
+    .return-notice p { margin: 0; color: #991b1b; font-size: 0.95rem; font-weight: 500; }
+    
+    .form-group { margin-bottom: 25px; }
+    .form-group label { display: block; font-weight: 700; color: #1e293b; margin-bottom: 8px; font-size: 0.95rem; }
+    .form-group label span { color: #ef4444; }
+    
+    .form-control { width: 100%; padding: 14px 16px; border: 1.5px solid #e2e8f0; border-radius: 12px; font-family: 'Inter'; font-size: 1rem; color: #334155; transition: 0.3s; box-sizing: border-box; }
+    .form-control:focus { border-color: var(--primary-light); outline: none; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1); }
+    
+    textarea.form-control { resize: vertical; min-height: 120px; }
+
+    .file-upload-wrapper { border: 2px dashed #cbd5e1; border-radius: 12px; padding: 30px 20px; text-align: center; position: relative; transition: 0.3s; background: #f8fafc; cursor: pointer; }
+    .file-upload-wrapper:hover { border-color: var(--primary-light); background: #eff6ff; }
+    .file-upload-wrapper input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .file-upload-icon { font-size: 2rem; color: #94a3b8; margin-bottom: 10px; }
+    .file-upload-text { margin: 0; font-weight: 600; color: #475569; }
+    .file-upload-hint { margin: 5px 0 0; font-size: 0.8rem; color: #94a3b8; }
+    
+    .file-name-display { margin-top: 10px; font-size: 0.85rem; color: var(--primary); font-weight: 600; word-break: break-all; }
+
+    .btn-submit { width: 100%; background: var(--primary); color: white; border: none; padding: 16px; border-radius: 14px; font-family: 'Outfit'; font-weight: 700; font-size: 1.1rem; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+    .btn-submit:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 10px 25px rgba(29, 78, 216, 0.3); }
+
+    .btn-back { display: inline-flex; align-items: center; gap: 8px; color: #64748b; text-decoration: none; font-weight: 600; font-size: 0.95rem; margin-bottom: 20px; transition: 0.3s; }
+    .btn-back:hover { color: var(--primary); }
+
+    .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    @media (max-width: 768px) {
+        .two-cols { grid-template-columns: 1fr; gap: 0; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-wrapper">
+    <a href="javascript:history.back()" class="btn-back" data-aos="fade-right">
+        <i class="fa-solid fa-arrow-left"></i> Quay lại
+    </a>
+
+    <div class="page-header" data-aos="fade-up">
+        <h1>Yêu cầu đổi / trả hàng</h1>
+        <p>Đơn hàng #{{ order.MaDH }}</p>
+    </div>
+
+    <div class="return-form-card" data-aos="fade-up" data-aos-delay="100">
+        <div class="return-notice">
+            <p><i class="fa-solid fa-circle-info"></i> Quý khách vui lòng cung cấp thông tin chính xác và hình ảnh minh chứng rõ nét để chúng tôi xử lý yêu cầu hoàn tiền nhanh nhất.</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="two-cols">
+                <div class="form-group">
+                    <label>Số điện thoại liên hệ <span>*</span></label>
+                    <input type="text" name="sdt" class="form-control" required placeholder="Nhập số điện thoại..." value="{{ customer_phone|default:'' }}">
+                </div>
+                <div class="form-group">
+                    <label>Email liên hệ</label>
+                    <input type="email" name="email" class="form-control" placeholder="Nhập địa chỉ email..." value="{{ customer_email|default:'' }}">
+                </div>
+            </div>
+
+            <div class="two-cols">
+                <div class="form-group">
+                    <label>Số tài khoản Ngân hàng nhận hoàn (nếu có)</label>
+                    <input type="text" name="stk_nh" class="form-control" placeholder="VD: 123456789 - VCB - Nguyen Van A">
+                </div>
+                <div class="form-group">
+                    <label>Số tài khoản MoMo nhận hoàn (nếu có)</label>
+                    <input type="text" name="stk_momo" class="form-control" placeholder="Nhập số MoMo...">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Lý do đổi trả <span>*</span></label>
+                <textarea name="ly_do" class="form-control" required placeholder="Mô tả chi tiết tình trạng hàng hóa và lý do bạn muốn đổi/trả..."></textarea>
+            </div>
+
+            <div class="two-cols">
+                <div class="form-group">
+                    <label>Ảnh hóa đơn (nếu có)</label>
+                    <div class="file-upload-wrapper">
+                        <i class="fa-solid fa-file-invoice file-upload-icon"></i>
+                        <p class="file-upload-text">Chọn hoặc kéo thả ảnh</p>
+                        <p class="file-upload-hint">PNG, JPG ốp tối đa 5MB</p>
+                        <input type="file" name="anh_hoa_don" accept="image/*" onchange="updateFileName(this, 'hd_name')">
+                    </div>
+                    <div id="hd_name" class="file-name-display"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Ảnh minh chứng sản phẩm <span>*</span></label>
+                    <div class="file-upload-wrapper">
+                        <i class="fa-solid fa-camera file-upload-icon"></i>
+                        <p class="file-upload-text">Chọn hoặc kéo thả ảnh</p>
+                        <p class="file-upload-hint">Ảnh chụp rõ Tình trạng sản phẩm</p>
+                        <input type="file" name="anh_minh_chung" accept="image/*" required onchange="updateFileName(this, 'mc_name')">
+                    </div>
+                    <div id="mc_name" class="file-name-display"></div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fa-solid fa-paper-plane"></i> Gửi Yêu Cầu
+            </button>
+        </form>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function updateFileName(input, displayId) {
+        const display = document.getElementById(displayId);
+        if (input.files && input.files.length > 0) {
+            display.innerHTML = '<i class="fa-solid fa-check-circle"></i> ' + input.files[0].name;
+        } else {
+            display.innerHTML = '';
+        }
+    }
+</script>
+{% endblock %}

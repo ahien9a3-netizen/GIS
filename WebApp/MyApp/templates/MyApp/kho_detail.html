@@ -20,8 +20,15 @@
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .main-grid {
@@ -31,12 +38,14 @@
         min-width: 0;
     }
 
-    .main-grid > div {
+    .main-grid>div {
         min-width: 0;
     }
 
     @media (max-width: 1024px) {
-        .main-grid { grid-template-columns: 1fr; }
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
     }
 
     /* Visual Side */
@@ -44,7 +53,7 @@
         background: white;
         border-radius: 30px;
         padding: 1.5rem;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
         border: 1px solid var(--gray-100);
         height: min-content;
     }
@@ -110,7 +119,7 @@
         border-radius: 30px;
         padding: 2.5rem;
         border: 1px solid var(--glass-border);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
     }
 
     .status-badge {
@@ -154,7 +163,7 @@
         align-items: center;
         gap: 1.25rem;
         padding: 1.25rem;
-        background: rgba(255,255,255,0.5);
+        background: rgba(255, 255, 255, 0.5);
         border-radius: 20px;
         border: 1px solid var(--gray-50);
         transition: all 0.2s;
@@ -198,7 +207,10 @@
         box-shadow: var(--shadow-md);
     }
 
-    #mini-map-wh { width: 100%; height: 100%; }
+    #mini-map-wh {
+        width: 100%;
+        height: 100%;
+    }
 
     .map-overlay {
         position: absolute;
@@ -239,8 +251,16 @@
         transition: all 0.3s;
     }
 
-    .btn-edit { background: var(--dark); color: white; }
-    .btn-back { background: white; color: var(--gray-600); border: 1.5px solid var(--gray-200); }
+    .btn-edit {
+        background: var(--dark);
+        color: white;
+    }
+
+    .btn-back {
+        background: white;
+        color: var(--gray-600);
+        border: 1.5px solid var(--gray-200);
+    }
 
     .empty-state {
         height: 450px;
@@ -259,42 +279,41 @@
 {% block content %}
 <div class="detail-container">
     <div class="main-grid">
-        
+
         <div class="left-col" style="display: flex; flex-direction: column; gap: 1.5rem;">
             <div class="gallery-card">
                 {% if wh.hinhanh %}
-                    <div class="swiper swiper-main" id="main-gal-wh">
-                        <div class="swiper-wrapper">
-                            {% for img in wh.hinhanh %}
-                                <div class="swiper-slide">
-                                    <img src="{% if 'http' in img %}{{ img }}{% elif '/' in img %}/media/{{ img }}{% else %}/media/warehouse/{{ img }}{% endif %}" 
-                                         alt="{{ wh.Ten }}"
-                                         onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop';">
-                                </div>
-                            {% endfor %}
+                <div class="swiper swiper-main" id="main-gal-wh">
+                    <div class="swiper-wrapper">
+                        {% for img in wh.hinhanh %}
+                        <div class="swiper-slide">
+                            <img src="{% if 'http' in img %}{{ img }}{% elif '/' in img %}/media/{{ img }}{% else %}/media/warehouse/{{ img }}{% endif %}"
+                                alt="{{ wh.Ten }}"
+                                onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop';">
                         </div>
-                        <div class="swiper-button-next"></div>
-                        <div class="swiper-button-prev"></div>
+                        {% endfor %}
                     </div>
-                    {% if wh.hinhanh|length > 1 %}
-                    <div class="swiper swiper-thumbs" id="thumb-gal-wh">
-                        <div class="swiper-wrapper">
-                            {% for img in wh.hinhanh %}
-                                <div class="swiper-slide">
-                                    <img src="{% if 'http' in img %}{{ img }}{% elif '/' in img %}/media/{{ img }}{% else %}/media/warehouse/{{ img }}{% endif %}" 
-                                         alt="Thumb" 
-                                         style="width:100%; height:100%; object-fit:cover;"
-                                         onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop';">
-                                </div>
-                            {% endfor %}
+                    <div class="swiper-button-next"></div>
+                    <div class="swiper-button-prev"></div>
+                </div>
+                {% if wh.hinhanh|length > 1 %}
+                <div class="swiper swiper-thumbs" id="thumb-gal-wh">
+                    <div class="swiper-wrapper">
+                        {% for img in wh.hinhanh %}
+                        <div class="swiper-slide">
+                            <img src="{% if 'http' in img %}{{ img }}{% elif '/' in img %}/media/{{ img }}{% else %}/media/warehouse/{{ img }}{% endif %}"
+                                alt="Thumb" style="width:100%; height:100%; object-fit:cover;"
+                                onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop';">
                         </div>
+                        {% endfor %}
                     </div>
-                    {% endif %}
+                </div>
+                {% endif %}
                 {% else %}
-                    <div class="empty-state">
-                        <i class="fa-solid fa-warehouse fa-5x" style="opacity: 0.1; margin-bottom: 2rem;"></i>
-                        <p style="font-weight: 700;">Chưa cập nhật hình ảnh</p>
-                    </div>
+                <div class="empty-state">
+                    <i class="fa-solid fa-warehouse fa-5x" style="opacity: 0.1; margin-bottom: 2rem;"></i>
+                    <p style="font-weight: 700;">Chưa cập nhật hình ảnh</p>
+                </div>
                 {% endif %}
             </div>
 
@@ -313,7 +332,7 @@
                 <div class="status-badge">
                     <i class="fa-solid fa-warehouse"></i> {{ wh.Loai }}
                 </div>
-                
+
                 <h1 class="store-name">{{ wh.Ten }}</h1>
                 <span class="store-type">Hệ thống Logistic • ID #{{ wh.MaKho }}</span>
 
@@ -327,7 +346,8 @@
                     </div>
 
                     <div class="detail-item">
-                        <div class="icon-box" style="color: #6366f1; background: #eef2ff;"><i class="fa-solid fa-box-open"></i></div>
+                        <div class="icon-box" style="color: #6366f1; background: #eef2ff;"><i
+                                class="fa-solid fa-box-open"></i></div>
                         <div class="text-box">
                             <label>Quản lý tồn kho</label>
                             <p>Tự động hóa toàn phần</p>
@@ -336,18 +356,22 @@
 
                     {% if wh.geom %}
                     <div class="detail-item">
-                        <div class="icon-box" style="color: #f59e0b; background: #fffbeb;"><i class="fa-solid fa-compass"></i></div>
+                        <div class="icon-box" style="color: #f59e0b; background: #fffbeb;"><i
+                                class="fa-solid fa-compass"></i></div>
                         <div class="text-box">
                             <label>Lat, Lng</label>
-                            <p style="font-family: monospace;">{{ wh.geom.y|floatformat:6 }}, {{ wh.geom.x|floatformat:6 }}</p>
+                            <p style="font-family: monospace;">{{ wh.geom.y|floatformat:6 }}, {{ wh.geom.x|floatformat:6
+                                }}</p>
                         </div>
                     </div>
                     {% endif %}
                     <div class="detail-item" style="align-items: flex-start;">
-                        <div class="icon-box" style="color: #ec4899; background: #fdf2f8;"><i class="fa-solid fa-circle-info"></i></div>
+                        <div class="icon-box" style="color: #ec4899; background: #fdf2f8;"><i
+                                class="fa-solid fa-circle-info"></i></div>
                         <div class="text-box">
                             <label>Thông tin mô tả</label>
-                            <p style="font-weight: 500; line-height: 1.6; color: #475569;">{{ wh.MoTa|default:"Chưa có thông tin mô tả cho kho hàng này."|safe }}</p>
+                            <p style="font-weight: 500; line-height: 1.6; color: #475569;">{{ wh.MoTa|default:"Chưa có
+                                thông tin mô tả cho kho hàng này."|safe }}</p>
                         </div>
                     </div>
                 </div>
@@ -372,7 +396,7 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         if (document.getElementById('thumb-gal-wh')) {
             const swiperThumbs = new Swiper('#thumb-gal-wh', {
                 spaceBetween: 10,
@@ -398,29 +422,86 @@
             });
         }
 
-        {% if wh.geom %}
-        var lat = {{ wh.geom.y }};
-        var lng = {{ wh.geom.x }};
-        var map = L.map('mini-map-wh', {
-            zoomControl: false,
-            attributionControl: false,
-            scrollWheelZoom: false,
-            dragging: false
-        }).setView([lat, lng], 16);
+        // --- Mini Map Logic ---
+        function initMiniMap() {
+            const mapContainer = document.getElementById('mini-map-wh');
 
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; CartoDB'
-        }).addTo(map);
+            if (!mapContainer) {
+                console.error('Mini map container not found');
+                return;
+            }
 
-        var customIcon = L.divIcon({
-            className: 'custom-div-icon',
-            html: "<div style='background-color:#10b981; width:20px; height:20px; border-radius:50%; border:4px solid white; box-shadow:0 0 10px rgba(0,0,0,0.3);'></div>",
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
-        });
+            {% if wh.geom %}
+            try {
+                {% load l10n %}
+                var lat = {{ wh.geom.y| unlocalize
+            }};
+        var lng = {{ wh.geom.x| unlocalize
+    }};
 
-        L.marker([lat, lng], {icon: customIcon}).addTo(map);
-        {% endif %}
+    console.log('Initializing warehouse mini map at:', lat, lng);
+
+    // Ensure container has dimensions before initializing map
+    mapContainer.style.width = '100%';
+    mapContainer.style.height = '100%';
+    mapContainer.style.minHeight = '250px';
+
+    var map = L.map('mini-map-wh', {
+        zoomControl: false,
+        attributionControl: false,
+        scrollWheelZoom: false,
+        dragging: false
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Create custom divIcon (same style as main GIS map for warehouses)
+    var customIcon = L.divIcon({
+        className: 'custom-marker',
+        html: '<div style="background: #ef4444; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"><i class="fa-solid fa-warehouse"></i></div>',
+        iconSize: [30, 30]
+    });
+
+    var marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+
+    // Add a popup with warehouse info
+    marker.bindPopup(`
+                    <div style="padding: 8px; min-width: 200px;">
+                        <div style="font-weight: 800; font-size: 1rem; margin-bottom: 4px;">{{ wh.Ten|escapejs }}</div>
+                        <div style="font-size: 0.85rem; color: #64748b;">
+                            <i class="fa-solid fa-tag" style="color: #ef4444; margin-right: 4px;"></i>{{ wh.Loai|escapejs }}
+                        </div>
+                        <div style="font-size: 0.85rem; color: #475569; margin-top: 6px;">
+                            <i class="fa-solid fa-location-dot" style="margin-right: 4px;"></i>{{ wh.DiaChi|default:"Chưa có địa chỉ"|escapejs }}
+                        </div>
+                    </div>
+                `);
+
+    // Set view and invalidate size
+    map.setView([lat, lng], 16);
+
+    // Force map to re-render multiple times to fix layout issues
+    setTimeout(function () {
+        map.invalidateSize();
+        console.log('Warehouse map invalidated');
+    }, 100);
+    setTimeout(function () {
+        map.invalidateSize();
+    }, 500);
+
+            } catch (error) {
+        console.error('Error initializing warehouse mini map:', error);
+        mapContainer.innerHTML = "<div style='height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f1f5f9; color:#94a3b8;'><i class='fa-solid fa-triangle-exclamation fa-2x' style='margin-bottom:0.5rem;'></i><span>Lỗi tải bản đồ</span></div>";
+    }
+    {% else %}
+    mapContainer.innerHTML = "<div style='height:100%; display:flex; align-items:center; justify-content:center; background:#f1f5f9; color:#94a3b8;'><i class='fa-solid fa-map-location-dot fa-2x' style='margin-right:0.5rem;'></i> Không có dữ liệu bản đồ</div>";
+    {% endif %}
+        }
+
+    // Initialize map
+    initMiniMap();
     });
 </script>
 {% endblock %}

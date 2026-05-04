@@ -1,1 +1,2580 @@
-[{"model": "sessions.session", "pk": "00k2t6xtg3qum0so9c0o136n9j5z856f", "fields": {"session_data": ".eJyrViotTi2KL8rPSVWyUnJMyc3MU9KBiGWmKFkp-YUZGBjCRPISc0GqPEpLFZwS85VqAW9PE5M:1w9KTg:KzjpcM6xbtW5kIOWHcsx2jTAKAwqExAwHJ3ZoBXIHLg", "expire_date": "2026-04-19T10:13:12.119Z"}}, {"model": "sessions.session", "pk": "1bipdo2k9jmy0vmhvrlaw8djciejkfg5", "fields": {"session_data": ".eJyrViotTi2Kz0xRslLyCzMwMFLSgYjkJeamgsTSSytT8xTCEvMUHGFSRfk5ICnvmFLD1KQ0hZD8mFIDg1TDPKVaANi8GPU:1wALAw:IpHdBncPYcShHNFYATadCoZPvuiXEA1s9PCUE-XIa38", "expire_date": "2026-04-22T05:10:02.971Z"}}, {"model": "sessions.session", "pk": "2hncg2mviwl5df8nblsyro41l1uafo69", "fields": {"session_data": ".eJyrViotTi2Kz0xRslLyCzMwMFbSgYjkJeamKlkphRQl5imEJeYpOMEkivJzQBJ-GTGlBgapRnkKYZlgVmKeUi0AzLkYtA:1w7n1I:BFoO9NiHQ_Cv-yo6ojf8KfXvuIIW0xBzuNx7Kj_QGEM", "expire_date": "2026-04-15T04:17:32.517Z"}}, {"model": "sessions.session", "pk": "3fewne2z5b50dqy5q4fiyv68tityq6wp", "fields": {"session_data": ".eJyrViotTi2KL8rPSVWyUvLLiCk1MEg1ylMIywSzEvOUdCAqMlNA8mEGBsYwkbzEXJCekKLEPIWwxDwFJ6VaAOmhGLQ:1w5xjj:n7ZPMWG_MujHTiT2cjoocSVyzgNDaoHyY9qNsIpdEQY", "expire_date": "2026-04-10T03:19:51.152Z"}}, {"model": "sessions.session", "pk": "55gpfmx99x3ptggo2pyw3lfuaosddbhl", "fields": {"session_data": ".eJyrViotTi2KL8rPSVWyUnJMyc3MU9KBiGWmKFkp-YUZGBjCRPISc0GqPEpLFZwS85VqAW9PE5M:1w7bxw:ra3jJ9gxZs2Yu4H6GDOhlMSNspafONHPrQTls4VwXyY", "expire_date": "2026-04-14T16:29:20.615Z"}}, {"model": "sessions.session", "pk": "6mz0bpaf6g70yg1jcz7hqb2jtvg21b46", "fields": {"session_data": ".eJyrViotTi2KL8rPSVWyUnJMyc3MU9KBiGWmKFkp-YUZGBjCRPISc0GqPEpLFZwS85VqAW9PE5M:1wCYBN:VkiqDDwLTaDQfYlVYe_xorn0bylscRq3EQPhOqCfMd4", "expire_date": "2026-04-28T07:27:37.140Z"}}, {"model": "sessions.session", "pk": "akre45v7gngy7i99ci4vbiq3ejolcttd", "fields": {"session_data": ".eJyrViotTi2KL8rPSVWyUnJMyc3MU9JRii9OLS7OzM-LT60oyCyqVLIyMzDQgajMTFGyUvILMzAwVIKK5CXmgvR6lJYqOCXmK9UCAJ1wGzY:1wAJ7M:QpNC3eHPMPOljQkyyBkvdM9Tly3EetvM-R5BCGkaAtA", "expire_date": "2026-04-08T03:08:12.610Z"}}, {"model": "sessions.session", "pk": "anjpjlzwcgvne31fa0yc2resmm8dpai7", "fields": {"session_data": ".eJyrViotTi2Kz0xRslLyCzMwMFTSgYjkJeamKlkpeZSWKjgl5sNEi_JzQKKOKbmZeUq1AFejE5M:1w7cFz:g0XXoQ1-8Zv4vm2-zNTmh6VMC0S7PiWrr7HzQNW5Zk8", "expire_date": "2026-04-14T16:47:59.263Z"}}, {"model": "sessions.session", "pk": "cbb818rvn8xfp41cuob3ui0r2sv7691l", "fields": {"session_data": "eyJfc2Vzc2lvbl9leHBpcnkiOjYwMH0:1wCT9M:0XRiywJmwVUGEMUGh0GqDjp6l8O3mBbXa80Uh3KVd3w", "expire_date": "2026-04-14T02:15:12.375Z"}}, {"model": "sessions.session", "pk": "cdwv4y75k3ft052is3dfyvi6angdjqbl", "fields": {"session_data": ".eJyrViotTi2KL8rPSVWyUgotTi1S0oEIZaaABIJdg8wNjcwtYaJ5ibkghSGpxSUKYNW1ANRrFVg:1wCfBD:kELkHZNEpwG1XBcrKOnLS0ItF_d4cp2upXVCut0m2Os", "expire_date": "2026-04-28T14:55:55.242Z"}}, {"model": "sessions.session", "pk": "dtz21kuhf3imqymwmsbcbaybe99iyzi0", "fields": {"session_data": ".eJw9y7EKgCAURuFXiX92sIIKt5qaGltF6A5CangziujdI4rWj3NOJKaoY5gJCu3krIeAZmK2wWvaFxsPqEpK8ZZ2gsIwSpnjE2_c8_YpZZ0JEIjEtOqwLlAoy7ppih-d8dv_Xzcg6yeP:1wA9bO:h4Frss7UFty6qlryaRABpF16sLbgWNzU3Iwtbk2ztvc", "expire_date": "2026-04-07T16:58:34.133Z"}}, {"model": "sessions.session", "pk": "ffvbgc8mqe4p49jvqccv544yys9h9xhp", "fields": {"session_data": ".eJyrViotTi2Kz0xRslLyCzMwMFLSgYjkJeamgsTSSytT8xTCEvMUHGFSRfk5ICnvmFLD1KQ0hZD8mFIDg1TDPKVaANi8GPU:1w7mn8:ih-Ef_AeAmXrpMM5dSoyp-maNVQwOHZSARRrE6hMS20", "expire_date": "2026-04-15T04:02:54.242Z"}}, {"model": "sessions.session", "pk": "gumuf76lp46dux04l3pof1t6lvyec6nh", "fields": {"session_data": "eyJ1c2VyX3JvbGUiOiJBZG1pbiIsInJlc2V0X290cCI6IjIzNTQ0NiIsInJlc2V0X21hbnYiOiJOVjAwMSIsIl9zZXNzaW9uX2V4cGlyeSI6NjAwfQ:1wAOJc:S4URKNiHuLOUUwHi4a_-bI2tJsayFeI-RWL2LLUYfug", "expire_date": "2026-04-08T08:41:12.756Z"}}, {"model": "sessions.session", "pk": "h74akykw8d7nl7x3hwld6by85y46ysfm", "fields": {"session_data": ".eJyrViotTi2Kz0xRslLyCzMwMFTSgYjkJeamKlkpeZSWKjgl5sNEi_JzQKKOKbmZeUq1AFejE5M:1w5w4D:vau7k5e2panFtsI5IWTvMNph_Z4y2nfrSO1sz7kReFI", "expire_date": "2026-04-10T01:32:53.827Z"}}, {"model": "sessions.session", "pk": "x9ubh3nq7kabt0om5i674azbrf1vezms", "fields": {"session_data": ".eJyrVoovTi0uzszPi0-tKMgsqlSyMjMw0FEqLU4tis9MUbJS8gszMDBUgorkJeamKlkpeZSWKjgl5sNEi_JzQKKOKbmZeUq1AIwmGzY:1wCTYd:SrLjmUpn02YhqIo_aenhtaQFYBy8yt4bWgDUHrWydbs", "expire_date": "2026-04-14T02:41:19.218Z"}}, {"model": "MyApp.sanpham", "pk": "SP01", "fields": {"Ten": "Sữa tươi Vinamilk", "Image": "products/suatuoi.jpg", "DanhMuc": "DM01", "MieuTa": "Sữa tiệt trùng", "TrangThai": "Đang bán", "Gia": "25000"}}, {"model": "MyApp.sanpham", "pk": "SP02", "fields": {"Ten": "Bánh mì", "Image": "products/banhmi.jpg", "DanhMuc": "DM02", "MieuTa": "Bánh mì truyền thống", "TrangThai": "Đang bán", "Gia": "12000"}}, {"model": "MyApp.sanpham", "pk": "SP03", "fields": {"Ten": "Mì gói", "Image": "products/migoi.jpg", "DanhMuc": "DM02", "MieuTa": "Mì ăn liền", "TrangThai": "Đang bán", "Gia": "26000"}}, {"model": "MyApp.sanpham", "pk": "SP04", "fields": {"Ten": "Nước ngọt Coca", "Image": "products/coca.jpg", "DanhMuc": "DM01", "MieuTa": "Nước ngọt có ga", "TrangThai": "Đang bán", "Gia": "10000"}}, {"model": "MyApp.sanpham", "pk": "SP05", "fields": {"Ten": "Bim bim", "Image": "products/bimbim.jpg", "DanhMuc": "DM02", "MieuTa": "Snack khoai tây chiên", "TrangThai": "Đang bán", "Gia": "10000"}}, {"model": "MyApp.sanpham", "pk": "SP06", "fields": {"Ten": "Kem", "Image": "products/kem.jpg", "DanhMuc": "DM02", "MieuTa": "Kem que", "TrangThai": "Đang bán", "Gia": "28000"}}, {"model": "MyApp.sanpham", "pk": "SP1001", "fields": {"Ten": "Nước giải khát vị trái cây", "Image": "products/nuocgiaikhattraicay.jpg", "DanhMuc": "DM001", "MieuTa": "Thức uống thơm mát, giải nhiệt mùa hè, đóng chai siêu tốc từ thiên nhiên.", "TrangThai": "Đang bán", "Gia": "12000"}}, {"model": "MyApp.sanpham", "pk": "SP1002", "fields": {"Ten": "Mì ly ăn liền vị lẩu thái", "Image": "products/milyanlien.jpg", "DanhMuc": "DM001", "MieuTa": "Tiện lợi, nhanh chóng, chua cay tròn vị.", "TrangThai": "Đang bán", "Gia": "24000"}}, {"model": "MyApp.sanpham", "pk": "SP1003", "fields": {"Ten": "Bánh quy chocolate hạt rắc", "Image": "products/banhquyrachat.jpg", "DanhMuc": "DM001", "MieuTa": "Bánh giòn rụm với chocolate thượng hạng nguyên chất.", "TrangThai": "Đang bán", "Gia": "11000"}}, {"model": "MyApp.sanpham", "pk": "SP1004", "fields": {"Ten": "Combo Gạo ST25 5kg", "Image": "products/comboST25_5kg.jpg", "DanhMuc": "DM001", "MieuTa": "Gạo chuẩn đặc sản, thơm dẻo đặc biệt cho gia đình bạn.", "TrangThai": "Đang bán", "Gia": "24000"}}, {"model": "MyApp.sanpham", "pk": "SP1005", "fields": {"Ten": "Nước yến sào đóng lon", "Image": "products/nuocyen.jpg", "DanhMuc": "DM001", "MieuTa": "Tăng cường sức khỏe mỗi ngày cùng tổ yến thiên nhiên.", "TrangThai": "Đang bán", "Gia": "5000"}}, {"model": "MyApp.danhgia", "pk": 1, "fields": {"SanPham": "SP03", "NguoiDung": "Huu Bao", "Diem": 5, "BinhLuan": "ngon", "NgayTao": "2026-04-13T18:49:26.311Z"}}, {"model": "MyApp.danhgiacuahang", "pk": 1, "fields": {"CuaHang": "CH01", "NguoiDung": "Huu Bao", "Diem": 4, "BinhLuan": "Test review: Great store!", "NgayTao": "2026-04-13T16:55:55.468Z"}}, {"model": "MyApp.danhgiacuahang", "pk": 2, "fields": {"CuaHang": "CH02", "NguoiDung": "Khách ẩn danh", "Diem": 5, "BinhLuan": "không gian sạch sẽ\r\n", "NgayTao": "2026-04-14T03:16:09.767Z"}}, {"model": "MyApp.kho", "pk": "K01", "fields": {"Ten": "Kho Trung Tâm", "Loai": "Kho Tổng", "DiaChi": "Quận 1, TP.HCM", "Icon": "warehouse.png", "hinhanh": "[\"warehouse/Khohang1.jpg\", \"warehouse/Khohang2.jpg\", \"warehouse/Khohang3.jpg\"]", "geom": "SRID=4326;POINT (106.70089999999998 10.776899999999998)", "MoTa": "<p>Đ&acirc;y l&agrave; đầu mối logistics ch&iacute;nh của to&agrave;n hệ thống. Kho được trang bị hệ thống quản l&yacute; hiện đại, chịu tr&aacute;ch nhiệm tiếp nhận h&agrave;ng h&oacute;a từ nh&agrave; cung cấp v&agrave; ph&acirc;n phối đến c&aacute;c kho chi nh&aacute;nh. Vị tr&iacute; trung t&acirc;m gi&uacute;p tối ưu h&oacute;a thời gian lu&acirc;n chuyển h&agrave;ng h&oacute;a nội đ&ocirc;.</p>"}}, {"model": "MyApp.kho", "pk": "K02", "fields": {"Ten": "Kho Quận 9", "Loai": "Kho Chi Nhánh", "DiaChi": "Quận 9, TP.HCM", "Icon": "warehouse.png", "hinhanh": "[\"warehouse/Khohang4.jpg\", \"warehouse/Khohang5.JPG\", \"warehouse/Khohang6.jpg\"]", "geom": "SRID=4326;POINT (106.803 10.814200000000007)", "MoTa": "<p>Đ&oacute;ng vai tr&ograve; l&agrave; trạm trung chuyển chiến lược cho khu vực ph&iacute;a Đ&ocirc;ng th&agrave;nh phố. Kho tập trung lưu trữ c&aacute;c mặt h&agrave;ng điện tử v&agrave; gia dụng c&oacute; k&iacute;ch thước lớn, hỗ trợ giao h&agrave;ng nhanh ch&oacute;ng cho c&aacute;c cửa h&agrave;ng tại Thủ Đức, Quận 9 v&agrave; Quận 2.</p>"}}, {"model": "MyApp.kho", "pk": "K03", "fields": {"Ten": "Kho Bình Tân", "Loai": "Kho Chi Nhánh", "DiaChi": "Bình Tân, TP.HCM", "Icon": "warehouse.png", "hinhanh": "[\"warehouse/Khohang7.jpg\", \"warehouse/Khohang8.jpg\", \"warehouse/Khohang9.jpg\"]", "geom": "SRID=4326;POINT (106.6037 10.738499999999991)", "MoTa": "<p>Kho vệ tinh phục vụ khu vực cửa ng&otilde; ph&iacute;a T&acirc;y. Với diện t&iacute;ch lưu trữ lớn, kho chuy&ecirc;n tr&aacute;ch c&aacute;c mặt h&agrave;ng ti&ecirc;u d&ugrave;ng nhanh (FMCG) v&agrave; thực phẩm kh&ocirc;, đảm bảo nguồn cung ổn định cho c&aacute;c cụm cửa h&agrave;ng tiện lợi tại B&igrave;nh T&acirc;n v&agrave; l&acirc;n cận.</p>"}}, {"model": "MyApp.kho", "pk": "K04", "fields": {"Ten": "test", "Loai": "Kho Chi Nhánh", "DiaChi": "Hẻm 236B Lê Văn Sỹ, Phường Tân Sơn Hòa,Tân Bình, TP.HCM", "Icon": null, "hinhanh": "[\"warehouse/computer.jpg\", \"warehouse/sapiens.jpg\", \"warehouse/thinking.jpg\"]", "geom": "SRID=4326;POINT (106.666776 10.796645)", "MoTa": "<p>test</p>"}}, {"model": "MyApp.cuahang", "pk": "99", "fields": {"Ten": "test1", "Loai": "Tiện Lợi", "Icon": null, "DiaChi": "Đường Nguyễn Thị Minh Khai, Khu phố 4, Phường Xuân Hòa, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 71006, Việt Nam", "SDT": "0909111222", "hinhanh": "[]", "TrangThai": "Hoạt động", "geom": "SRID=4326;POINT (106.697544 10.782291)", "GioMoCua": null, "GioDongCua": null, "MoTa": "<p>test1</p>"}}, {"model": "MyApp.cuahang", "pk": "CH01", "fields": {"Ten": "Cửa hàng Quận 3", "Loai": "Tiện Lợi", "Icon": "store.png", "DiaChi": "Quận 3, TP.HCM", "SDT": "0909123456", "hinhanh": "[\"store/tienloi1.jpg\", \"store/tienloi2.jpg\", \"store/tienloi3.jpg\"]", "TrangThai": "Hoạt động", "geom": "SRID=4326;POINT (106.682 10.783999999999994)", "GioMoCua": "08:00:00", "GioDongCua": "22:00:00", "MoTa": "<p>Điểm đến tin cậy cho cư d&acirc;n khu vực Quận 3. Cửa h&agrave;ng sở hữu danh mục sản phẩm đa dạng từ thực phẩm tươi sống đến đồ d&ugrave;ng c&aacute; nh&acirc;n, đảm bảo ti&ecirc;u chuẩn vệ sinh an to&agrave;n thực phẩm v&agrave; sự tiện lợi tối đa.</p>"}}, {"model": "MyApp.cuahang", "pk": "CH02", "fields": {"Ten": "Cửa hàng Quận 1", "Loai": "Tiện Lợi", "Icon": "store.png", "DiaChi": "Quận 1, TP.HCM", "SDT": "0909111222", "hinhanh": "[\"store/tienloi4.jpg\", \"store/tienloi5.jpg\", \"store/tienloi6.jpg\"]", "TrangThai": "Hoạt động", "geom": "SRID=4326;POINT (106.70501199999998 10.775891000000003)", "GioMoCua": "08:00:00", "GioDongCua": "22:00:00", "MoTa": "<p>Nằm tại vị tr&iacute; đắc địa trung t&acirc;m th&agrave;nh phố, cửa h&agrave;ng Quận 1 chuy&ecirc;n cung cấp c&aacute;c mặt h&agrave;ng thực phẩm nhanh, đồ uống v&agrave; nhu yếu phẩm 24/7. Kh&ocirc;ng gian hiện đại, phục vụ nhanh ch&oacute;ng cho d&acirc;n văn ph&ograve;ng v&agrave; kh&aacute;ch du lịch.</p>"}}, {"model": "MyApp.cuahang", "pk": "CH03", "fields": {"Ten": "Cửa hàng Bình Thạnh", "Loai": "Gia Dụng", "Icon": "store.png", "DiaChi": "Bình Thạnh, TP.HCM", "SDT": "0909333444", "hinhanh": "[\"store/giadung1.jpg\", \"store/giadung2.jpg\", \"store/giadung3.jpg\"]", "TrangThai": "Hoạt động", "geom": "SRID=4326;POINT (106.7073 10.802500000000002)", "GioMoCua": "08:00:00", "GioDongCua": "22:00:00", "MoTa": "<p>Chuy&ecirc;n cung cấp c&aacute;c thiết bị gia đ&igrave;nh, đồ d&ugrave;ng nh&agrave; bếp v&agrave; vật dụng trang tr&iacute; nội thất. Sản phẩm tại chi nh&aacute;nh B&igrave;nh Thạnh lu&ocirc;n cập nhật xu hướng mới, gi&uacute;p tối ưu h&oacute;a kh&ocirc;ng gian sống cho gia đ&igrave;nh bạn.</p>"}}, {"model": "MyApp.cuahang", "pk": "CH04", "fields": {"Ten": "Cửa hàng Tân Bình", "Loai": "Tiện Lợi", "Icon": "store.png", "DiaChi": "Tân Bình, TP.HCM", "SDT": "0909555666", "hinhanh": "[\"store/tienloi7.jpg\", \"store/tienloi8.jpg\", \"store/tienloi9.jpg\"]", "TrangThai": "Hoạt động", "geom": "SRID=4326;POINT (106.65449999999997 10.799199999999981)", "GioMoCua": "08:00:00", "GioDongCua": "22:00:00", "MoTa": "<p>Tọa lạc tại khu vực d&acirc;n cư đ&ocirc;ng đ&uacute;c quận T&acirc;n B&igrave;nh, cửa h&agrave;ng tập trung v&agrave;o c&aacute;c nh&oacute;m h&agrave;ng ti&ecirc;u d&ugrave;ng thiết yếu với mức gi&aacute; b&igrave;nh ổn, hỗ trợ thanh to&aacute;n linh hoạt v&agrave; dịch vụ kh&aacute;ch h&agrave;ng tận t&acirc;m</p>"}}, {"model": "MyApp.cuahang", "pk": "CH05", "fields": {"Ten": "Cửa hàng Phú Nhuận", "Loai": "Điện Tử", "Icon": "store.png", "DiaChi": "Phú Nhuận, TP.HCM", "SDT": "0909777888", "hinhanh": "[\"store/dientu1.jpg\", \"store/dientu2.jpg\", \"store/dientu3.jpg\"]", "TrangThai": "Hoạt động", "geom": "SRID=4326;POINT (106.68299999999998 10.7972)", "GioMoCua": "08:00:00", "GioDongCua": "22:00:00", "MoTa": "<p>Trung t&acirc;m trải nghiệm c&ocirc;ng nghệ tại Ph&uacute; Nhuận. Chuy&ecirc;n ph&acirc;n phối c&aacute;c thiết bị di động, phụ kiện th&ocirc;ng minh v&agrave; linh kiện m&aacute;y t&iacute;nh ch&iacute;nh h&atilde;ng với ch&iacute;nh s&aacute;ch bảo h&agrave;nh ưu việt</p>"}}, {"model": "MyApp.cuahang", "pk": "CH06", "fields": {"Ten": "Cửa hàng Quận 7", "Loai": "Gia Dụng", "Icon": "store.png", "DiaChi": "Quận 7, TP.HCM", "SDT": "0909999000", "hinhanh": "[\"store/giadung4.jpg\", \"store/giadung5.jpg\", \"store/giadung6.jpg\"]", "TrangThai": "Hoạt động", "geom": "SRID=4326;POINT (106.7186 10.73329999999999)", "GioMoCua": "08:00:00", "GioDongCua": "22:00:00", "MoTa": "<p>Kh&ocirc;ng gian mua sắm hiện đại tại khu đ&ocirc; thị Quận 7. Cửa h&agrave;ng tập trung v&agrave;o c&aacute;c d&ograve;ng sản phẩm gia dụng cao cấp, m&aacute;y m&oacute;c tiện &iacute;ch gia đ&igrave;nh từ c&aacute;c thương hiệu uy t&iacute;n, đ&aacute;p ứng ti&ecirc;u chuẩn sống chất lượng cao.</p>"}}, {"model": "MyApp.cuahang", "pk": "CH07", "fields": {"Ten": "Cửa hàng Gò Vấp", "Loai": "Điện Tử", "Icon": "store.png", "DiaChi": "Gò Vấp, TP.HCM", "SDT": "0909123789", "hinhanh": "[\"store/dientu4.jpg\", \"store/dientu5.jpg\", \"store/dientu6.jpg\"]", "TrangThai": "Hoạt động", "geom": "SRID=4326;POINT (106.6676 10.837600000000002)", "GioMoCua": "08:00:00", "GioDongCua": "22:00:00", "MoTa": "<p>Điểm đến cho những t&iacute;n đồ c&ocirc;ng nghệ khu vực G&ograve; Vấp. Cung cấp giải ph&aacute;p thiết bị điện tử giải tr&iacute;, đồ chơi c&ocirc;ng nghệ v&agrave; c&aacute;c sản phẩm gia dụng th&ocirc;ng minh (Smart Home) mới nhất tr&ecirc;n thị trường.</p>"}}, {"model": "MyApp.cuahang", "pk": "CH08", "fields": {"Ten": "Cửa hàng Thủ Đức", "Loai": "Tiện Lợi", "Icon": "store.png", "DiaChi": "Thủ Đức, TP.HCM", "SDT": "0909456123", "hinhanh": "[\"store/tienloi10.jpg\", \"store/tienloi11.jpg\", \"store/tienloi12.jpg\"]", "TrangThai": "Hoạt động", "geom": "SRID=4326;POINT (106.7718 10.850799999999994)", "GioMoCua": "08:00:00", "GioDongCua": "22:00:00", "MoTa": "<p>Phục vụ cộng đồng sinh vi&ecirc;n v&agrave; cư d&acirc;n tại TP. Thủ Đức. Cửa h&agrave;ng cung cấp đầy đủ c&aacute;c loại văn ph&ograve;ng phẩm, thực phẩm đ&oacute;ng g&oacute;i v&agrave; đồ ăn nhẹ với nhiều chương tr&igrave;nh ưu đ&atilde;i hấp dẫn h&agrave;ng th&aacute;ng.</p>"}}, {"model": "MyApp.nhanvien", "pk": "NV001", "fields": {"Ten": "Huu Bao", "SDT": "0567103725", "Email": "baohuu752@gmail.com", "MatKhau": "123456", "Role": "Admin"}}, {"model": "MyApp.nhanvien", "pk": "NV002", "fields": {"Ten": "Nguyen Van A", "SDT": "0987654321", "Email": "vana@gmail.com", "MatKhau": "123456", "Role": "Kế Toán"}}, {"model": "MyApp.nhanvien", "pk": "NV003", "fields": {"Ten": "Tran Van B", "SDT": "0123456789", "Email": "vanb@gmail.com", "MatKhau": "123456", "Role": "Nhân Viên"}}, {"model": "MyApp.nhanvien", "pk": "NV004", "fields": {"Ten": "test", "SDT": "0909111221", "Email": "test@gmail.com", "MatKhau": "123456", "Role": "Nhân Viên"}}, {"model": "MyApp.nhanvien", "pk": "USER71279", "fields": {"Ten": "Test User", "SDT": "0123456789", "Email": "testuser@example.com", "MatKhau": "password123", "Role": "User"}}, {"model": "MyApp.yeucaunhapkho", "pk": "YC01", "fields": {"Ngay": "2026-03-27", "TrangThai": "Đã duyệt", "GhiChu": "Nhập hàng bổ sung đợt 1", "MaNV": "NV001"}}, {"model": "MyApp.yeucaunhapkho", "pk": "YC02", "fields": {"Ngay": "2026-03-28", "TrangThai": "Đã duyệt", "GhiChu": "Nhập hàng khuyến mãi tháng 4", "MaNV": "NV002"}}, {"model": "MyApp.yeucaunhapkho", "pk": "YC03", "fields": {"Ngay": "2026-03-29", "TrangThai": "Đã duyệt", "GhiChu": "Nhập gấp sữa tươi Vinamilk", "MaNV": "NV001"}}, {"model": "MyApp.yeucaunhapkho", "pk": "YC04", "fields": {"Ngay": "2026-03-27", "TrangThai": "Đã duyệt", "GhiChu": "Nhập hàng đầu tháng", "MaNV": "NV001"}}, {"model": "MyApp.yeucaunhapkho", "pk": "YC05", "fields": {"Ngay": "2026-04-08", "TrangThai": "Đã duyệt", "GhiChu": "test", "MaNV": "NV001"}}, {"model": "MyApp.hangtonkho", "pk": 1, "fields": {"MaKho": "K01", "MaSP": "SP03", "SoLuong": 97}}, {"model": "MyApp.hangtonkho", "pk": 2, "fields": {"MaKho": "K02", "MaSP": "SP01", "SoLuong": 46}}, {"model": "MyApp.hangtonkho", "pk": 3, "fields": {"MaKho": "K01", "MaSP": "SP04", "SoLuong": 80}}, {"model": "MyApp.hangtonkho", "pk": 4, "fields": {"MaKho": "K02", "MaSP": "SP05", "SoLuong": 86}}, {"model": "MyApp.hangtonkho", "pk": 5, "fields": {"MaKho": "K03", "MaSP": "SP02", "SoLuong": 26}}, {"model": "MyApp.hangtonkho", "pk": 6, "fields": {"MaKho": "K03", "MaSP": "SP06", "SoLuong": 40}}, {"model": "MyApp.hangtonkho", "pk": 7, "fields": {"MaKho": "K01", "MaSP": "SP01", "SoLuong": 71}}, {"model": "MyApp.hangtonkho", "pk": 8, "fields": {"MaKho": "K01", "MaSP": "SP02", "SoLuong": 19}}, {"model": "MyApp.hangtonkho", "pk": 9, "fields": {"MaKho": "K04", "MaSP": "SP04", "SoLuong": 81}}, {"model": "MyApp.hangtonkho", "pk": 10, "fields": {"MaKho": "K04", "MaSP": "SP1003", "SoLuong": 29}}, {"model": "MyApp.hangtonkho", "pk": 11, "fields": {"MaKho": "K04", "MaSP": "SP1001", "SoLuong": 45}}, {"model": "MyApp.hangtonkho", "pk": 13, "fields": {"MaKho": "K04", "MaSP": "SP01", "SoLuong": 92}}, {"model": "MyApp.hangtonkho", "pk": 14, "fields": {"MaKho": "K04", "MaSP": "SP05", "SoLuong": 27}}, {"model": "MyApp.hangtonkho", "pk": 15, "fields": {"MaKho": "K04", "MaSP": "SP1002", "SoLuong": 42}}, {"model": "MyApp.hangtonkho", "pk": 16, "fields": {"MaKho": "K04", "MaSP": "SP06", "SoLuong": 12}}, {"model": "MyApp.hangtonkho", "pk": 17, "fields": {"MaKho": "K04", "MaSP": "SP1005", "SoLuong": 14}}, {"model": "MyApp.hangtonkho", "pk": 18, "fields": {"MaKho": "K04", "MaSP": "SP03", "SoLuong": 30}}, {"model": "MyApp.hangtonkho", "pk": 19, "fields": {"MaKho": "K04", "MaSP": "SP1004", "SoLuong": 97}}, {"model": "MyApp.hangtonkho", "pk": 20, "fields": {"MaKho": "K04", "MaSP": "SP02", "SoLuong": 32}}, {"model": "MyApp.hangtonkho", "pk": 21, "fields": {"MaKho": "K01", "MaSP": "SP1002", "SoLuong": 39}}, {"model": "MyApp.hangtonkho", "pk": 22, "fields": {"MaKho": "K01", "MaSP": "SP1001", "SoLuong": 95}}, {"model": "MyApp.hangtonkho", "pk": 23, "fields": {"MaKho": "K01", "MaSP": "SP1003", "SoLuong": 24}}, {"model": "MyApp.hangtonkho", "pk": 24, "fields": {"MaKho": "K01", "MaSP": "SP1005", "SoLuong": 35}}, {"model": "MyApp.hangtonkho", "pk": 25, "fields": {"MaKho": "K01", "MaSP": "SP05", "SoLuong": 18}}, {"model": "MyApp.hangtonkho", "pk": 26, "fields": {"MaKho": "K01", "MaSP": "SP06", "SoLuong": 21}}, {"model": "MyApp.hangtonkho", "pk": 28, "fields": {"MaKho": "K01", "MaSP": "SP1004", "SoLuong": 18}}, {"model": "MyApp.hangtonkho", "pk": 29, "fields": {"MaKho": "K02", "MaSP": "SP1004", "SoLuong": 55}}, {"model": "MyApp.hangtonkho", "pk": 30, "fields": {"MaKho": "K02", "MaSP": "SP1002", "SoLuong": 52}}, {"model": "MyApp.hangtonkho", "pk": 31, "fields": {"MaKho": "K02", "MaSP": "SP1003", "SoLuong": 47}}, {"model": "MyApp.hangtonkho", "pk": 32, "fields": {"MaKho": "K02", "MaSP": "SP1005", "SoLuong": 99}}, {"model": "MyApp.hangtonkho", "pk": 33, "fields": {"MaKho": "K02", "MaSP": "SP03", "SoLuong": 32}}, {"model": "MyApp.hangtonkho", "pk": 34, "fields": {"MaKho": "K02", "MaSP": "SP06", "SoLuong": 92}}, {"model": "MyApp.hangtonkho", "pk": 36, "fields": {"MaKho": "K02", "MaSP": "SP02", "SoLuong": 15}}, {"model": "MyApp.hangtonkho", "pk": 37, "fields": {"MaKho": "K02", "MaSP": "SP04", "SoLuong": 15}}, {"model": "MyApp.hangtonkho", "pk": 38, "fields": {"MaKho": "K02", "MaSP": "SP1001", "SoLuong": 54}}, {"model": "MyApp.hangtonkho", "pk": 39, "fields": {"MaKho": "K03", "MaSP": "SP1003", "SoLuong": 11}}, {"model": "MyApp.hangtonkho", "pk": 41, "fields": {"MaKho": "K03", "MaSP": "SP03", "SoLuong": 54}}, {"model": "MyApp.hangtonkho", "pk": 42, "fields": {"MaKho": "K03", "MaSP": "SP1004", "SoLuong": 25}}, {"model": "MyApp.hangtonkho", "pk": 43, "fields": {"MaKho": "K03", "MaSP": "SP1002", "SoLuong": 22}}, {"model": "MyApp.hangtonkho", "pk": 44, "fields": {"MaKho": "K03", "MaSP": "SP05", "SoLuong": 23}}, {"model": "MyApp.hangtonkho", "pk": 45, "fields": {"MaKho": "K03", "MaSP": "SP01", "SoLuong": 55}}, {"model": "MyApp.hangtonkho", "pk": 46, "fields": {"MaKho": "K03", "MaSP": "SP1001", "SoLuong": 77}}, {"model": "MyApp.hangtonkho", "pk": 47, "fields": {"MaKho": "K03", "MaSP": "SP04", "SoLuong": 35}}, {"model": "MyApp.hangtonkho", "pk": 48, "fields": {"MaKho": "K03", "MaSP": "SP1005", "SoLuong": 60}}, {"model": "MyApp.nhapkhochitiet", "pk": 3, "fields": {"MaYC": "YC01", "MaKho": "K01", "MaSP": "SP02", "SoLuong": 50}}, {"model": "MyApp.nhapkhochitiet", "pk": 4, "fields": {"MaYC": "YC02", "MaKho": "K02", "MaSP": "SP03", "SoLuong": 200}}, {"model": "MyApp.nhapkhochitiet", "pk": 5, "fields": {"MaYC": "YC03", "MaKho": "K01", "MaSP": "SP01", "SoLuong": 150}}, {"model": "MyApp.nhapkhochitiet", "pk": 6, "fields": {"MaYC": "YC04", "MaKho": "K03", "MaSP": "SP03", "SoLuong": 30}}, {"model": "MyApp.nhapkhochitiet", "pk": 8, "fields": {"MaYC": "YC05", "MaKho": "K01", "MaSP": "SP02", "SoLuong": 10}}, {"model": "MyApp.danhmuc", "pk": "DM_TL", "fields": {"Ten": "Cửa hàng Tiện lợi"}}, {"model": "MyApp.danhmuc", "pk": "DM001", "fields": {"Ten": "Bách Hóa Tổng Hợp"}}, {"model": "MyApp.danhmuc", "pk": "DM01", "fields": {"Ten": "Đồ uống"}}, {"model": "MyApp.danhmuc", "pk": "DM02", "fields": {"Ten": "Thực phẩm"}}, {"model": "MyApp.danhmuc", "pk": "DM03", "fields": {"Ten": "Gia dụng"}}, {"model": "MyApp.danhmuc", "pk": "DM04", "fields": {"Ten": "Tiện lợi"}}, {"model": "MyApp.danhmuc", "pk": "DM05", "fields": {"Ten": "Điện tử"}}, {"model": "MyApp.phanbocungcap", "pk": 1, "fields": {"cua_hang": "CH02", "kho": "K04", "khoang_cach": "4.9", "thoi_gian": 7, "uu_tien": 1}}, {"model": "MyApp.phanbocungcap", "pk": 2, "fields": {"cua_hang": "CH02", "kho": "K01", "khoang_cach": "0.5", "thoi_gian": 0, "uu_tien": 2}}, {"model": "MyApp.phanbocungcap", "pk": 3, "fields": {"cua_hang": "CH06", "kho": "K03", "khoang_cach": "12.8", "thoi_gian": 19, "uu_tien": 1}}, {"model": "MyApp.phanbocungcap", "pk": 4, "fields": {"cua_hang": "CH06", "kho": "K02", "khoang_cach": "13.1", "thoi_gian": 19, "uu_tien": 2}}, {"model": "MyApp.phanbocungcap", "pk": 5, "fields": {"cua_hang": "CH07", "kho": "K01", "khoang_cach": "7.8", "thoi_gian": 11, "uu_tien": 1}}, {"model": "MyApp.phanbocungcap", "pk": 6, "fields": {"cua_hang": "CH07", "kho": "K04", "khoang_cach": "4.6", "thoi_gian": 6, "uu_tien": 2}}, {"model": "MyApp.phanbocungcap", "pk": 7, "fields": {"cua_hang": "CH04", "kho": "K04", "khoang_cach": "1.4", "thoi_gian": 2, "uu_tien": 1}}, {"model": "MyApp.phanbocungcap", "pk": 8, "fields": {"cua_hang": "CH04", "kho": "K02", "khoang_cach": "16.6", "thoi_gian": 24, "uu_tien": 2}}, {"model": "MyApp.phanbocungcap", "pk": 9, "fields": {"cua_hang": "CH08", "kho": "K02", "khoang_cach": "5.4", "thoi_gian": 8, "uu_tien": 1}}, {"model": "MyApp.phanbocungcap", "pk": 10, "fields": {"cua_hang": "CH08", "kho": "K04", "khoang_cach": "13.2", "thoi_gian": 19, "uu_tien": 2}}, {"model": "MyApp.phanbocungcap", "pk": 11, "fields": {"cua_hang": "CH03", "kho": "K03", "khoang_cach": "13.6", "thoi_gian": 20, "uu_tien": 1}}, {"model": "MyApp.phanbocungcap", "pk": 12, "fields": {"cua_hang": "CH03", "kho": "K02", "khoang_cach": "10.7", "thoi_gian": 16, "uu_tien": 2}}, {"model": "MyApp.phanbocungcap", "pk": 13, "fields": {"cua_hang": "CH01", "kho": "K01", "khoang_cach": "2.3", "thoi_gian": 3, "uu_tien": 1}}, {"model": "MyApp.phanbocungcap", "pk": 14, "fields": {"cua_hang": "CH01", "kho": "K04", "khoang_cach": "2.2", "thoi_gian": 3, "uu_tien": 2}}, {"model": "MyApp.phanbocungcap", "pk": 15, "fields": {"cua_hang": "CH05", "kho": "K01", "khoang_cach": "3.0", "thoi_gian": 4, "uu_tien": 1}}, {"model": "MyApp.phanbocungcap", "pk": 16, "fields": {"cua_hang": "CH05", "kho": "K04", "khoang_cach": "1.8", "thoi_gian": 2, "uu_tien": 2}}, {"model": "MyApp.giohang", "pk": 1, "fields": {"NguoiDung": "NV001", "SessionID": null, "NgayTao": "2026-04-13T18:23:04.699Z", "NgayCapNhat": "2026-04-13T18:23:04.699Z"}}, {"model": "MyApp.giohang", "pk": 2, "fields": {"NguoiDung": null, "SessionID": "fcq5ivqtem00udlo9cgoeb4buaj4vef4", "NgayTao": "2026-04-14T01:39:11.752Z", "NgayCapNhat": "2026-04-14T01:39:11.752Z"}}, {"model": "MyApp.giohang", "pk": 3, "fields": {"NguoiDung": null, "SessionID": "cbb818rvn8xfp41cuob3ui0r2sv7691l", "NgayTao": "2026-04-14T01:48:03.072Z", "NgayCapNhat": "2026-04-14T01:48:03.072Z"}}, {"model": "MyApp.giohang", "pk": 4, "fields": {"NguoiDung": null, "SessionID": "x9ubh3nq7kabt0om5i674azbrf1vezms", "NgayTao": "2026-04-14T02:21:12.579Z", "NgayCapNhat": "2026-04-14T02:21:12.579Z"}}, {"model": "MyApp.giohang", "pk": 5, "fields": {"NguoiDung": null, "SessionID": "x4o1q8akmtoov5nr72xmghmrl3zxcshz", "NgayTao": "2026-04-14T02:46:30.411Z", "NgayCapNhat": "2026-04-14T02:46:30.411Z"}}, {"model": "MyApp.giohang", "pk": 6, "fields": {"NguoiDung": null, "SessionID": "pejvgl5lyb3yfrkkaqcsws1cmrnmygbs", "NgayTao": "2026-04-14T13:35:24.108Z", "NgayCapNhat": "2026-04-14T13:35:24.108Z"}}, {"model": "MyApp.giohang", "pk": 7, "fields": {"NguoiDung": "NV002", "SessionID": null, "NgayTao": "2026-04-14T13:35:50.212Z", "NgayCapNhat": "2026-04-14T13:35:50.212Z"}}, {"model": "MyApp.giohang", "pk": 8, "fields": {"NguoiDung": null, "SessionID": "cdwv4y75k3ft052is3dfyvi6angdjqbl", "NgayTao": "2026-04-14T13:36:34.173Z", "NgayCapNhat": "2026-04-14T13:36:34.173Z"}}, {"model": "MyApp.giohang", "pk": 9, "fields": {"NguoiDung": "NV003", "SessionID": null, "NgayTao": "2026-04-14T13:36:52.017Z", "NgayCapNhat": "2026-04-14T13:36:52.017Z"}}, {"model": "MyApp.giohang", "pk": 10, "fields": {"NguoiDung": "USER71279", "SessionID": null, "NgayTao": "2026-04-14T14:55:55.343Z", "NgayCapNhat": "2026-04-14T14:55:55.343Z"}}, {"model": "MyApp.chitietgiohang", "pk": 5, "fields": {"GioHang": 5, "SanPham": "SP03", "SoLuong": 1}}, {"model": "MyApp.chitietgiohang", "pk": 8, "fields": {"GioHang": 1, "SanPham": "SP04", "SoLuong": 1}}, {"model": "MyApp.chitietgiohang", "pk": 9, "fields": {"GioHang": 1, "SanPham": "SP05", "SoLuong": 1}}, {"model": "MyApp.donhang", "pk": "DH120276", "fields": {"NguoiDung": "NV001", "TenNguoiNhan": "Huu BaoNguy", "SDT_Nhan": "05671037250988777666", "DiaChi_Nhan": "S", "TongTien": "20000", "PhuongThucThanhToan": "COD", "TrangThai": "Đang xử lý", "GhiChu": "", "NgayTao": "2026-04-13T18:43:01.128Z"}}, {"model": "MyApp.donhang", "pk": "DH509247", "fields": {"NguoiDung": "NV001", "TenNguoiNhan": "Huu Bao", "SDT_Nhan": "0567103725", "DiaChi_Nhan": "Lê Văn Sỹ, Khu phố 50, Phường Nhiêu Lộc, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 70150, Việt Nam", "TongTien": "10000", "PhuongThucThanhToan": "COD", "TrangThai": "Đã trả hàng", "GhiChu": "", "NgayTao": "2026-04-14T03:49:18.020Z"}}, {"model": "MyApp.donhang", "pk": "DH949177", "fields": {"NguoiDung": "NV001", "TenNguoiNhan": "Huu Bao", "SDT_Nhan": "0567103725", "DiaChi_Nhan": "123 ABC Street, District 1, HCM City", "TongTien": "25000", "PhuongThucThanhToan": "COD", "TrangThai": "Đang xử lý", "GhiChu": "", "NgayTao": "2026-04-13T19:04:05.231Z"}}, {"model": "MyApp.donhang", "pk": "DH965479", "fields": {"NguoiDung": "NV001", "TenNguoiNhan": "Huu Bao", "SDT_Nhan": "0567103725", "DiaChi_Nhan": "sấc", "TongTien": "11000", "PhuongThucThanhToan": "COD", "TrangThai": "Đang xử lý", "GhiChu": "", "NgayTao": "2026-04-14T03:31:03.106Z"}}, {"model": "MyApp.chitietdonhang", "pk": 1, "fields": {"DonHang": "DH120276", "SanPham": "SP04", "SoLuong": 1, "GiaBan": "10000"}}, {"model": "MyApp.chitietdonhang", "pk": 2, "fields": {"DonHang": "DH120276", "SanPham": "SP05", "SoLuong": 1, "GiaBan": "10000"}}, {"model": "MyApp.chitietdonhang", "pk": 3, "fields": {"DonHang": "DH949177", "SanPham": "SP01", "SoLuong": 1, "GiaBan": "25000"}}, {"model": "MyApp.chitietdonhang", "pk": 4, "fields": {"DonHang": "DH965479", "SanPham": "SP1003", "SoLuong": 1, "GiaBan": "11000"}}, {"model": "MyApp.chitietdonhang", "pk": 5, "fields": {"DonHang": "DH509247", "SanPham": "SP04", "SoLuong": 1, "GiaBan": "10000"}}, {"model": "MyApp.yeucautrahang", "pk": "TH957436", "fields": {"DonHang": "DH509247", "SdtLienHe": "0567103725", "EmailLienHe": "baohuu752@gmail.com", "SoTaiKhoanNH": "132312412421", "SoTaiKhoanMoMo": "141241433141241", "LyDo": "thích", "AnhHoaDon": "", "AnhMinhChung": "", "GhiChuAdmin": "", "SoTienHoan": "10000", "TrangThai": "Đã hoàn tiền", "NgayTao": "2026-04-14T09:04:18.965Z", "NgayXuLy": "2026-04-14T09:04:49.744Z"}}]
+[
+{
+    "model": "MyApp.sanpham",
+    "pk": "SP01",
+    "fields": {
+        "Ten": "Sữa tươi Vinamilk",
+        "Image": "products/suatuoi.jpg",
+        "DanhMuc": "DM01",
+        "MieuTa": "Sữa tiệt trùng",
+        "TrangThai": "Đang bán",
+        "Gia": "25000"
+    }
+},
+{
+    "model": "MyApp.sanpham",
+    "pk": "SP02",
+    "fields": {
+        "Ten": "Bánh mì",
+        "Image": "products/banhmi.jpg",
+        "DanhMuc": "DM02",
+        "MieuTa": "Bánh mì truyền thống",
+        "TrangThai": "Đang bán",
+        "Gia": "12000"
+    }
+},
+{
+    "model": "MyApp.sanpham",
+    "pk": "SP03",
+    "fields": {
+        "Ten": "Mì gói",
+        "Image": "products/migoi.jpg",
+        "DanhMuc": "DM02",
+        "MieuTa": "Mì ăn liền",
+        "TrangThai": "Đang bán",
+        "Gia": "26000"
+    }
+},
+{
+    "model": "MyApp.sanpham",
+    "pk": "SP04",
+    "fields": {
+        "Ten": "Nước ngọt Coca",
+        "Image": "products/coca.jpg",
+        "DanhMuc": "DM01",
+        "MieuTa": "Nước ngọt có ga",
+        "TrangThai": "Đang bán",
+        "Gia": "10000"
+    }
+},
+{
+    "model": "MyApp.sanpham",
+    "pk": "SP05",
+    "fields": {
+        "Ten": "Bim bim",
+        "Image": "products/bimbim.jpg",
+        "DanhMuc": "DM02",
+        "MieuTa": "Snack khoai tây chiên",
+        "TrangThai": "Đang bán",
+        "Gia": "10000"
+    }
+},
+{
+    "model": "MyApp.sanpham",
+    "pk": "SP06",
+    "fields": {
+        "Ten": "Kem",
+        "Image": "products/kem.jpg",
+        "DanhMuc": "DM02",
+        "MieuTa": "Kem que",
+        "TrangThai": "Đang bán",
+        "Gia": "28000"
+    }
+},
+{
+    "model": "MyApp.sanpham",
+    "pk": "SP1001",
+    "fields": {
+        "Ten": "Nước giải khát vị trái cây",
+        "Image": "products/nuocgiaikhattraicay.jpg",
+        "DanhMuc": "DM001",
+        "MieuTa": "Thức uống thơm mát, giải nhiệt mùa hè, đóng chai siêu tốc từ thiên nhiên.",
+        "TrangThai": "Đang bán",
+        "Gia": "12000"
+    }
+},
+{
+    "model": "MyApp.sanpham",
+    "pk": "SP1002",
+    "fields": {
+        "Ten": "Mì ly ăn liền vị lẩu thái",
+        "Image": "products/milyanlien.jpg",
+        "DanhMuc": "DM001",
+        "MieuTa": "Tiện lợi, nhanh chóng, chua cay tròn vị.",
+        "TrangThai": "Đang bán",
+        "Gia": "24000"
+    }
+},
+{
+    "model": "MyApp.sanpham",
+    "pk": "SP1003",
+    "fields": {
+        "Ten": "Bánh quy chocolate hạt rắc",
+        "Image": "products/banhquyrachat.jpg",
+        "DanhMuc": "DM001",
+        "MieuTa": "Bánh giòn rụm với chocolate thượng hạng nguyên chất.",
+        "TrangThai": "Đang bán",
+        "Gia": "11000"
+    }
+},
+{
+    "model": "MyApp.sanpham",
+    "pk": "SP1004",
+    "fields": {
+        "Ten": "Combo Gạo ST25 5kg",
+        "Image": "products/comboST25_5kg.jpg",
+        "DanhMuc": "DM001",
+        "MieuTa": "Gạo chuẩn đặc sản, thơm dẻo đặc biệt cho gia đình bạn.",
+        "TrangThai": "Đang bán",
+        "Gia": "24000"
+    }
+},
+{
+    "model": "MyApp.sanpham",
+    "pk": "SP1005",
+    "fields": {
+        "Ten": "Nước yến sào đóng lon",
+        "Image": "products/nuocyen.jpg",
+        "DanhMuc": "DM001",
+        "MieuTa": "Tăng cường sức khỏe mỗi ngày cùng tổ yến thiên nhiên.",
+        "TrangThai": "Đang bán",
+        "Gia": "5000"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 1,
+    "fields": {
+        "SanPham": "SP03",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "ngon",
+        "NgayTao": "2026-04-13T18:49:26.311Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 2,
+    "fields": {
+        "SanPham": "SP02",
+        "NguoiDung": "Huu Bao",
+        "Diem": 4,
+        "BinhLuan": "S",
+        "NgayTao": "2026-05-02T18:23:11.770Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 3,
+    "fields": {
+        "SanPham": "SP02",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "Good!",
+        "NgayTao": "2026-05-02T18:25:00.458Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 4,
+    "fields": {
+        "SanPham": "SP02",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "Excellent!",
+        "NgayTao": "2026-05-02T18:25:20.478Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 5,
+    "fields": {
+        "SanPham": "SP02",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "Review 4",
+        "NgayTao": "2026-05-02T18:25:34.713Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 6,
+    "fields": {
+        "SanPham": "SP02",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "Review 5",
+        "NgayTao": "2026-05-02T18:25:46.029Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 7,
+    "fields": {
+        "SanPham": "SP02",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "Review 6 - Triggering Pagination!",
+        "NgayTao": "2026-05-02T18:26:00.318Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 8,
+    "fields": {
+        "SanPham": "SP02",
+        "NguoiDung": "Huu Bao",
+        "Diem": 3,
+        "BinhLuan": "Test ",
+        "NgayTao": "2026-05-02T18:39:29.364Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 9,
+    "fields": {
+        "SanPham": "SP06",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "kem ngon\r\n",
+        "NgayTao": "2026-05-02T18:42:18.192Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 10,
+    "fields": {
+        "SanPham": "SP02",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "First test review",
+        "NgayTao": "2026-05-03T04:19:36.489Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 11,
+    "fields": {
+        "SanPham": "SP02",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "First test review",
+        "NgayTao": "2026-05-03T04:20:06.638Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 12,
+    "fields": {
+        "SanPham": "SP1003",
+        "NguoiDung": "Huu Bao",
+        "Diem": 4,
+        "BinhLuan": "bánh quy rất ngon, sẽ quay lại ủng hộ tiếp",
+        "NgayTao": "2026-05-03T05:04:00.198Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 13,
+    "fields": {
+        "SanPham": "SP1002",
+        "NguoiDung": "Sting",
+        "Diem": 5,
+        "BinhLuan": "ngon",
+        "NgayTao": "2026-05-04T04:41:41.805Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 14,
+    "fields": {
+        "SanPham": "SP01",
+        "NguoiDung": "Sting",
+        "Diem": 5,
+        "BinhLuan": "ngon",
+        "NgayTao": "2026-05-04T06:32:52.671Z"
+    }
+},
+{
+    "model": "MyApp.danhgia",
+    "pk": 15,
+    "fields": {
+        "SanPham": "SP1004",
+        "NguoiDung": "Sting",
+        "Diem": 5,
+        "BinhLuan": "tốt",
+        "NgayTao": "2026-05-04T07:31:56.120Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 1,
+    "fields": {
+        "CuaHang": "CH01",
+        "NguoiDung": "Huu Bao",
+        "Diem": 4,
+        "BinhLuan": "Test review: Great store!",
+        "NgayTao": "2026-04-13T16:55:55.468Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 2,
+    "fields": {
+        "CuaHang": "CH02",
+        "NguoiDung": "Khách ẩn danh",
+        "Diem": 5,
+        "BinhLuan": "không gian sạch sẽ\r\n",
+        "NgayTao": "2026-04-14T03:16:09.767Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 3,
+    "fields": {
+        "CuaHang": "CH03",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "tốt",
+        "NgayTao": "2026-04-14T17:49:33.453Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 4,
+    "fields": {
+        "CuaHang": "CH01",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "Store Good 1",
+        "NgayTao": "2026-05-02T18:26:49.771Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 5,
+    "fields": {
+        "CuaHang": "CH01",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "More reviews!",
+        "NgayTao": "2026-05-02T18:28:03.329Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 6,
+    "fields": {
+        "CuaHang": "CH01",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "Review 4 for Store!",
+        "NgayTao": "2026-05-02T18:28:33.655Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 7,
+    "fields": {
+        "CuaHang": "CH01",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "Review 5 for store.",
+        "NgayTao": "2026-05-02T18:29:03.530Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 8,
+    "fields": {
+        "CuaHang": "CH01",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "Review 6 - Pagination Trigger!",
+        "NgayTao": "2026-05-02T18:29:40.255Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 9,
+    "fields": {
+        "CuaHang": "CH01",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "Store test 1",
+        "NgayTao": "2026-05-03T04:23:10.739Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 10,
+    "fields": {
+        "CuaHang": "CH01",
+        "NguoiDung": "Huu Bao",
+        "Diem": 4,
+        "BinhLuan": "Store test 2",
+        "NgayTao": "2026-05-03T04:23:47.561Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 11,
+    "fields": {
+        "CuaHang": "CH01",
+        "NguoiDung": "Huu Bao",
+        "Diem": 3,
+        "BinhLuan": "Store test 3",
+        "NgayTao": "2026-05-03T04:24:27.301Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 12,
+    "fields": {
+        "CuaHang": "CH01",
+        "NguoiDung": "Huu Bao",
+        "Diem": 2,
+        "BinhLuan": "Store test 4",
+        "NgayTao": "2026-05-03T04:25:05.348Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 13,
+    "fields": {
+        "CuaHang": "CH01",
+        "NguoiDung": "Huu Bao",
+        "Diem": 1,
+        "BinhLuan": "Store test 5",
+        "NgayTao": "2026-05-03T04:25:43.854Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 14,
+    "fields": {
+        "CuaHang": "CH02",
+        "NguoiDung": "Huu Bao",
+        "Diem": 5,
+        "BinhLuan": "Chi nhanh rat sach se",
+        "NgayTao": "2026-05-03T05:04:57.556Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 15,
+    "fields": {
+        "CuaHang": "CH01",
+        "NguoiDung": "Sting",
+        "Diem": 5,
+        "BinhLuan": "tốt",
+        "NgayTao": "2026-05-04T04:41:17.331Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 16,
+    "fields": {
+        "CuaHang": "CH04",
+        "NguoiDung": "Sting",
+        "Diem": 5,
+        "BinhLuan": "tốt",
+        "NgayTao": "2026-05-04T06:33:52.632Z"
+    }
+},
+{
+    "model": "MyApp.danhgiacuahang",
+    "pk": 17,
+    "fields": {
+        "CuaHang": "CH06",
+        "NguoiDung": "Sting",
+        "Diem": 5,
+        "BinhLuan": "tốt",
+        "NgayTao": "2026-05-04T07:32:14.596Z"
+    }
+},
+{
+    "model": "MyApp.kho",
+    "pk": "K01",
+    "fields": {
+        "Ten": "Kho Trung Tâm",
+        "Loai": "Kho Tổng",
+        "DiaChi": "Quận 1, TP.HCM",
+        "Icon": "warehouse.png",
+        "hinhanh": "[\"warehouse/Khohang1.jpg\", \"warehouse/Khohang2.jpg\", \"warehouse/Khohang3.jpg\"]",
+        "geom": "SRID=4326;POINT (106.70089999999998 10.776899999999998)",
+        "MoTa": "<p>Đ&acirc;y l&agrave; đầu mối logistics ch&iacute;nh của to&agrave;n hệ thống. Kho được trang bị hệ thống quản l&yacute; hiện đại, chịu tr&aacute;ch nhiệm tiếp nhận h&agrave;ng h&oacute;a từ nh&agrave; cung cấp v&agrave; ph&acirc;n phối đến c&aacute;c kho chi nh&aacute;nh. Vị tr&iacute; trung t&acirc;m gi&uacute;p tối ưu h&oacute;a thời gian lu&acirc;n chuyển h&agrave;ng h&oacute;a nội đ&ocirc;.</p>"
+    }
+},
+{
+    "model": "MyApp.kho",
+    "pk": "K02",
+    "fields": {
+        "Ten": "Kho Quận 9",
+        "Loai": "Kho Chi Nhánh",
+        "DiaChi": "Quận 9, TP.HCM",
+        "Icon": "warehouse.png",
+        "hinhanh": "[\"warehouse/Khohang4.jpg\", \"warehouse/Khohang5.JPG\", \"warehouse/Khohang6.jpg\"]",
+        "geom": "SRID=4326;POINT (106.803 10.814200000000007)",
+        "MoTa": "<p>Đ&oacute;ng vai tr&ograve; l&agrave; trạm trung chuyển chiến lược cho khu vực ph&iacute;a Đ&ocirc;ng th&agrave;nh phố. Kho tập trung lưu trữ c&aacute;c mặt h&agrave;ng điện tử v&agrave; gia dụng c&oacute; k&iacute;ch thước lớn, hỗ trợ giao h&agrave;ng nhanh ch&oacute;ng cho c&aacute;c cửa h&agrave;ng tại Thủ Đức, Quận 9 v&agrave; Quận 2.</p>"
+    }
+},
+{
+    "model": "MyApp.kho",
+    "pk": "K03",
+    "fields": {
+        "Ten": "Kho Bình Tân",
+        "Loai": "Kho Chi Nhánh",
+        "DiaChi": "Bình Tân, TP.HCM",
+        "Icon": "warehouse.png",
+        "hinhanh": "[\"warehouse/Khohang7.jpg\", \"warehouse/Khohang8.jpg\", \"warehouse/Khohang9.jpg\"]",
+        "geom": "SRID=4326;POINT (106.6037 10.738499999999991)",
+        "MoTa": "<p>Kho vệ tinh phục vụ khu vực cửa ng&otilde; ph&iacute;a T&acirc;y. Với diện t&iacute;ch lưu trữ lớn, kho chuy&ecirc;n tr&aacute;ch c&aacute;c mặt h&agrave;ng ti&ecirc;u d&ugrave;ng nhanh (FMCG) v&agrave; thực phẩm kh&ocirc;, đảm bảo nguồn cung ổn định cho c&aacute;c cụm cửa h&agrave;ng tiện lợi tại B&igrave;nh T&acirc;n v&agrave; l&acirc;n cận.</p>"
+    }
+},
+{
+    "model": "MyApp.cuahang",
+    "pk": "CH01",
+    "fields": {
+        "Ten": "Cửa hàng Quận 3",
+        "Loai": "Tiện Lợi",
+        "Icon": "store.png",
+        "DiaChi": "Quận 3, TP.HCM",
+        "SDT": "0909123456",
+        "hinhanh": "[\"store/tienloi1.jpg\", \"store/tienloi2.jpg\", \"store/tienloi3.jpg\"]",
+        "TrangThai": "Hoạt động",
+        "geom": "SRID=4326;POINT (106.682 10.783999999999994)",
+        "GioMoCua": "08:00:00",
+        "GioDongCua": "22:00:00",
+        "MoTa": "<p>Điểm đến tin cậy cho cư d&acirc;n khu vực Quận 3. Cửa h&agrave;ng sở hữu danh mục sản phẩm đa dạng từ thực phẩm tươi sống đến đồ d&ugrave;ng c&aacute; nh&acirc;n, đảm bảo ti&ecirc;u chuẩn vệ sinh an to&agrave;n thực phẩm v&agrave; sự tiện lợi tối đa.</p>"
+    }
+},
+{
+    "model": "MyApp.cuahang",
+    "pk": "CH02",
+    "fields": {
+        "Ten": "Cửa hàng Quận 1",
+        "Loai": "Tiện Lợi",
+        "Icon": "store.png",
+        "DiaChi": "Quận 1, TP.HCM",
+        "SDT": "0909111222",
+        "hinhanh": "[\"store/tienloi4.jpg\", \"store/tienloi5.jpg\", \"store/tienloi6.jpg\"]",
+        "TrangThai": "Hoạt động",
+        "geom": "SRID=4326;POINT (106.70501199999998 10.775891000000003)",
+        "GioMoCua": "08:00:00",
+        "GioDongCua": "22:00:00",
+        "MoTa": "<p>Nằm tại vị tr&iacute; đắc địa trung t&acirc;m th&agrave;nh phố, cửa h&agrave;ng Quận 1 chuy&ecirc;n cung cấp c&aacute;c mặt h&agrave;ng thực phẩm nhanh, đồ uống v&agrave; nhu yếu phẩm 24/7. Kh&ocirc;ng gian hiện đại, phục vụ nhanh ch&oacute;ng cho d&acirc;n văn ph&ograve;ng v&agrave; kh&aacute;ch du lịch.</p>"
+    }
+},
+{
+    "model": "MyApp.cuahang",
+    "pk": "CH03",
+    "fields": {
+        "Ten": "Cửa hàng Bình Thạnh",
+        "Loai": "Gia Dụng",
+        "Icon": "store.png",
+        "DiaChi": "Bình Thạnh, TP.HCM",
+        "SDT": "0909333444",
+        "hinhanh": "[\"store/giadung1.jpg\", \"store/giadung2.jpg\", \"store/giadung3.jpg\"]",
+        "TrangThai": "Hoạt động",
+        "geom": "SRID=4326;POINT (106.7073 10.802500000000002)",
+        "GioMoCua": "08:00:00",
+        "GioDongCua": "22:00:00",
+        "MoTa": "<p>Chuy&ecirc;n cung cấp c&aacute;c thiết bị gia đ&igrave;nh, đồ d&ugrave;ng nh&agrave; bếp v&agrave; vật dụng trang tr&iacute; nội thất. Sản phẩm tại chi nh&aacute;nh B&igrave;nh Thạnh lu&ocirc;n cập nhật xu hướng mới, gi&uacute;p tối ưu h&oacute;a kh&ocirc;ng gian sống cho gia đ&igrave;nh bạn.</p>"
+    }
+},
+{
+    "model": "MyApp.cuahang",
+    "pk": "CH04",
+    "fields": {
+        "Ten": "Cửa hàng Tân Bình",
+        "Loai": "Tiện Lợi",
+        "Icon": "store.png",
+        "DiaChi": "Tân Bình, TP.HCM",
+        "SDT": "0909555666",
+        "hinhanh": "[\"store/tienloi7.jpg\", \"store/tienloi8.jpg\", \"store/tienloi9.jpg\"]",
+        "TrangThai": "Hoạt động",
+        "geom": "SRID=4326;POINT (106.65449999999997 10.799199999999981)",
+        "GioMoCua": "08:00:00",
+        "GioDongCua": "22:00:00",
+        "MoTa": "<p>Tọa lạc tại khu vực d&acirc;n cư đ&ocirc;ng đ&uacute;c quận T&acirc;n B&igrave;nh, cửa h&agrave;ng tập trung v&agrave;o c&aacute;c nh&oacute;m h&agrave;ng ti&ecirc;u d&ugrave;ng thiết yếu với mức gi&aacute; b&igrave;nh ổn, hỗ trợ thanh to&aacute;n linh hoạt v&agrave; dịch vụ kh&aacute;ch h&agrave;ng tận t&acirc;m</p>"
+    }
+},
+{
+    "model": "MyApp.cuahang",
+    "pk": "CH05",
+    "fields": {
+        "Ten": "Cửa hàng Phú Nhuận",
+        "Loai": "Điện Tử",
+        "Icon": "store.png",
+        "DiaChi": "Phú Nhuận, TP.HCM",
+        "SDT": "0909777888",
+        "hinhanh": "[\"store/dientu1.jpg\", \"store/dientu2.jpg\", \"store/dientu3.jpg\"]",
+        "TrangThai": "Hoạt động",
+        "geom": "SRID=4326;POINT (106.68299999999998 10.7972)",
+        "GioMoCua": "08:00:00",
+        "GioDongCua": "22:00:00",
+        "MoTa": "<p>Trung t&acirc;m trải nghiệm c&ocirc;ng nghệ tại Ph&uacute; Nhuận. Chuy&ecirc;n ph&acirc;n phối c&aacute;c thiết bị di động, phụ kiện th&ocirc;ng minh v&agrave; linh kiện m&aacute;y t&iacute;nh ch&iacute;nh h&atilde;ng với ch&iacute;nh s&aacute;ch bảo h&agrave;nh ưu việt</p>"
+    }
+},
+{
+    "model": "MyApp.cuahang",
+    "pk": "CH06",
+    "fields": {
+        "Ten": "Cửa hàng Quận 7",
+        "Loai": "Gia Dụng",
+        "Icon": "store.png",
+        "DiaChi": "Quận 7, TP.HCM",
+        "SDT": "0909999000",
+        "hinhanh": "[\"store/giadung4.jpg\", \"store/giadung5.jpg\", \"store/giadung6.jpg\"]",
+        "TrangThai": "Hoạt động",
+        "geom": "SRID=4326;POINT (106.7186 10.73329999999999)",
+        "GioMoCua": "08:00:00",
+        "GioDongCua": "22:00:00",
+        "MoTa": "<p>Kh&ocirc;ng gian mua sắm hiện đại tại khu đ&ocirc; thị Quận 7. Cửa h&agrave;ng tập trung v&agrave;o c&aacute;c d&ograve;ng sản phẩm gia dụng cao cấp, m&aacute;y m&oacute;c tiện &iacute;ch gia đ&igrave;nh từ c&aacute;c thương hiệu uy t&iacute;n, đ&aacute;p ứng ti&ecirc;u chuẩn sống chất lượng cao.</p>"
+    }
+},
+{
+    "model": "MyApp.cuahang",
+    "pk": "CH07",
+    "fields": {
+        "Ten": "Cửa hàng Gò Vấp",
+        "Loai": "Điện Tử",
+        "Icon": "store.png",
+        "DiaChi": "Gò Vấp, TP.HCM",
+        "SDT": "0909123789",
+        "hinhanh": "[\"store/dientu4.jpg\", \"store/dientu5.jpg\", \"store/dientu6.jpg\"]",
+        "TrangThai": "Hoạt động",
+        "geom": "SRID=4326;POINT (106.6676 10.837600000000002)",
+        "GioMoCua": "08:00:00",
+        "GioDongCua": "22:00:00",
+        "MoTa": "<p>Điểm đến cho những t&iacute;n đồ c&ocirc;ng nghệ khu vực G&ograve; Vấp. Cung cấp giải ph&aacute;p thiết bị điện tử giải tr&iacute;, đồ chơi c&ocirc;ng nghệ v&agrave; c&aacute;c sản phẩm gia dụng th&ocirc;ng minh (Smart Home) mới nhất tr&ecirc;n thị trường.</p>"
+    }
+},
+{
+    "model": "MyApp.cuahang",
+    "pk": "CH08",
+    "fields": {
+        "Ten": "Cửa hàng Thủ Đức",
+        "Loai": "Tiện Lợi",
+        "Icon": "store.png",
+        "DiaChi": "Thủ Đức, TP.HCM",
+        "SDT": "0909456123",
+        "hinhanh": "[\"store/tienloi10.jpg\", \"store/tienloi11.jpg\", \"store/tienloi12.jpg\"]",
+        "TrangThai": "Hoạt động",
+        "geom": "SRID=4326;POINT (106.7718 10.850799999999994)",
+        "GioMoCua": "08:00:00",
+        "GioDongCua": "22:00:00",
+        "MoTa": "<p>Phục vụ cộng đồng sinh vi&ecirc;n v&agrave; cư d&acirc;n tại TP. Thủ Đức. Cửa h&agrave;ng cung cấp đầy đủ c&aacute;c loại văn ph&ograve;ng phẩm, thực phẩm đ&oacute;ng g&oacute;i v&agrave; đồ ăn nhẹ với nhiều chương tr&igrave;nh ưu đ&atilde;i hấp dẫn h&agrave;ng th&aacute;ng.</p>"
+    }
+},
+{
+    "model": "MyApp.nhanvien",
+    "pk": "NV001",
+    "fields": {
+        "Ten": "Huu Bao",
+        "SDT": "0567103725",
+        "Email": "baohuu752@gmail.com",
+        "MatKhau": "123456",
+        "Role": "Admin"
+    }
+},
+{
+    "model": "MyApp.nhanvien",
+    "pk": "NV002",
+    "fields": {
+        "Ten": "Nguyen Van A",
+        "SDT": "0987654321",
+        "Email": "vana@gmail.com",
+        "MatKhau": "123456",
+        "Role": "Kế Toán"
+    }
+},
+{
+    "model": "MyApp.nhanvien",
+    "pk": "NV003",
+    "fields": {
+        "Ten": "Tran Van B",
+        "SDT": "0123456789",
+        "Email": "vanb@gmail.com",
+        "MatKhau": "123456",
+        "Role": "Nhân Viên"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "100",
+    "fields": {
+        "Ngay": "2026-04-16",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "test",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "99",
+    "fields": {
+        "Ngay": "2026-04-14",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "test",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "YC01",
+    "fields": {
+        "Ngay": "2026-03-27",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "Nhập hàng bổ sung đợt 1",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "YC02",
+    "fields": {
+        "Ngay": "2026-03-28",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "Nhập hàng khuyến mãi tháng 4",
+        "MaNV": "NV002"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "YC03",
+    "fields": {
+        "Ngay": "2026-03-29",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "Nhập gấp sữa tươi Vinamilk",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "YC04",
+    "fields": {
+        "Ngay": "2026-03-27",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "Nhập hàng đầu tháng",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "YC05",
+    "fields": {
+        "Ngay": "2026-04-08",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "test",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "YC07",
+    "fields": {
+        "Ngay": "2026-04-17",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "Nhập kho đầu tháng",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "YC087",
+    "fields": {
+        "Ngay": "2026-05-04",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "test",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "YC088",
+    "fields": {
+        "Ngay": "2026-04-15",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "test",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "YC0987",
+    "fields": {
+        "Ngay": "2026-05-04",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "test",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "YC099",
+    "fields": {
+        "Ngay": "2026-05-04",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "test",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucaunhapkho",
+    "pk": "YC12",
+    "fields": {
+        "Ngay": "2026-04-30",
+        "TrangThai": "Đã duyệt",
+        "GhiChu": "Nhập kho đầu tháng 5",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 1,
+    "fields": {
+        "MaKho": "K01",
+        "MaSP": "SP03",
+        "SoLuong": 93
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 2,
+    "fields": {
+        "MaKho": "K02",
+        "MaSP": "SP01",
+        "SoLuong": 47
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 3,
+    "fields": {
+        "MaKho": "K01",
+        "MaSP": "SP04",
+        "SoLuong": 78
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 4,
+    "fields": {
+        "MaKho": "K02",
+        "MaSP": "SP05",
+        "SoLuong": 86
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 5,
+    "fields": {
+        "MaKho": "K03",
+        "MaSP": "SP02",
+        "SoLuong": 26
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 6,
+    "fields": {
+        "MaKho": "K03",
+        "MaSP": "SP06",
+        "SoLuong": 40
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 8,
+    "fields": {
+        "MaKho": "K01",
+        "MaSP": "SP02",
+        "SoLuong": 60
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 21,
+    "fields": {
+        "MaKho": "K01",
+        "MaSP": "SP1002",
+        "SoLuong": 39
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 22,
+    "fields": {
+        "MaKho": "K01",
+        "MaSP": "SP1001",
+        "SoLuong": 95
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 23,
+    "fields": {
+        "MaKho": "K01",
+        "MaSP": "SP1003",
+        "SoLuong": 21
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 24,
+    "fields": {
+        "MaKho": "K01",
+        "MaSP": "SP1005",
+        "SoLuong": 35
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 25,
+    "fields": {
+        "MaKho": "K01",
+        "MaSP": "SP05",
+        "SoLuong": 16
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 26,
+    "fields": {
+        "MaKho": "K01",
+        "MaSP": "SP06",
+        "SoLuong": 20
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 28,
+    "fields": {
+        "MaKho": "K01",
+        "MaSP": "SP1004",
+        "SoLuong": 17
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 29,
+    "fields": {
+        "MaKho": "K02",
+        "MaSP": "SP1004",
+        "SoLuong": 55
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 30,
+    "fields": {
+        "MaKho": "K02",
+        "MaSP": "SP1002",
+        "SoLuong": 52
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 31,
+    "fields": {
+        "MaKho": "K02",
+        "MaSP": "SP1003",
+        "SoLuong": 46
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 32,
+    "fields": {
+        "MaKho": "K02",
+        "MaSP": "SP1005",
+        "SoLuong": 99
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 33,
+    "fields": {
+        "MaKho": "K02",
+        "MaSP": "SP03",
+        "SoLuong": 32
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 34,
+    "fields": {
+        "MaKho": "K02",
+        "MaSP": "SP06",
+        "SoLuong": 92
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 36,
+    "fields": {
+        "MaKho": "K02",
+        "MaSP": "SP02",
+        "SoLuong": 15
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 37,
+    "fields": {
+        "MaKho": "K02",
+        "MaSP": "SP04",
+        "SoLuong": 15
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 38,
+    "fields": {
+        "MaKho": "K02",
+        "MaSP": "SP1001",
+        "SoLuong": 54
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 39,
+    "fields": {
+        "MaKho": "K03",
+        "MaSP": "SP1003",
+        "SoLuong": 11
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 41,
+    "fields": {
+        "MaKho": "K03",
+        "MaSP": "SP03",
+        "SoLuong": 60
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 42,
+    "fields": {
+        "MaKho": "K03",
+        "MaSP": "SP1004",
+        "SoLuong": 25
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 43,
+    "fields": {
+        "MaKho": "K03",
+        "MaSP": "SP1002",
+        "SoLuong": 22
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 44,
+    "fields": {
+        "MaKho": "K03",
+        "MaSP": "SP05",
+        "SoLuong": 23
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 45,
+    "fields": {
+        "MaKho": "K03",
+        "MaSP": "SP01",
+        "SoLuong": 55
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 46,
+    "fields": {
+        "MaKho": "K03",
+        "MaSP": "SP1001",
+        "SoLuong": 77
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 47,
+    "fields": {
+        "MaKho": "K03",
+        "MaSP": "SP04",
+        "SoLuong": 35
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 48,
+    "fields": {
+        "MaKho": "K03",
+        "MaSP": "SP1005",
+        "SoLuong": 60
+    }
+},
+{
+    "model": "MyApp.hangtonkho",
+    "pk": 51,
+    "fields": {
+        "MaKho": "K01",
+        "MaSP": "SP01",
+        "SoLuong": 99
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 3,
+    "fields": {
+        "MaYC": "YC01",
+        "MaKho": "K01",
+        "MaSP": "SP02",
+        "SoLuong": 50
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 4,
+    "fields": {
+        "MaYC": "YC02",
+        "MaKho": "K02",
+        "MaSP": "SP03",
+        "SoLuong": 200
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 5,
+    "fields": {
+        "MaYC": "YC03",
+        "MaKho": "K01",
+        "MaSP": "SP01",
+        "SoLuong": 150
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 6,
+    "fields": {
+        "MaYC": "YC04",
+        "MaKho": "K03",
+        "MaSP": "SP03",
+        "SoLuong": 30
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 8,
+    "fields": {
+        "MaYC": "YC05",
+        "MaKho": "K01",
+        "MaSP": "SP02",
+        "SoLuong": 10
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 9,
+    "fields": {
+        "MaYC": "99",
+        "MaKho": "K01",
+        "MaSP": "SP01",
+        "SoLuong": 10
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 10,
+    "fields": {
+        "MaYC": "YC088",
+        "MaKho": "K01",
+        "MaSP": "SP02",
+        "SoLuong": 10
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 11,
+    "fields": {
+        "MaYC": "100",
+        "MaKho": "K01",
+        "MaSP": "SP01",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 12,
+    "fields": {
+        "MaYC": "100",
+        "MaKho": "K01",
+        "MaSP": "SP02",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 13,
+    "fields": {
+        "MaYC": "YC07",
+        "MaKho": "K01",
+        "MaSP": "SP01",
+        "SoLuong": 10
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 14,
+    "fields": {
+        "MaYC": "YC07",
+        "MaKho": "K01",
+        "MaSP": "SP02",
+        "SoLuong": 20
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 15,
+    "fields": {
+        "MaYC": "YC12",
+        "MaKho": "K01",
+        "MaSP": "SP01",
+        "SoLuong": 8
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 16,
+    "fields": {
+        "MaYC": "YC12",
+        "MaKho": "K01",
+        "MaSP": "SP02",
+        "SoLuong": 11
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 17,
+    "fields": {
+        "MaYC": "YC12",
+        "MaKho": "K03",
+        "MaSP": "SP03",
+        "SoLuong": 6
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 18,
+    "fields": {
+        "MaYC": "YC087",
+        "MaKho": "K01",
+        "MaSP": "SP01",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 19,
+    "fields": {
+        "MaYC": "YC087",
+        "MaKho": "K01",
+        "MaSP": "SP02",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 22,
+    "fields": {
+        "MaYC": "YC099",
+        "MaKho": "K02",
+        "MaSP": "SP01",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 23,
+    "fields": {
+        "MaYC": "YC099",
+        "MaKho": "K01",
+        "MaSP": "SP02",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 24,
+    "fields": {
+        "MaYC": "YC0987",
+        "MaKho": "K01",
+        "MaSP": "SP01",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.nhapkhochitiet",
+    "pk": 25,
+    "fields": {
+        "MaYC": "YC0987",
+        "MaKho": "K01",
+        "MaSP": "SP02",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.yeucauxuatkho",
+    "pk": "XK01",
+    "fields": {
+        "Ngay": "2026-04-15",
+        "LyDo": "Bán hàng",
+        "DonHang": "DH509247",
+        "TrangThai": "Đã xuất",
+        "GhiChu": "TEST",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucauxuatkho",
+    "pk": "XK02",
+    "fields": {
+        "Ngay": "2026-04-17",
+        "LyDo": "Bán hàng",
+        "DonHang": "DH965479",
+        "TrangThai": "Đã xuất",
+        "GhiChu": "",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucauxuatkho",
+    "pk": "XK03",
+    "fields": {
+        "Ngay": "2026-04-17",
+        "LyDo": "Bán hàng",
+        "DonHang": "DH949177",
+        "TrangThai": "Đang xử lý",
+        "GhiChu": "",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucauxuatkho",
+    "pk": "XK04",
+    "fields": {
+        "Ngay": "2026-05-04",
+        "LyDo": "Bán hàng",
+        "DonHang": "DH589571",
+        "TrangThai": "Đã hủy",
+        "GhiChu": "test1",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.yeucauxuatkho",
+    "pk": "XK05",
+    "fields": {
+        "Ngay": "2026-05-04",
+        "LyDo": "Bán hàng",
+        "DonHang": "DH851027",
+        "TrangThai": "Đã xuất",
+        "GhiChu": "test",
+        "MaNV": "NV001"
+    }
+},
+{
+    "model": "MyApp.xuatkhochitiet",
+    "pk": 1,
+    "fields": {
+        "PhieuXuat": "XK01",
+        "MaKho": "K01",
+        "MaSP": "SP05",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.xuatkhochitiet",
+    "pk": 2,
+    "fields": {
+        "PhieuXuat": "XK01",
+        "MaKho": "K01",
+        "MaSP": "SP06",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.xuatkhochitiet",
+    "pk": 3,
+    "fields": {
+        "PhieuXuat": "XK02",
+        "MaKho": "K02",
+        "MaSP": "SP1003",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.xuatkhochitiet",
+    "pk": 4,
+    "fields": {
+        "PhieuXuat": "XK03",
+        "MaKho": "K03",
+        "MaSP": "SP01",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.xuatkhochitiet",
+    "pk": 5,
+    "fields": {
+        "PhieuXuat": "XK04",
+        "MaKho": "K01",
+        "MaSP": "SP02",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.xuatkhochitiet",
+    "pk": 6,
+    "fields": {
+        "PhieuXuat": "XK05",
+        "MaKho": "K01",
+        "MaSP": "SP03",
+        "SoLuong": 2
+    }
+},
+{
+    "model": "MyApp.xuatkhochitiet",
+    "pk": 7,
+    "fields": {
+        "PhieuXuat": "XK05",
+        "MaKho": "K01",
+        "MaSP": "SP04",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.danhmuc",
+    "pk": "DM_TL",
+    "fields": {
+        "Ten": "Cửa hàng Tiện lợi"
+    }
+},
+{
+    "model": "MyApp.danhmuc",
+    "pk": "DM001",
+    "fields": {
+        "Ten": "Bách Hóa Tổng Hợp"
+    }
+},
+{
+    "model": "MyApp.danhmuc",
+    "pk": "DM01",
+    "fields": {
+        "Ten": "Đồ uống"
+    }
+},
+{
+    "model": "MyApp.danhmuc",
+    "pk": "DM02",
+    "fields": {
+        "Ten": "Thực phẩm"
+    }
+},
+{
+    "model": "MyApp.danhmuc",
+    "pk": "DM03",
+    "fields": {
+        "Ten": "Gia dụng"
+    }
+},
+{
+    "model": "MyApp.danhmuc",
+    "pk": "DM04",
+    "fields": {
+        "Ten": "Tiện lợi"
+    }
+},
+{
+    "model": "MyApp.danhmuc",
+    "pk": "DM05",
+    "fields": {
+        "Ten": "Điện tử"
+    }
+},
+{
+    "model": "MyApp.phanbocungcap",
+    "pk": 2,
+    "fields": {
+        "cua_hang": "CH02",
+        "kho": "K01",
+        "khoang_cach": "0.5",
+        "thoi_gian": 0,
+        "uu_tien": 2
+    }
+},
+{
+    "model": "MyApp.phanbocungcap",
+    "pk": 3,
+    "fields": {
+        "cua_hang": "CH06",
+        "kho": "K03",
+        "khoang_cach": "12.8",
+        "thoi_gian": 19,
+        "uu_tien": 1
+    }
+},
+{
+    "model": "MyApp.phanbocungcap",
+    "pk": 4,
+    "fields": {
+        "cua_hang": "CH06",
+        "kho": "K02",
+        "khoang_cach": "13.1",
+        "thoi_gian": 19,
+        "uu_tien": 2
+    }
+},
+{
+    "model": "MyApp.phanbocungcap",
+    "pk": 5,
+    "fields": {
+        "cua_hang": "CH07",
+        "kho": "K01",
+        "khoang_cach": "7.8",
+        "thoi_gian": 11,
+        "uu_tien": 1
+    }
+},
+{
+    "model": "MyApp.phanbocungcap",
+    "pk": 8,
+    "fields": {
+        "cua_hang": "CH04",
+        "kho": "K02",
+        "khoang_cach": "16.6",
+        "thoi_gian": 24,
+        "uu_tien": 2
+    }
+},
+{
+    "model": "MyApp.phanbocungcap",
+    "pk": 9,
+    "fields": {
+        "cua_hang": "CH08",
+        "kho": "K02",
+        "khoang_cach": "5.4",
+        "thoi_gian": 8,
+        "uu_tien": 1
+    }
+},
+{
+    "model": "MyApp.phanbocungcap",
+    "pk": 11,
+    "fields": {
+        "cua_hang": "CH03",
+        "kho": "K03",
+        "khoang_cach": "13.6",
+        "thoi_gian": 20,
+        "uu_tien": 1
+    }
+},
+{
+    "model": "MyApp.phanbocungcap",
+    "pk": 12,
+    "fields": {
+        "cua_hang": "CH03",
+        "kho": "K02",
+        "khoang_cach": "10.7",
+        "thoi_gian": 16,
+        "uu_tien": 2
+    }
+},
+{
+    "model": "MyApp.phanbocungcap",
+    "pk": 13,
+    "fields": {
+        "cua_hang": "CH01",
+        "kho": "K01",
+        "khoang_cach": "2.3",
+        "thoi_gian": 3,
+        "uu_tien": 1
+    }
+},
+{
+    "model": "MyApp.phanbocungcap",
+    "pk": 15,
+    "fields": {
+        "cua_hang": "CH05",
+        "kho": "K01",
+        "khoang_cach": "3.0",
+        "thoi_gian": 4,
+        "uu_tien": 1
+    }
+},
+{
+    "model": "MyApp.khachhang",
+    "pk": "KH10213",
+    "fields": {
+        "Ten": "Verify User",
+        "SDT": "0987654321",
+        "Email": "verifyuser@gmail.com",
+        "MatKhau": "password123",
+        "NgayTao": "2026-05-03T16:52:42.447Z"
+    }
+},
+{
+    "model": "MyApp.khachhang",
+    "pk": "KH39414",
+    "fields": {
+        "Ten": "Test Customer",
+        "SDT": "0123456789",
+        "Email": "customer@test.com",
+        "MatKhau": "123456",
+        "NgayTao": "2026-05-02T17:27:26.193Z"
+    }
+},
+{
+    "model": "MyApp.khachhang",
+    "pk": "KH47245",
+    "fields": {
+        "Ten": "Test Customer",
+        "SDT": "0123456789",
+        "Email": "testcustomer@example.com",
+        "MatKhau": "Password123!",
+        "NgayTao": "2026-05-03T16:13:27.500Z"
+    }
+},
+{
+    "model": "MyApp.khachhang",
+    "pk": "KH52448",
+    "fields": {
+        "Ten": "Test User",
+        "SDT": "0909090909",
+        "Email": "test@user.com",
+        "MatKhau": "123456",
+        "NgayTao": "2026-05-02T17:29:42.059Z"
+    }
+},
+{
+    "model": "MyApp.khachhang",
+    "pk": "KH56530",
+    "fields": {
+        "Ten": "C User",
+        "SDT": "0987654321",
+        "Email": "c@c.com",
+        "MatKhau": "123456",
+        "NgayTao": "2026-05-02T17:29:04.787Z"
+    }
+},
+{
+    "model": "MyApp.khachhang",
+    "pk": "KH56556",
+    "fields": {
+        "Ten": "Test User",
+        "SDT": "0123456789",
+        "Email": "testuser@gmail.com",
+        "MatKhau": "password123",
+        "NgayTao": "2026-05-03T16:48:38.804Z"
+    }
+},
+{
+    "model": "MyApp.khachhang",
+    "pk": "KH88447",
+    "fields": {
+        "Ten": "Test User",
+        "SDT": "0123456789",
+        "Email": "testuser123@gmail.com",
+        "MatKhau": "password123",
+        "NgayTao": "2026-04-25T06:25:42.791Z"
+    }
+},
+{
+    "model": "MyApp.khachhang",
+    "pk": "KH88522",
+    "fields": {
+        "Ten": "Sting",
+        "SDT": "0902234566",
+        "Email": "baohuu3@gmail.com",
+        "MatKhau": "123456",
+        "NgayTao": "2026-05-04T04:22:44.124Z"
+    }
+},
+{
+    "model": "MyApp.khachhang",
+    "pk": "KH95491",
+    "fields": {
+        "Ten": "New Test",
+        "SDT": "0987654321",
+        "Email": "newtest@example.com",
+        "MatKhau": "Password123!",
+        "NgayTao": "2026-05-03T16:16:13.800Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 1,
+    "fields": {
+        "NguoiDung": "NV001",
+        "KhachHang": null,
+        "SessionID": null,
+        "NgayTao": "2026-04-13T18:23:04.699Z",
+        "NgayCapNhat": "2026-04-13T18:23:04.699Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 2,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "fcq5ivqtem00udlo9cgoeb4buaj4vef4",
+        "NgayTao": "2026-04-14T01:39:11.752Z",
+        "NgayCapNhat": "2026-04-14T01:39:11.752Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 3,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "cbb818rvn8xfp41cuob3ui0r2sv7691l",
+        "NgayTao": "2026-04-14T01:48:03.072Z",
+        "NgayCapNhat": "2026-04-14T01:48:03.072Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 4,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "x9ubh3nq7kabt0om5i674azbrf1vezms",
+        "NgayTao": "2026-04-14T02:21:12.579Z",
+        "NgayCapNhat": "2026-04-14T02:21:12.579Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 5,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "x4o1q8akmtoov5nr72xmghmrl3zxcshz",
+        "NgayTao": "2026-04-14T02:46:30.411Z",
+        "NgayCapNhat": "2026-04-14T02:46:30.411Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 6,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "pejvgl5lyb3yfrkkaqcsws1cmrnmygbs",
+        "NgayTao": "2026-04-14T13:35:24.108Z",
+        "NgayCapNhat": "2026-04-14T13:35:24.108Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 7,
+    "fields": {
+        "NguoiDung": "NV002",
+        "KhachHang": null,
+        "SessionID": null,
+        "NgayTao": "2026-04-14T13:35:50.212Z",
+        "NgayCapNhat": "2026-04-14T13:35:50.212Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 8,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "cdwv4y75k3ft052is3dfyvi6angdjqbl",
+        "NgayTao": "2026-04-14T13:36:34.173Z",
+        "NgayCapNhat": "2026-04-14T13:36:34.173Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 9,
+    "fields": {
+        "NguoiDung": "NV003",
+        "KhachHang": null,
+        "SessionID": null,
+        "NgayTao": "2026-04-14T13:36:52.017Z",
+        "NgayCapNhat": "2026-04-14T13:36:52.017Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 11,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "eeo1rqzp5vcgotbwh4p54dv3gpcbm8in",
+        "NgayTao": "2026-04-14T15:19:57.300Z",
+        "NgayCapNhat": "2026-04-14T15:19:57.300Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 13,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "bjlmxzzo9ulj15xz0w4s6508m66gwtc5",
+        "NgayTao": "2026-04-14T15:39:05.639Z",
+        "NgayCapNhat": "2026-04-14T15:39:05.639Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 14,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "o723r1qop0fos4xgqy30asbws3stc8vz",
+        "NgayTao": "2026-04-14T17:23:30.508Z",
+        "NgayCapNhat": "2026-04-14T17:23:30.508Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 16,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "bvgzd7fl0algxd58a9sl2dfwu1qk3nnc",
+        "NgayTao": "2026-04-14T18:00:01.749Z",
+        "NgayCapNhat": "2026-04-14T18:00:01.749Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 17,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "kkgsfal4807ad7waud0txmdz1ivvmva1",
+        "NgayTao": "2026-04-14T23:16:20.817Z",
+        "NgayCapNhat": "2026-04-14T23:16:20.817Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 18,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "9jhcq0xkv3vpwpifncfh9m6maaql19fv",
+        "NgayTao": "2026-04-15T00:30:22.328Z",
+        "NgayCapNhat": "2026-04-15T00:30:22.328Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 19,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "jq4waqma10bfuhr65d5rqt9fq58u83p0",
+        "NgayTao": "2026-04-15T09:09:18.358Z",
+        "NgayCapNhat": "2026-04-15T09:09:18.358Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 20,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "s0c3qdvte28l5ahlpf4047hcjg2rfihg",
+        "NgayTao": "2026-04-16T04:31:20.162Z",
+        "NgayCapNhat": "2026-04-16T04:31:20.162Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 22,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "yp4dgee0m47zrh63zpc7niyjofkxnxl8",
+        "NgayTao": "2026-04-16T04:31:43.986Z",
+        "NgayCapNhat": "2026-04-16T04:31:43.986Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 23,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "vc1578xcwz621mlsaxtdpc4fl64waxl1",
+        "NgayTao": "2026-04-17T00:45:35.088Z",
+        "NgayCapNhat": "2026-04-17T00:45:35.088Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 24,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "f9e9mg551u2ch7nwtoixgkm0nmyoiana",
+        "NgayTao": "2026-04-18T10:27:58.947Z",
+        "NgayCapNhat": "2026-04-18T10:27:58.947Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 25,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "yndq82zgk9mpuzpf8s0j5w1wcy9gsyae",
+        "NgayTao": "2026-04-24T09:23:31.365Z",
+        "NgayCapNhat": "2026-04-24T09:23:31.365Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 27,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": "KH88447",
+        "SessionID": null,
+        "NgayTao": "2026-04-25T06:26:29.133Z",
+        "NgayCapNhat": "2026-04-25T06:26:29.133Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 28,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "z2xov3q0ce9fuz2bb01zv64agn66vwps",
+        "NgayTao": "2026-04-30T01:45:00.077Z",
+        "NgayCapNhat": "2026-04-30T01:45:00.077Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 29,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": "KH52448",
+        "SessionID": null,
+        "NgayTao": "2026-05-02T17:30:13.793Z",
+        "NgayCapNhat": "2026-05-02T17:30:13.793Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 30,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": "KH39414",
+        "SessionID": null,
+        "NgayTao": "2026-05-03T15:28:01.414Z",
+        "NgayCapNhat": "2026-05-03T15:28:01.414Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 31,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": "KH95491",
+        "SessionID": null,
+        "NgayTao": "2026-05-03T16:16:41.805Z",
+        "NgayCapNhat": "2026-05-03T16:16:41.805Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 32,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": "KH10213",
+        "SessionID": null,
+        "NgayTao": "2026-05-03T16:53:23.853Z",
+        "NgayCapNhat": "2026-05-03T16:53:23.853Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 33,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": "KH88522",
+        "SessionID": null,
+        "NgayTao": "2026-05-04T04:23:02.634Z",
+        "NgayCapNhat": "2026-05-04T04:23:02.634Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 34,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "pi6qfwrankn2kh1bhrqg8cziqlec27td",
+        "NgayTao": "2026-05-04T04:24:46.362Z",
+        "NgayCapNhat": "2026-05-04T04:24:46.362Z"
+    }
+},
+{
+    "model": "MyApp.giohang",
+    "pk": 35,
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": null,
+        "SessionID": "0zgnjddiyio0o4da1ob0ug5zejv3w5d3",
+        "NgayTao": "2026-05-04T04:58:08.403Z",
+        "NgayCapNhat": "2026-05-04T04:58:08.403Z"
+    }
+},
+{
+    "model": "MyApp.chitietgiohang",
+    "pk": 5,
+    "fields": {
+        "GioHang": 5,
+        "SanPham": "SP03",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.chitietgiohang",
+    "pk": 16,
+    "fields": {
+        "GioHang": 29,
+        "SanPham": "SP02",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.chitietgiohang",
+    "pk": 17,
+    "fields": {
+        "GioHang": 1,
+        "SanPham": "SP02",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.chitietgiohang",
+    "pk": 19,
+    "fields": {
+        "GioHang": 31,
+        "SanPham": "SP1003",
+        "SoLuong": 1
+    }
+},
+{
+    "model": "MyApp.donhang",
+    "pk": "DH120276",
+    "fields": {
+        "NguoiDung": "NV001",
+        "KhachHang": null,
+        "TenNguoiNhan": "Huu BaoNguy",
+        "SDT_Nhan": "05671037250988777666",
+        "DiaChi_Nhan": "S",
+        "TongTien": "20000",
+        "PhuongThucThanhToan": "COD",
+        "TrangThai": "Đang xử lý",
+        "GhiChu": "",
+        "NgayTao": "2026-04-13T18:43:01.128Z"
+    }
+},
+{
+    "model": "MyApp.donhang",
+    "pk": "DH183042",
+    "fields": {
+        "NguoiDung": "NV001",
+        "KhachHang": null,
+        "TenNguoiNhan": "Huu Bao",
+        "SDT_Nhan": "0567103725",
+        "DiaChi_Nhan": "Khu phố 44, Phường Trung Mỹ Tây, Thuận An, Thành phố Hồ Chí Minh, 71507, Việt Nam",
+        "TongTien": "12000",
+        "PhuongThucThanhToan": "COD",
+        "TrangThai": "Đang xử lý",
+        "GhiChu": "",
+        "NgayTao": "2026-04-25T04:09:47.591Z"
+    }
+},
+{
+    "model": "MyApp.donhang",
+    "pk": "DH381788",
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": "KH88522",
+        "TenNguoiNhan": "Sting",
+        "SDT_Nhan": "0902234566",
+        "DiaChi_Nhan": "Bàu Cát 3, Phường Tân Bình, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72000, Việt Nam",
+        "TongTien": "32000",
+        "PhuongThucThanhToan": "COD",
+        "TrangThai": "Đã trả hàng",
+        "GhiChu": "Xuất từ: Kho Trung Tâm",
+        "NgayTao": "2026-05-04T06:35:19.804Z"
+    }
+},
+{
+    "model": "MyApp.donhang",
+    "pk": "DH473747",
+    "fields": {
+        "NguoiDung": "NV001",
+        "KhachHang": null,
+        "TenNguoiNhan": "Huu Bao",
+        "SDT_Nhan": "0567103725",
+        "DiaChi_Nhan": "Hẻm 2/5 Bình Giã, Phường Tân Bình, Thành phố Hồ Chí Minh, 70500, Việt Nam",
+        "TongTien": "38000",
+        "PhuongThucThanhToan": "COD",
+        "TrangThai": "Đã trả hàng",
+        "GhiChu": "",
+        "NgayTao": "2026-04-14T17:29:19.186Z"
+    }
+},
+{
+    "model": "MyApp.donhang",
+    "pk": "DH478696",
+    "fields": {
+        "NguoiDung": "NV001",
+        "KhachHang": null,
+        "TenNguoiNhan": "Huu Bao",
+        "SDT_Nhan": "0567103725",
+        "DiaChi_Nhan": "Hẻm 320 Trường Chinh, Phường Tân Bình, Thành phố Hồ Chí Minh, 70500, Việt Nam",
+        "TongTien": "20000",
+        "PhuongThucThanhToan": "COD",
+        "TrangThai": "Đã trả hàng",
+        "GhiChu": "",
+        "NgayTao": "2026-04-14T15:24:04.648Z"
+    }
+},
+{
+    "model": "MyApp.donhang",
+    "pk": "DH499373",
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": "KH88447",
+        "TenNguoiNhan": "Test User",
+        "SDT_Nhan": "0123456789",
+        "DiaChi_Nhan": "Hẻm 220 Âu Cơ, Khu phố 25, Phường Tân Hòa, Thành phố Hồ Chí Minh, 72000, Việt Nam",
+        "TongTien": "12000",
+        "PhuongThucThanhToan": "COD",
+        "TrangThai": "Đang xử lý",
+        "GhiChu": "Xuất từ: Kho Trung Tâm",
+        "NgayTao": "2026-04-25T06:27:46.297Z"
+    }
+},
+{
+    "model": "MyApp.donhang",
+    "pk": "DH509247",
+    "fields": {
+        "NguoiDung": "NV001",
+        "KhachHang": null,
+        "TenNguoiNhan": "Huu Bao",
+        "SDT_Nhan": "0567103725",
+        "DiaChi_Nhan": "Lê Văn Sỹ, Khu phố 50, Phường Nhiêu Lộc, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 70150, Việt Nam",
+        "TongTien": "10000",
+        "PhuongThucThanhToan": "COD",
+        "TrangThai": "Đã trả hàng",
+        "GhiChu": "",
+        "NgayTao": "2026-04-14T03:49:18.020Z"
+    }
+},
+{
+    "model": "MyApp.donhang",
+    "pk": "DH589571",
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": "KH95491",
+        "TenNguoiNhan": "New Test",
+        "SDT_Nhan": "0987654321",
+        "DiaChi_Nhan": "Phòng khám Sản Phụ khoa - BS Khánh Từ Dũ, 134/40, Đoàn Văn Bơ, Phường Xóm Chiếu, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72806, Việt Nam",
+        "TongTien": "12000",
+        "PhuongThucThanhToan": "COD",
+        "TrangThai": "Đã hủy",
+        "GhiChu": "Xuất từ: Kho Trung Tâm",
+        "NgayTao": "2026-05-03T16:22:01.202Z"
+    }
+},
+{
+    "model": "MyApp.donhang",
+    "pk": "DH632007",
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": "KH88522",
+        "TenNguoiNhan": "Sting",
+        "SDT_Nhan": "0902234566",
+        "DiaChi_Nhan": "Bàu Cát 3, Phường Tân Bình, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72000, Việt Nam",
+        "TongTien": "35000",
+        "PhuongThucThanhToan": "COD",
+        "TrangThai": "Đã trả hàng",
+        "GhiChu": "Xuất từ: Kho Trung Tâm",
+        "NgayTao": "2026-05-04T07:32:45.079Z"
+    }
+},
+{
+    "model": "MyApp.donhang",
+    "pk": "DH851027",
+    "fields": {
+        "NguoiDung": null,
+        "KhachHang": "KH88522",
+        "TenNguoiNhan": "Sting",
+        "SDT_Nhan": "0902234566",
+        "DiaChi_Nhan": "50 Trung Lang, Phường Bảy Hiền, Thành phố Thủ Đức, Thành phố Hồ Chí Minh, 72110, Việt Nam",
+        "TongTien": "62000",
+        "PhuongThucThanhToan": "COD",
+        "TrangThai": "Đã trả hàng",
+        "GhiChu": "test | Xuất từ: Kho Trung Tâm",
+        "NgayTao": "2026-05-04T04:24:30.011Z"
+    }
+},
+{
+    "model": "MyApp.donhang",
+    "pk": "DH949177",
+    "fields": {
+        "NguoiDung": "NV001",
+        "KhachHang": null,
+        "TenNguoiNhan": "Huu Bao",
+        "SDT_Nhan": "0567103725",
+        "DiaChi_Nhan": "123 ABC Street, District 1, HCM City",
+        "TongTien": "25000",
+        "PhuongThucThanhToan": "COD",
+        "TrangThai": "Đã hoàn thành",
+        "GhiChu": "",
+        "NgayTao": "2026-04-13T19:04:05.231Z"
+    }
+},
+{
+    "model": "MyApp.donhang",
+    "pk": "DH965479",
+    "fields": {
+        "NguoiDung": "NV001",
+        "KhachHang": null,
+        "TenNguoiNhan": "Huu Bao",
+        "SDT_Nhan": "0567103725",
+        "DiaChi_Nhan": "sấc",
+        "TongTien": "11000",
+        "PhuongThucThanhToan": "COD",
+        "TrangThai": "Đã trả hàng",
+        "GhiChu": "",
+        "NgayTao": "2026-04-14T03:31:03.106Z"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 1,
+    "fields": {
+        "DonHang": "DH120276",
+        "SanPham": "SP04",
+        "SoLuong": 1,
+        "GiaBan": "10000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 2,
+    "fields": {
+        "DonHang": "DH120276",
+        "SanPham": "SP05",
+        "SoLuong": 1,
+        "GiaBan": "10000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 3,
+    "fields": {
+        "DonHang": "DH949177",
+        "SanPham": "SP01",
+        "SoLuong": 1,
+        "GiaBan": "25000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 4,
+    "fields": {
+        "DonHang": "DH965479",
+        "SanPham": "SP1003",
+        "SoLuong": 1,
+        "GiaBan": "11000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 5,
+    "fields": {
+        "DonHang": "DH509247",
+        "SanPham": "SP04",
+        "SoLuong": 1,
+        "GiaBan": "10000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 6,
+    "fields": {
+        "DonHang": "DH478696",
+        "SanPham": "SP04",
+        "SoLuong": 1,
+        "GiaBan": "10000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 7,
+    "fields": {
+        "DonHang": "DH478696",
+        "SanPham": "SP05",
+        "SoLuong": 1,
+        "GiaBan": "10000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 8,
+    "fields": {
+        "DonHang": "DH473747",
+        "SanPham": "SP05",
+        "SoLuong": 1,
+        "GiaBan": "10000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 9,
+    "fields": {
+        "DonHang": "DH473747",
+        "SanPham": "SP06",
+        "SoLuong": 1,
+        "GiaBan": "28000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 10,
+    "fields": {
+        "DonHang": "DH183042",
+        "SanPham": "SP02",
+        "SoLuong": 1,
+        "GiaBan": "12000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 11,
+    "fields": {
+        "DonHang": "DH499373",
+        "SanPham": "SP02",
+        "SoLuong": 1,
+        "GiaBan": "12000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 12,
+    "fields": {
+        "DonHang": "DH589571",
+        "SanPham": "SP02",
+        "SoLuong": 1,
+        "GiaBan": "12000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 13,
+    "fields": {
+        "DonHang": "DH851027",
+        "SanPham": "SP03",
+        "SoLuong": 2,
+        "GiaBan": "26000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 14,
+    "fields": {
+        "DonHang": "DH851027",
+        "SanPham": "SP04",
+        "SoLuong": 1,
+        "GiaBan": "10000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 15,
+    "fields": {
+        "DonHang": "DH381788",
+        "SanPham": "SP1003",
+        "SoLuong": 2,
+        "GiaBan": "11000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 16,
+    "fields": {
+        "DonHang": "DH381788",
+        "SanPham": "SP05",
+        "SoLuong": 1,
+        "GiaBan": "10000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 17,
+    "fields": {
+        "DonHang": "DH632007",
+        "SanPham": "SP1003",
+        "SoLuong": 1,
+        "GiaBan": "11000"
+    }
+},
+{
+    "model": "MyApp.chitietdonhang",
+    "pk": 18,
+    "fields": {
+        "DonHang": "DH632007",
+        "SanPham": "SP1004",
+        "SoLuong": 1,
+        "GiaBan": "24000"
+    }
+},
+{
+    "model": "MyApp.yeucautrahang",
+    "pk": "TH327252",
+    "fields": {
+        "DonHang": "DH965479",
+        "SdtLienHe": "0567103725",
+        "EmailLienHe": "baohuu752@gmail.com",
+        "SoTaiKhoanNH": "4123423423432",
+        "SoTaiKhoanMoMo": "1243143214",
+        "LyDo": "test",
+        "AnhHoaDon": "",
+        "AnhMinhChung": "returns/proof/test3.jpg",
+        "GhiChuAdmin": "",
+        "SoTienHoan": "11000",
+        "TrangThai": "Đã hoàn tiền",
+        "NgayTao": "2026-04-18T04:38:07.491Z",
+        "NgayXuLy": "2026-05-03T08:11:24.752Z"
+    }
+},
+{
+    "model": "MyApp.yeucautrahang",
+    "pk": "TH361929",
+    "fields": {
+        "DonHang": "DH851027",
+        "SdtLienHe": "0902234566",
+        "EmailLienHe": "baohuu3@gmail.com",
+        "SoTaiKhoanNH": "41234234234",
+        "SoTaiKhoanMoMo": "4232534253532",
+        "LyDo": "không giao đúng hạn",
+        "AnhHoaDon": "",
+        "AnhMinhChung": "returns/proof/delay-giao-hang_08d1db475b204d238a976da9d24ab59f_grande.jpg",
+        "GhiChuAdmin": "",
+        "SoTienHoan": "62000",
+        "TrangThai": "Đã hoàn tiền",
+        "NgayTao": "2026-05-04T04:28:37.881Z",
+        "NgayXuLy": "2026-05-04T06:26:10.504Z"
+    }
+},
+{
+    "model": "MyApp.yeucautrahang",
+    "pk": "TH422496",
+    "fields": {
+        "DonHang": "DH473747",
+        "SdtLienHe": "0567103725",
+        "EmailLienHe": "baohuu752@gmail.com",
+        "SoTaiKhoanNH": "41234234234",
+        "SoTaiKhoanMoMo": "4232534253532",
+        "LyDo": "test",
+        "AnhHoaDon": "",
+        "AnhMinhChung": "returns/proof/nuocyen.jpg",
+        "GhiChuAdmin": "",
+        "SoTienHoan": "38000",
+        "TrangThai": "Đã hoàn tiền",
+        "NgayTao": "2026-04-14T17:42:17.805Z",
+        "NgayXuLy": "2026-04-14T17:42:41.560Z"
+    }
+},
+{
+    "model": "MyApp.yeucautrahang",
+    "pk": "TH751269",
+    "fields": {
+        "DonHang": "DH478696",
+        "SdtLienHe": "0567103725",
+        "EmailLienHe": "baohuu752@gmail.com",
+        "SoTaiKhoanNH": "41234234234",
+        "SoTaiKhoanMoMo": "12321431324243",
+        "LyDo": "test",
+        "AnhHoaDon": "",
+        "AnhMinhChung": "returns/proof/milyanlien.jpg",
+        "GhiChuAdmin": "",
+        "SoTienHoan": "20000",
+        "TrangThai": "Đã hoàn tiền",
+        "NgayTao": "2026-04-15T02:14:13.673Z",
+        "NgayXuLy": "2026-04-15T02:14:45.960Z"
+    }
+},
+{
+    "model": "MyApp.yeucautrahang",
+    "pk": "TH821606",
+    "fields": {
+        "DonHang": "DH632007",
+        "SdtLienHe": "0902234566",
+        "EmailLienHe": "baohuu3@gmail.com",
+        "SoTaiKhoanNH": "4123423423433",
+        "SoTaiKhoanMoMo": "1243143214",
+        "LyDo": "giao hàng muộn",
+        "AnhHoaDon": "",
+        "AnhMinhChung": "returns/proof/delay-giao-hang_08d1db475b204d238a976da9d24ab59f_grande_JyYZdo8.jpg",
+        "GhiChuAdmin": "",
+        "SoTienHoan": "35000",
+        "TrangThai": "Đã hoàn tiền",
+        "NgayTao": "2026-05-04T07:34:06.021Z",
+        "NgayXuLy": "2026-05-04T07:35:52.720Z"
+    }
+},
+{
+    "model": "MyApp.yeucautrahang",
+    "pk": "TH899939",
+    "fields": {
+        "DonHang": "DH381788",
+        "SdtLienHe": "0902234566",
+        "EmailLienHe": "baohuu3@gmail.com",
+        "SoTaiKhoanNH": "4123423423432",
+        "SoTaiKhoanMoMo": "4232534253532",
+        "LyDo": "giao hàng muộn",
+        "AnhHoaDon": "",
+        "AnhMinhChung": "returns/proof/delay-giao-hang_08d1db475b204d238a976da9d24ab59f_grande_oYP3zVY.jpg",
+        "GhiChuAdmin": "",
+        "SoTienHoan": "32000",
+        "TrangThai": "Đã hoàn tiền",
+        "NgayTao": "2026-05-04T06:36:53.785Z",
+        "NgayXuLy": "2026-05-04T06:37:42.910Z"
+    }
+},
+{
+    "model": "MyApp.yeucautrahang",
+    "pk": "TH957436",
+    "fields": {
+        "DonHang": "DH509247",
+        "SdtLienHe": "0567103725",
+        "EmailLienHe": "baohuu752@gmail.com",
+        "SoTaiKhoanNH": "132312412421",
+        "SoTaiKhoanMoMo": "141241433141241",
+        "LyDo": "sản phẩm quá hạn",
+        "AnhHoaDon": "",
+        "AnhMinhChung": "",
+        "GhiChuAdmin": "",
+        "SoTienHoan": "10000",
+        "TrangThai": "Đã hoàn tiền",
+        "NgayTao": "2026-04-14T09:04:18.965Z",
+        "NgayXuLy": "2026-04-14T09:04:49.744Z"
+    }
+}
+]

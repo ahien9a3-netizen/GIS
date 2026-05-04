@@ -2,8 +2,8 @@ from django.urls import path
 from django.views.generic import TemplateView
 from .tool import store_geojson, store_heatmap, service_area, kho_geojson
 from .views import (
-    home, report_view, login_view, logout_view, settings_view, gis_map, inventory_stats, upload_gis_images, delete_gis_image,
-    forgot_password_view, reset_password_view, verify_otp_view,
+    home, report_view, login_view, logout_view, settings_view, gis_map, inventory_stats, upload_gis_images, delete_gis_image, check_coordinates,
+    forgot_password_view, reset_password_view, verify_otp_view, export_nhapkho_excel, export_stockout_excel,
     CuaHangListView, CuaHangCreateView, CuaHangUpdateView, CuaHangDeleteView, store_detail_view,
     SanPhamListView, SanPhamCreateView, SanPhamUpdateView, SanPhamDeleteView, SanPhamDetailView,
     DanhMucListView, DanhMucCreateView, DanhMucUpdateView, DanhMucDeleteView,
@@ -12,12 +12,12 @@ from .views import (
     StockInListView, StockInCreateView, StockInUpdateView, StockInDeleteView, StockInDetailView,
     HangTonKhoListView, HangTonKhoCreateView, HangTonKhoUpdateView, HangTonKhoDeleteView,
     public_home, public_about, public_product_list, public_product_detail, public_store_detail, public_kho_detail, public_login, public_register, public_logout, public_gis_map,
-    customer_forgot_password_view, customer_verify_otp_view, customer_reset_password_view,
-    view_cart, ajax_add_to_cart, ajax_update_cart, public_checkout, create_order, public_order_invoice, public_return_request, public_order_history, public_profile, submit_return_request,
+    view_cart, ajax_add_to_cart, ajax_update_cart, public_checkout, create_order, public_order_invoice, public_return_request, public_order_history, public_profile, public_settings, submit_return_request,
     public_store_list,
     OrderListView, OrderDetailView, update_order_status,
     ReturnListView, ReturnDetailView, update_return_status,
-    StockOutListView, StockOutCreateView, StockOutUpdateView, StockOutDetailView, StockOutDeleteView
+    StockOutListView, StockOutCreateView, StockOutUpdateView, StockOutDetailView, StockOutDeleteView,
+    download_stockin_template, parse_stockin_excel
 )
 
 urlpatterns = [
@@ -30,9 +30,6 @@ urlpatterns = [
     path('store/detail/<str:pk>/', public_store_detail, name='public_store_detail'),
     path('warehouses/public/<str:pk>/', public_kho_detail, name='public_kho_detail'),
     path('customer/login/', public_login, name='public_login'),
-    path('customer/forgot-password/', customer_forgot_password_view, name='customer_forgot_password'),
-    path('customer/verify-otp/', customer_verify_otp_view, name='customer_verify_otp'),
-    path('customer/reset-password/', customer_reset_password_view, name='customer_reset_password'),
     path('customer/register/', public_register, name='public_register'),
     path('customer/logout/', public_logout, name='public_logout'),
     path('cart/', view_cart, name='view_cart'),
@@ -46,6 +43,7 @@ urlpatterns = [
     path('api/store-heatmap/', store_heatmap, name='store_heatmap'),
     path('api/service-area/', service_area, name='service_area'),
     path('api/kho-geojson/', kho_geojson, name='kho_geojson'),
+    path('api/check-coordinates/', check_coordinates, name='check_coordinates'),
     path('dashboard/', home, name='home'),
     path('gis-map/', gis_map, name='gis_map'),
     path('reports/', report_view, name='reports'),
@@ -55,13 +53,13 @@ urlpatterns = [
     path('verify-otp/', verify_otp_view, name='verify_otp'),
     path('logout/', logout_view, name='logout'),
     path('settings/', settings_view, name='settings'),
-    path('api/stores-geojson/', store_geojson, name='store_geojson'),
-    path('api/stores-heatmap/', store_heatmap, name='store_heatmap'),
-    path('api/service-area/', service_area, name='service_area'),
-    path('api/kho-geojson/', kho_geojson, name='kho_geojson'),
     path('api/inventory-stats/', inventory_stats, name='inventory_stats'),
     path('api/upload-gis-images/', upload_gis_images, name='upload_gis_images'),
     path('api/delete-gis-image/', delete_gis_image, name='delete_gis_image'),
+    
+    # Excel Import/Export
+    path('api/download-stockin-template/', download_stockin_template, name='download_stockin_template'),
+    path('api/parse-stockin-excel/', parse_stockin_excel, name='parse_stockin_excel'),
 
     # Cửa hàng
     path('stores/', CuaHangListView.as_view(), name='store_list'),
@@ -99,6 +97,7 @@ urlpatterns = [
 
     # Nhập kho
     path('stock-in/', StockInListView.as_view(), name='stock_in_list'),
+    path('stock-in/export-excel/', export_nhapkho_excel, name='stock_in_export_excel'),
     path('stock-in/add/', StockInCreateView.as_view(), name='stock_in_add'),
     path('stock-in/<str:pk>/', StockInDetailView.as_view(), name='stock_in_detail'),
     path('stock-in/<str:pk>/edit/', StockInUpdateView.as_view(), name='stock_in_edit'),
@@ -119,6 +118,7 @@ urlpatterns = [
     path('order/<str:order_id>/return-request/', public_return_request, name='public_return_request'),
     path('customer/order-history/', public_order_history, name='public_order_history'),
     path('customer/profile/', public_profile, name='public_profile'),
+    path('customer/settings/', public_settings, name='public_settings'),
     path('customer/submit-return/<str:order_id>/', submit_return_request, name='submit_return_request'),
 
     # --- ADMIN ORDER MANAGEMENT ---
@@ -132,6 +132,7 @@ urlpatterns = [
     
     # --- ADMIN STOCK OUT MANAGEMENT ---
     path('stock-out/', StockOutListView.as_view(), name='stock_out_list'),
+    path('stock-out/export-excel/', export_stockout_excel, name='stock_out_export_excel'),
     path('stock-out/add/', StockOutCreateView.as_view(), name='stock_out_add'),
     path('stock-out/<str:pk>/', StockOutDetailView.as_view(), name='stock_out_detail'),
     path('stock-out/<str:pk>/edit/', StockOutUpdateView.as_view(), name='stock_out_edit'),

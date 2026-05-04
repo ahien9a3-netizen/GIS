@@ -1,0 +1,37 @@
+# Django Framework
+Django==6.0.1
+djangorestframework==3.16.1
+djangorestframework-gis==1.2.0
+djangorestframework_simplejwt==5.5.1
+django-cors-headers==4.9.0
+django-filter==25.2
+django-ckeditor==6.7.3
+django-js-asset==3.1.2
+
+# Database
+psycopg2==2.9.11
+psycopg2-binary==2.9.11
+
+# GIS Libraries
+geopandas==1.1.2
+folium==0.20.0
+shapely==2.1.2
+pyproj==3.7.2
+pyogrio==0.12.1
+branca==0.8.2
+
+# Data Processing
+pandas==3.0.1
+numpy==2.4.2
+openpyxl==3.1.5
+
+# Image Processing
+pillow==12.1.0
+
+# Utilities
+requests==2.32.5
+python-dotenv==1.2.1
+python-docx==1.2.0
+bcrypt==5.0.0
+PyJWT==2.12.1
+lxml==6.0.4

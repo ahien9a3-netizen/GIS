@@ -82,8 +82,15 @@
     }
 
     @keyframes pulse {
-        0% { transform: scale(0.5); opacity: 1; }
-        100% { transform: scale(1.5); opacity: 0; }
+        0% {
+            transform: scale(0.5);
+            opacity: 1;
+        }
+
+        100% {
+            transform: scale(1.5);
+            opacity: 0;
+        }
     }
 
     .leaflet-routing-container {
@@ -98,52 +105,276 @@
         width: 280px !important;
     }
 
-    .leaflet-routing-alt h2 { font-size: 14px !important; color: var(--primary) !important; }
-    .leaflet-routing-alt table { font-size: 12px !important; }
+    .leaflet-routing-alt h2 {
+        font-size: 14px !important;
+        color: var(--primary) !important;
+    }
 
-    .leaflet-popup-content-wrapper { border-radius: 12px; padding: 5px; }
-    .popup-info-card { padding: 5px; min-width: 200px; }
-    .popup-header { border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 8px; }
-    .popup-title { font-weight: 700; color: var(--dark); font-size: 1rem; display: block; }
-    .popup-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-top: 4px; }
-    .popup-body { font-size: 0.85rem; color: var(--gray-600); display: flex; flex-direction: column; gap: 6px; }
-    .popup-row { display: flex; align-items: flex-start; gap: 8px; }
-    .popup-row i { color: var(--primary); width: 14px; margin-top: 2px; }
+    .leaflet-routing-alt table {
+        font-size: 12px !important;
+    }
 
-    .custom-search-box { position: absolute; top: 20px; left: 60px; z-index: 1000; width: 320px; background: white; border-radius: 8px; box-shadow: var(--shadow-md); display: flex; flex-direction: column; }
-    .custom-search-box input { width: 100%; padding: 12px 14px 12px 40px; border: none; border-radius: 8px; outline: none; font-family: inherit; font-size: 14px; color: #1e293b; }
-    .custom-search-box .search-icon { position: absolute; left: 14px; top: 14px; color: #94a3b8; }
-    .search-results-list { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; border-top: 1px solid #f1f5f9; display: none; background: white; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
-    .search-result-item { padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f8fafc; }
-    .search-result-item:hover { background: #f8fafc; }
+    .leaflet-popup-content-wrapper {
+        border-radius: 12px;
+        padding: 5px;
+    }
 
-    .map-sidebar { position: absolute; top: 0; right: 0; transform: translateX(100%); width: 380px; height: 100%; background: white; z-index: 2000; box-shadow: -4px 0 15px rgba(0,0,0,0.1); transition: transform 0.3s ease-in-out; display: flex; flex-direction: column; }
-    .map-sidebar.active { transform: translateX(0); }
-    .map-sidebar-header { padding: 20px; background: var(--primary); color: white; display: flex; justify-content: space-between; align-items: center; }
-    .map-sidebar-header h3 { margin: 0; font-size: 1.25rem; display: flex; align-items: center; gap: 10px; }
+    .popup-info-card {
+        padding: 5px;
+        min-width: 200px;
+    }
 
-    .store-products-slider { margin-top: 15px; margin-bottom: 20px; }
-    .swiper-main { width: 100%; border-radius: 8px; overflow: hidden; margin-bottom: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .swiper-main img { width: 100%; height: 160px; object-fit: cover; }
-    .swiper-thumbs { width: 100%; box-sizing: border-box; }
-    .swiper-thumbs .swiper-slide { width: 25%; height: 50px; opacity: 0.5; border-radius: 6px; overflow: hidden; cursor: pointer; transition: opacity 0.2s; }
-    .swiper-thumbs .swiper-slide-thumb-active { opacity: 1; border: 2px solid var(--primary); }
-    .swiper-thumbs img { width: 100%; height: 100%; object-fit: cover; }
+    .popup-header {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+    }
 
-    .btn-close-sidebar { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; opacity: 0.8; transition: opacity 0.2s; }
-    .btn-close-sidebar:hover { opacity: 1; }
-    .map-sidebar-body { padding: 20px; flex: 1; overflow-y: auto; }
-    .info-group { margin-bottom: 20px; }
-    .info-label { font-size: 0.85rem; color: var(--gray-500); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-    .info-value { font-size: 1rem; color: var(--gray-800); font-weight: 500; display: flex; align-items: flex-start; gap: 10px; }
-    .info-value i { color: var(--primary); margin-top: 4px; width: 16px; }
+    .popup-title {
+        font-weight: 700;
+        color: var(--dark);
+        font-size: 1rem;
+        display: block;
+    }
+
+    .popup-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        margin-top: 4px;
+    }
+
+    .popup-body {
+        font-size: 0.85rem;
+        color: var(--gray-600);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .popup-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .popup-row i {
+        color: var(--primary);
+        width: 14px;
+        margin-top: 2px;
+    }
+
+    .custom-search-box {
+        position: absolute;
+        top: 20px;
+        left: 60px;
+        z-index: 1000;
+        width: 320px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .custom-search-box input {
+        width: 100%;
+        padding: 12px 14px 12px 40px;
+        border: none;
+        border-radius: 8px;
+        outline: none;
+        font-family: inherit;
+        font-size: 14px;
+        color: #1e293b;
+    }
+
+    .custom-search-box .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 14px;
+        color: #94a3b8;
+    }
+
+    .search-results-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 300px;
+        overflow-y: auto;
+        border-top: 1px solid #f1f5f9;
+        display: none;
+        background: white;
+        border-bottom-left-radius: 8px;
+        border-bottom-right-radius: 8px;
+    }
+
+    .search-result-item {
+        padding: 10px 14px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid #f8fafc;
+    }
+
+    .search-result-item:hover {
+        background: #f8fafc;
+    }
+
+    .map-sidebar {
+        position: absolute;
+        top: 0;
+        right: 0;
+        transform: translateX(100%);
+        width: 380px;
+        height: 100%;
+        background: white;
+        z-index: 2000;
+        box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .map-sidebar.active {
+        transform: translateX(0);
+    }
+
+    .map-sidebar-header {
+        padding: 20px;
+        background: var(--primary);
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .map-sidebar-header h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .store-products-slider {
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+
+    .swiper-main {
+        width: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-bottom: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .swiper-main img {
+        width: 100%;
+        height: 160px;
+        object-fit: cover;
+    }
+
+    .swiper-thumbs {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .swiper-thumbs .swiper-slide {
+        width: 25%;
+        height: 50px;
+        opacity: 0.5;
+        border-radius: 6px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+
+    .swiper-thumbs .swiper-slide-thumb-active {
+        opacity: 1;
+        border: 2px solid var(--primary);
+    }
+
+    .swiper-thumbs img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .btn-close-sidebar {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+
+    .btn-close-sidebar:hover {
+        opacity: 1;
+    }
+
+    .map-sidebar-body {
+        padding: 20px;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .info-group {
+        margin-bottom: 20px;
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        color: var(--gray-500);
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+    }
+
+    .info-value {
+        font-size: 1rem;
+        color: var(--gray-800);
+        font-weight: 500;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .info-value i {
+        color: var(--primary);
+        margin-top: 4px;
+        width: 16px;
+    }
 
     @keyframes blink-marker {
-        0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(239, 68, 68, 0)); }
-        50% { transform: scale(1.3); filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.9)); }
-        100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(239, 68, 68, 0)); }
+        0% {
+            transform: scale(1);
+            filter: drop-shadow(0 0 0px rgba(239, 68, 68, 0));
+        }
+
+        50% {
+            transform: scale(1.3);
+            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.9));
+        }
+
+        100% {
+            transform: scale(1);
+            filter: drop-shadow(0 0 0px rgba(239, 68, 68, 0));
+        }
     }
-    .blinking-store > div { animation: blink-marker 0.8s infinite alternate !important; border-color: #ef4444 !important; z-index: 1000 !important; }
+
+    .blinking-store>div {
+        animation: blink-marker 0.8s infinite alternate !important;
+        border-color: #ef4444 !important;
+        z-index: 1000 !important;
+    }
 </style>
 {% endblock %}
 
@@ -156,34 +387,44 @@
 <div class="gis-map-container" data-aos="fade-up" data-aos-delay="200">
     <div id="full-gis-map"></div>
 
-    <!-- Modal Upload ảnh -->
-    <div id="image-upload-modal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-        <div class="chart-card" style="width:400px; padding:20px; position:relative; background:white; border-radius:8px;">
-            <button onclick="closeUploadModal()" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
+    <div id="image-upload-modal" class="modal-overlay"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+        <div class="chart-card"
+            style="width:400px; padding:20px; position:relative; background:white; border-radius:8px;">
+            <button onclick="closeUploadModal()"
+                style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
             <h3 style="margin-bottom:15px;"><i class="fa-solid fa-images"></i> Cập nhật hình ảnh</h3>
             <p id="upload-target-name" style="font-weight:600; color:var(--primary); margin-bottom:10px;"></p>
             <form id="upload-images-form" enctype="multipart/form-data">
                 <input type="hidden" id="upload-target-id">
                 <input type="hidden" id="upload-target-type">
                 <div style="margin-bottom:15px;">
-                    <label for="image-files" style="display:block; margin-bottom:5px;">Chọn ảnh (có thể chọn nhiều):</label>
-                    <input type="file" id="image-files" name="images" multiple accept="image/*" style="width:100%; height:auto; padding:10px;">
+                    <label for="image-files" style="display:block; margin-bottom:5px;">Chọn ảnh (có thể chọn
+                        nhiều):</label>
+                    <input type="file" id="image-files" name="images" multiple accept="image/*"
+                        style="width:100%; height:auto; padding:10px;">
                 </div>
-                <button type="submit" class="btn btn-primary" style="width:100%; padding:10px; background:var(--primary); color:white; border:none; border-radius:4px; cursor:pointer;"><i class="fa-solid fa-cloud-arrow-up"></i> Tải lên</button>
+                <button type="submit" class="btn btn-primary"
+                    style="width:100%; padding:10px; background:var(--primary); color:white; border:none; border-radius:4px; cursor:pointer;"><i
+                        class="fa-solid fa-cloud-arrow-up"></i> Tải lên</button>
             </form>
         </div>
     </div>
 
-    <!-- Heatmap Config Panel -->
-    <div id="heatmap-config-panel" style="position: absolute; top: 20px; left: 20px; z-index: 1000; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); width: 320px; display: none; flex-direction: column; overflow: hidden; border: 1px solid #e2e8f0;">
-        <div style="background: #5b21b6; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 1rem;">
+    <div id="heatmap-config-panel"
+        style="position: absolute; top: 20px; left: 20px; z-index: 1000; background: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); width: 320px; display: none; flex-direction: column; overflow: hidden; border: 1px solid #e2e8f0;">
+        <div
+            style="background: #5b21b6; color: white; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 1rem;">
             <span>Cấu hình Bản đồ nhiệt</span>
-            <button id="btn-close-heatmap" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem;"><i class="fa-solid fa-xmark"></i></button>
+            <button id="btn-close-heatmap"
+                style="background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem;"><i
+                    class="fa-solid fa-xmark"></i></button>
         </div>
         <div style="padding: 15px; display: flex; flex-direction: column; gap: 15px;">
             <div style="display: flex; flex-direction: column; gap: 5px;">
                 <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">Hiển thị theo loại:</label>
-                <select id="heatmap-type" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; width: 100%;">
+                <select id="heatmap-type"
+                    style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; width: 100%;">
                     <option value="all">Tất cả Cửa hàng & Kho</option>
                     <option value="Tiện Lợi">Chỉ Cửa hàng Tiện Lợi</option>
                     <option value="Điện Tử">Chỉ Cửa hàng Điện Tử</option>
@@ -194,16 +435,19 @@
             <div style="display: flex; flex-direction: column; gap: 5px;">
                 <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">Bán kính tỏa nhiệt (Radius)</label>
                 <input type="range" id="heatmap-radius" min="10" max="50" value="25" style="width: 100%;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: #94a3b8;"><span>10px</span><span>25px</span><span>50px</span></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: #94a3b8;">
+                    <span>10px</span><span>25px</span><span>50px</span></div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 5px;">
                 <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">Độ mờ/Độ nhòe (Blur)</label>
                 <input type="range" id="heatmap-blur" min="5" max="30" value="15" style="width: 100%;">
-                <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: #94a3b8;"><span>5px</span><span>15px</span><span>30px</span></div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: #94a3b8;">
+                    <span>5px</span><span>15px</span><span>30px</span></div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 5px;">
                 <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">Theme màu:</label>
-                <select id="heatmap-theme" style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; width: 100%;">
+                <select id="heatmap-theme"
+                    style="padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; width: 100%;">
                     <option value="classic">Cổ điển (Xanh - Vàng - Đỏ)</option>
                     <option value="neon">Hiện đại Neon (Tím - Đỏ)</option>
                 </select>
@@ -221,23 +465,45 @@
         <button id="btn-analysis" class="leaflet-analysis-btn">
             <i class="fa-solid fa-magnifying-glass-location"></i> Phân tích vùng phục vụ
         </button>
-        <div id="radius-control" style="display: none; align-items: center; justify-content: space-between; gap: 10px; margin-top: 5px; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
-            <label for="analysis-radius" style="font-size: 0.85rem; font-weight: 600; color: #475569;">Bán kính (km):</label>
-            <input type="number" id="analysis-radius" value="5" min="1" max="100" step="0.5" style="width: 70px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none;">
+        <div id="radius-control"
+            style="display: none; align-items: center; justify-content: space-between; gap: 10px; margin-top: 5px; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
+            <label for="analysis-radius" style="font-size: 0.85rem; font-weight: 600; color: #475569;">Bán kính
+                (km):</label>
+            <input type="number" id="analysis-radius" value="5" min="1" max="100" step="0.5"
+                style="width: 70px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 4px; outline: none;">
         </div>
     </div>
 
-    <div style="position: absolute; bottom: 85px; right: 20px; z-index: 1000; background: white; padding: 12px; border-radius: 8px; box-shadow: var(--shadow-md); border: 1px solid #eee; font-size: 0.8rem; min-width: 140px;">
-        <div style="font-weight: 700; margin-bottom: 8px; color: #64748b; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px;">Chú giải</div>
+    <div
+        style="position: absolute; bottom: 85px; right: 20px; z-index: 1000; background: white; padding: 12px; border-radius: 8px; box-shadow: var(--shadow-md); border: 1px solid #eee; font-size: 0.8rem; min-width: 140px;">
+        <div
+            style="font-weight: 700; margin-bottom: 8px; color: #64748b; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.5px;">
+            Chú giải</div>
         <div style="display: flex; flex-direction: column; gap: 8px;">
-            <div style="display: flex; align-items: center; gap: 10px;"><div style="width: 12px; height: 12px; border-radius: 50%; background: #3b82f6; border: 2px solid white; box-shadow: 0 0 0 1px #3b82f6;"></div><span>Tiện Lợi</span></div>
-            <div style="display: flex; align-items: center; gap: 10px;"><div style="width: 12px; height: 12px; border-radius: 50%; background: #0d9488; border: 2px solid white; box-shadow: 0 0 0 1px #0d9488;"></div><span>Gia Dụng</span></div>
-            <div style="display: flex; align-items: center; gap: 10px;"><div style="width: 12px; height: 12px; border-radius: 50%; background: #f59e0b; border: 2px solid white; box-shadow: 0 0 0 1px #f59e0b;"></div><span>Điện Tử</span></div>
-            <div style="display: flex; align-items: center; gap: 10px;"><div style="width: 12px; height: 12px; border-radius: 2px; background: #ef4444;"></div><span>Kho Hàng</span></div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div
+                    style="width: 12px; height: 12px; border-radius: 50%; background: #3b82f6; border: 2px solid white; box-shadow: 0 0 0 1px #3b82f6;">
+                </div><span>Tiện Lợi</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div
+                    style="width: 12px; height: 12px; border-radius: 50%; background: #0d9488; border: 2px solid white; box-shadow: 0 0 0 1px #0d9488;">
+                </div><span>Gia Dụng</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div
+                    style="width: 12px; height: 12px; border-radius: 50%; background: #f59e0b; border: 2px solid white; box-shadow: 0 0 0 1px #f59e0b;">
+                </div><span>Điện Tử</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 12px; height: 12px; border-radius: 2px; background: #ef4444;"></div><span>Kho
+                    Hàng</span>
+            </div>
         </div>
     </div>
 
-    <button id="btn-locate-user" class="btn-locate" title="Vị trí của tôi"><i class="fa-solid fa-crosshairs fa-lg"></i></button>
+    <button id="btn-locate-user" class="btn-locate" title="Vị trí của tôi"><i
+            class="fa-solid fa-crosshairs fa-lg"></i></button>
 
     <div id="map-sidebar" class="map-sidebar">
         <div class="map-sidebar-header">
@@ -262,11 +528,11 @@
         window.map = map;
 
         var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
-        var osm2 = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {minZoom: 0, maxZoom: 13});
+        var osm2 = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { minZoom: 0, maxZoom: 13 });
         var miniMap = new L.Control.MiniMap(osm2, { toggleDisplay: true, position: 'bottomleft' }).addTo(map);
 
         var geocoder = L.Control.geocoder({ defaultMarkGeocode: false, placeholder: "Tìm kiếm vị trí bất kỳ...", position: 'topleft' })
-            .on('markgeocode', function(e) {
+            .on('markgeocode', function (e) {
                 var bbox = e.geocode.bbox;
                 var poly = L.polygon([bbox.getSouthEast(), bbox.getNorthEast(), bbox.getNorthWest(), bbox.getSouthWest()]);
                 map.fitBounds(poly.getBounds());
@@ -300,7 +566,7 @@
                         layer.bindPopup(`<div class="popup-info-card"><div class="popup-header"><span class="popup-title">${props.name}</span><span class="popup-badge" style="background: rgba(59,130,246,0.1); color: #3b82f6;">${props.type}</span></div><div class="popup-body"><div class="popup-row"><i class="fa-solid fa-location-dot"></i><span>${props.address}</span></div><div class="popup-row"><i class="fa-solid fa-phone"></i><span>${props.phone}</span></div></div></div>`);
                         storesMarkers[props.id] = layer;
 
-                        layer.on('click', function(e) {
+                        layer.on('click', function (e) {
                             if (window.handleRoutePointSelection && window.handleRoutePointSelection(layer.getLatLng(), "Cửa hàng " + props.name)) return;
                             const sidebar = document.getElementById('map-sidebar');
                             const content = document.getElementById('sidebar-content');
@@ -324,13 +590,13 @@
                                     </div>
                                     <div class="swiper swiper-main" id="swiper-main-id"><div class="swiper-wrapper">
                                         ${(props.hinhanh && props.hinhanh.length > 0)
-                                            ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/' + img}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=400'" /></div>`).join('')
-                                            : `<div class="swiper-slide"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=400" /></div>`}
+                                    ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/' + img}" onerror="this.src='https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=400'" /></div>`).join('')
+                                    : `<div class="swiper-slide"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=400" /></div>`}
                                     </div></div>
                                     <div class="swiper swiper-thumbs" id="swiper-thumbs-id"><div class="swiper-wrapper">
                                         ${(props.hinhanh && props.hinhanh.length > 0)
-                                            ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/' + img}" /></div>`).join('')
-                                            : `<div class="swiper-slide"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=400" /></div>`}
+                                    ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/' + img}" /></div>`).join('')
+                                    : `<div class="swiper-slide"><img src="https://images.unsplash.com/photo-1542838132-92c53300491e?q=80&w=400" /></div>`}
                                     </div></div>
                                 </div>
                                 <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
@@ -360,7 +626,7 @@
                         const props = feature.properties;
                         layer.bindPopup(`<div class="popup-info-card"><div class="popup-header"><span class="popup-title"><i class="fa-solid fa-warehouse" style="color:#ef4444"></i> ${props.name}</span><span class="popup-badge" style="background:rgba(239,68,68,0.1); color:#ef4444;">KHO HÀNG</span></div><div class="popup-body"><div class="popup-row"><i class="fa-solid fa-location-dot" style="color:#ef4444"></i><span>${props.address}</span></div></div></div>`);
                         warehousesMarkers[props.id] = layer;
-                        layer.on('click', function(e) {
+                        layer.on('click', function (e) {
                             if (window.handleRoutePointSelection && window.handleRoutePointSelection(layer.getLatLng(), "Kho " + props.name)) return;
                             const sidebar = document.getElementById('map-sidebar');
                             const content = document.getElementById('sidebar-content');
@@ -379,13 +645,13 @@
                                     </div>
                                     <div class="swiper swiper-main" id="swiper-wh-main"><div class="swiper-wrapper">
                                         ${(props.hinhanh && props.hinhanh.length > 0)
-                                            ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/' + img}" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=400'" /></div>`).join('')
-                                            : `<div class="swiper-slide"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=400" /></div>`}
+                                    ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/' + img}" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=400'" /></div>`).join('')
+                                    : `<div class="swiper-slide"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=400" /></div>`}
                                     </div></div>
                                     <div class="swiper swiper-thumbs" id="swiper-wh-thumbs"><div class="swiper-wrapper">
                                         ${(props.hinhanh && props.hinhanh.length > 0)
-                                            ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/' + img}" /></div>`).join('')
-                                            : `<div class="swiper-slide"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=400" /></div>`}
+                                    ? props.hinhanh.map(img => `<div class="swiper-slide"><img src="${img.startsWith('http') ? img : '/media/' + img}" /></div>`).join('')
+                                    : `<div class="swiper-slide"><img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=400" /></div>`}
                                     </div></div>
                                 </div>
                                 <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 20px 0;">
@@ -405,7 +671,6 @@
                 }).addTo(warehousesLayer);
             });
 
-        // Heatmap
         var isHeatmapActive = false;
         function updateHeatmap() {
             if (heatLayer) map.removeLayer(heatLayer);
@@ -419,55 +684,131 @@
                 const latlng = item.layer && item.layer.getLatLng ? item.layer.getLatLng() : null;
                 if (latlng) heatData.push([latlng.lat, latlng.lng]);
             });
-            let gradient = theme === 'neon' ? {0.2:'indigo', 0.5:'purple', 0.8:'magenta', 1:'crimson'} : {0.4:'blue', 0.6:'cyan', 0.7:'lime', 0.8:'yellow', 1:'red'};
+            let gradient = theme === 'neon' ? { 0.2: 'indigo', 0.5: 'purple', 0.8: 'magenta', 1: 'crimson' } : { 0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red' };
             heatLayer = L.heatLayer(heatData, { radius, blur, gradient }).addTo(map);
         }
 
-        document.getElementById('btn-heatmap').onclick = function() {
+        document.getElementById('btn-heatmap').onclick = function () {
             isHeatmapActive = !isHeatmapActive;
             this.style.background = isHeatmapActive ? '#4c1d95' : '#7c3aed';
             document.getElementById('heatmap-config-panel').style.display = isHeatmapActive ? 'flex' : 'none';
             if (isHeatmapActive) updateHeatmap();
             else if (heatLayer) map.removeLayer(heatLayer);
         };
-        ['heatmap-type', 'heatmap-theme'].forEach(id => document.getElementById(id).addEventListener('change', () => { if(isHeatmapActive) updateHeatmap(); }));
-        ['heatmap-radius', 'heatmap-blur'].forEach(id => document.getElementById(id).addEventListener('input', () => { if(isHeatmapActive) updateHeatmap(); }));
-        document.getElementById('btn-close-heatmap').onclick = function() { if(isHeatmapActive) document.getElementById('btn-heatmap').click(); };
+        ['heatmap-type', 'heatmap-theme'].forEach(id => document.getElementById(id).addEventListener('change', () => { if (isHeatmapActive) updateHeatmap(); }));
+        ['heatmap-radius', 'heatmap-blur'].forEach(id => document.getElementById(id).addEventListener('input', () => { if (isHeatmapActive) updateHeatmap(); }));
+        document.getElementById('btn-close-heatmap').onclick = function () { if (isHeatmapActive) document.getElementById('btn-heatmap').click(); };
 
         L.control.layers(null, { "Cửa hàng": storesLayer, "Kho hàng": warehousesLayer }, { position: 'topleft' }).addTo(map);
 
-        // Analysis
         var isAnalysisMode = false;
         function resetStorePopups() {
-            storesLayer.eachLayer(function(layer) {
-                if (layer.eachLayer) layer.eachLayer(function(marker) {
+            storesLayer.eachLayer(function (layer) {
+                if (layer.eachLayer) layer.eachLayer(function (marker) {
                     if (marker._originalPopupContent) { marker.bindPopup(marker._originalPopupContent); delete marker._originalPopupContent; }
                     if (marker.getElement()) L.DomUtil.removeClass(marker.getElement(), 'blinking-store');
                 });
             });
         }
 
-        document.getElementById('btn-analysis').onclick = function() {
+        document.getElementById('btn-analysis').onclick = function () {
             isAnalysisMode = !isAnalysisMode;
             this.style.background = isAnalysisMode ? '#ef4444' : '#3b82f6';
             this.innerHTML = isAnalysisMode ? '<i class="fa-solid fa-xmark"></i> Hủy' : '<i class="fa-solid fa-magnifying-glass-location"></i> Phân tích vùng phục vụ';
             map.getContainer().style.cursor = isAnalysisMode ? 'crosshair' : '';
             document.getElementById('radius-control').style.display = isAnalysisMode ? 'flex' : 'none';
-            if (!isAnalysisMode) { serviceLayer.clearLayers(); resetStorePopups(); }
+            if (!isAnalysisMode) {
+                serviceLayer.clearLayers(); resetStorePopups();
+            } else {
+                if (window.userMarker) {
+                    startAnalysisAt(window.userMarker.getLatLng());
+                } else {
+                    const t = document.createElement('div');
+                    t.style.cssText = 'position:fixed;top:85px;left:50%;transform:translateX(-50%);background:#ef4444;color:white;padding:10px 20px;border-radius:8px;z-index:9999;font-weight:700;font-family:Inter,sans-serif;box-shadow:0 10px 25px rgba(0,0,0,0.1);';
+                    t.innerHTML = '<i class="fa-solid fa-crosshairs"></i> Vui lòng click lên bản đồ để đặt tâm phân tích!';
+                    document.body.appendChild(t);
+                    setTimeout(() => t.remove(), 3500);
+                }
+            }
         };
 
+        window.directRouteTo = function (lat, lng, name, centerLat, centerLng) {
+            document.getElementById('btn-close-sidebar').click();
+            if (!isRouteMode) document.getElementById('btn-route').click();
+            if (routingControl) map.removeControl(routingControl);
+            routePoints = []; routeMarkersLayer.clearLayers();
+            window.handleRoutePointSelection(L.latLng(centerLat, centerLng), 'Tâm phân tích');
+            window.handleRoutePointSelection(L.latLng(lat, lng), name);
+        };
+
+        function startAnalysisAt(latlng) {
+            if (!isAnalysisMode) return;
+            serviceLayer.clearLayers(); resetStorePopups();
+            const km = parseFloat(document.getElementById('analysis-radius').value) || 5;
+            const circle = L.circle(latlng, { radius: km * 1000, color: '#ef4444', fillColor: '#ef4444', fillOpacity: 0.12, weight: 2 }).addTo(serviceLayer);
+
+            const pin = L.marker(latlng, {
+                draggable: true,
+                icon: L.divIcon({ className: 'custom-marker', html: '<div style="background:white;color:#ef4444;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #ef4444;font-size:10px;cursor:move;"><i class="fa-solid fa-arrows-up-down-left-right"></i></div>', iconSize: [24, 24] })
+            }).addTo(serviceLayer);
+
+            pin.on('drag', ev => circle.setLatLng(ev.target.getLatLng()));
+            pin.on('dragend', ev => {
+                resetStorePopups();
+                performAnalysis(ev.target.getLatLng(), parseFloat(document.getElementById('analysis-radius').value) || 5, circle);
+            });
+            performAnalysis(latlng, km, circle);
+            map.setView(latlng, 13);
+        }
+
+        map.on('click', function (e) {
+            if (isAnalysisMode) startAnalysisAt(e.latlng);
+        });
+
         function performAnalysis(latlng, radiusKm, circle) {
-            circle.bindPopup(`Đang phân tích vùng ${radiusKm}km...`).openPopup();
+            circle.bindPopup(`<div style="padding:10px;"><b><i class="fa-solid fa-spinner fa-spin"></i> Đang tìm cửa hàng trong ${radiusKm}km...</b></div>`).openPopup();
             fetch(`/api/service-area/?lat=${latlng.lat}&lng=${latlng.lng}&radius=${radiusKm}`)
                 .then(res => res.json())
                 .then(data => {
                     const count = data.stores.features.length;
-                    if (count === 0) { circle.setPopupContent(`Không có cửa hàng trong bán kính ${radiusKm}km.`).openPopup(); return; }
-                    circle.setPopupContent(`Tìm thấy <strong>${count}</strong> cửa hàng trong bán kính ${radiusKm}km.`).openPopup();
+                    let html = `<div style="min-width: 270px; padding: 5px; font-family:'Inter', sans-serif;">`;
+                    html += `<div style="font-weight:800; color:var(--primary); font-size:14px; margin-bottom:10px; padding-bottom:10px; border-bottom:2px solid #f1f5f9;">
+                                <i class="fa-solid fa-shop"></i> Có <b>${count}</b> cửa hàng trong <b>${radiusKm}km</b>
+                             </div>`;
+
+                    if (count > 0) {
+                        html += `<div style="max-height: 240px; overflow-y: auto; padding-right:5px;">`;
+                        data.stores.features.forEach(f => {
+                            const p = f.properties;
+                            const distStr = p.distance_km ? p.distance_km.toFixed(2) : '?';
+                            const opTime = p.opening_time ? p.opening_time.substring(0, 5) : '08:00';
+                            const clTime = p.closing_time ? p.closing_time.substring(0, 5) : '22:00';
+
+                            html += `
+                            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:10px; transition:0.3s;" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='#e2e8f0'">
+                               <div style="font-weight:800; color:#1e293b; font-size:13.5px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                                    <span style="line-height:1.3;">${p.name}</span>
+                                    <span style="font-size:11px; font-weight:800; color:#ef4444; background:#fef2f2; padding:3px 8px; border-radius:20px; white-space:nowrap;">${distStr} km</span>
+                               </div>
+                               <div style="font-size:11.5px; color:#64748b; margin-bottom: 12px; display:flex; align-items:center; gap:6px; font-weight:600;">
+                                    <div style="background:#3b82f6; color:white; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-clock" style="font-size:10px;"></i></div>
+                                    Mở cửa: ${opTime} - ${clTime}
+                               </div>
+                               <div style="display:flex; gap: 8px;">
+                                   <a href="/stores/${p.id}/" target="_blank" style="flex:1; text-align:center; font-size:11px; font-weight:700; background:var(--primary); color:white; padding:8px 0; border-radius:8px; text-decoration:none; transition:0.2s;"><i class="fa-solid fa-arrow-up-right-from-square"></i> Chi tiết</a>
+                                   <button onclick="window.directRouteTo(${f.geometry.coordinates[1]}, ${f.geometry.coordinates[0]}, '${p.name.replace(/'/g, "\\'")}', ${latlng.lat}, ${latlng.lng})" style="flex:1.2; font-family:'Inter', sans-serif; font-size:11px; font-weight:700; background:#10b981; color:white; border:none; padding:8px 0; border-radius:8px; cursor:pointer; transition:0.2s;"><i class="fa-solid fa-route"></i> Đi đến đây</button>
+                               </div>
+                            </div>`;
+                        });
+                        html += `</div>`;
+                    }
+                    html += `</div>`;
+                    circle.setPopupContent(html).openPopup();
+
                     const distMap = {};
                     data.stores.features.forEach(f => { distMap[f.properties.id] = f.properties.distance_km; });
-                    storesLayer.eachLayer(function(layer) {
-                        if (layer.eachLayer) layer.eachLayer(function(marker) {
+                    storesLayer.eachLayer(function (layer) {
+                        if (layer.eachLayer) layer.eachLayer(function (marker) {
                             const props = marker.feature.properties;
                             const dist = distMap[props.id];
                             if (dist !== undefined) {
@@ -480,20 +821,8 @@
                 }).catch(() => { circle.setPopupContent("Lỗi kết nối máy chủ!").openPopup(); });
         }
 
-        map.on('click', function(e) {
-            if (!isAnalysisMode) return;
-            serviceLayer.clearLayers(); resetStorePopups();
-            const radiusKm = parseFloat(document.getElementById('analysis-radius').value) || 5;
-            const circle = L.circle(e.latlng, { radius: radiusKm*1000, color:'#ef4444', fillColor:'#ef4444', fillOpacity:0.15, weight:2 }).addTo(serviceLayer);
-            const centerMarker = L.marker(e.latlng, { draggable: true, icon: L.divIcon({ className: 'custom-marker', html: '<div style="background:white;color:#ef4444;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #ef4444;cursor:move;font-size:10px;"><i class="fa-solid fa-arrows-up-down-left-right"></i></div>', iconSize:[24,24] }) }).addTo(serviceLayer);
-            centerMarker.on('drag', ev => circle.setLatLng(ev.target.getLatLng()));
-            centerMarker.on('dragend', ev => { resetStorePopups(); performAnalysis(ev.target.getLatLng(), parseFloat(document.getElementById('analysis-radius').value)||5, circle); });
-            performAnalysis(e.latlng, radiusKm, circle);
-        });
-
-        // Routing
         var isRouteMode = false; var routePoints = []; var routingControl; var routeMarkersLayer = L.layerGroup().addTo(map);
-        window.handleRoutePointSelection = function(latlng, name) {
+        window.handleRoutePointSelection = function (latlng, name) {
             if (!isRouteMode) return false;
             if (routePoints.length === 0) routeMarkersLayer.clearLayers();
             routePoints.push(latlng);
@@ -501,44 +830,42 @@
             toast.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#10b981;color:white;padding:12px 24px;border-radius:8px;z-index:9999;box-shadow:0 4px 15px rgba(0,0,0,0.2);font-weight:bold;font-family:inherit;';
             toast.innerHTML = `<i class="fa-solid fa-location-dot"></i> Đã ghim: ${name}`;
             document.body.appendChild(toast);
-            setTimeout(() => { toast.style.opacity='0'; setTimeout(() => toast.remove(), 500); }, 2500);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 2500);
             let colorHTML = routePoints.length === 1 ? '#3b82f6' : '#ef4444';
-            L.circleMarker(latlng, { radius:6, color:colorHTML, weight:2, fillColor:'#fff', fillOpacity:1 }).bindTooltip(name, {permanent:true, direction:'right'}).addTo(routeMarkersLayer);
+            L.circleMarker(latlng, { radius: 6, color: colorHTML, weight: 2, fillColor: '#fff', fillOpacity: 1 }).bindTooltip(name, { permanent: true, direction: 'right' }).addTo(routeMarkersLayer);
             if (routePoints.length === 2) {
                 if (routingControl) map.removeControl(routingControl);
-                routingControl = L.Routing.control({ waypoints: [L.latLng(routePoints[0].lat, routePoints[0].lng), L.latLng(routePoints[1].lat, routePoints[1].lng)], lineOptions: { styles: [{color:'#10b981', weight:6, opacity:0.8}] }, position:'topleft', collapsible:true, createMarker: () => null }).addTo(map);
+                routingControl = L.Routing.control({ waypoints: [L.latLng(routePoints[0].lat, routePoints[0].lng), L.latLng(routePoints[1].lat, routePoints[1].lng)], lineOptions: { styles: [{ color: '#10b981', weight: 6, opacity: 0.8 }] }, position: 'topleft', collapsible: true, createMarker: () => null }).addTo(map);
                 routePoints = [];
             }
             return true;
         };
 
-        document.getElementById('btn-route').onclick = function() {
+        document.getElementById('btn-route').onclick = function () {
             isRouteMode = !isRouteMode;
             this.style.background = isRouteMode ? '#059669' : '#10b981';
             this.innerHTML = isRouteMode ? '<i class="fa-solid fa-xmark"></i> Hủy đo' : '<i class="fa-solid fa-route"></i> Đo quãng đường';
-            if (!isRouteMode) { if(routingControl) map.removeControl(routingControl); routePoints=[]; routeMarkersLayer.clearLayers(); map.getContainer().style.cursor=''; }
-            else { map.getContainer().style.cursor='help'; alert("Click chọn 2 điểm trên bản đồ (Cửa hàng, Kho hoặc vị trí bất kỳ) để đo quãng đường!"); }
+            if (!isRouteMode) { if (routingControl) map.removeControl(routingControl); routePoints = []; routeMarkersLayer.clearLayers(); map.getContainer().style.cursor = ''; }
+            else { map.getContainer().style.cursor = 'help'; alert("Click chọn 2 điểm trên bản đồ (Cửa hàng, Kho hoặc vị trí bất kỳ) để đo quãng đường!"); }
         };
 
-        map.on('click', function(e) {
+        map.on('click', function (e) {
             if (!isRouteMode) return;
             window.handleRoutePointSelection(e.latlng, "Điểm tùy chọn");
         });
 
-        // Locate
         var userMarker;
-        document.getElementById('btn-locate-user').onclick = function() {
+        document.getElementById('btn-locate-user').onclick = function () {
             navigator.geolocation.getCurrentPosition(pos => {
                 const lat = pos.coords.latitude; const lng = pos.coords.longitude;
                 if (userMarker) userMarker.setLatLng([lat, lng]);
-                else userMarker = L.marker([lat, lng], { icon: L.divIcon({ className: 'user-location-marker', iconSize:[18,18], iconAnchor:[9,9] }) }).addTo(map);
+                else userMarker = L.marker([lat, lng], { icon: L.divIcon({ className: 'user-location-marker', iconSize: [18, 18], iconAnchor: [9, 9] }) }).addTo(map);
                 map.setView([lat, lng], 15);
             }, () => alert("Không thể định vị!"));
         };
 
         document.getElementById('btn-close-sidebar').addEventListener('click', () => document.getElementById('map-sidebar').classList.remove('active'));
 
-        // URL Params deep-link
         const urlParams = new URLSearchParams(window.location.search);
         const targetId = urlParams.get('id'); const targetType = urlParams.get('type');
         if (targetId && targetType) {
@@ -549,7 +876,6 @@
         }
     });
 
-    // Image Upload Modal
     function openUploadModal(id, type, name) {
         document.getElementById('upload-target-id').value = id;
         document.getElementById('upload-target-type').value = type;
@@ -560,17 +886,17 @@
         document.getElementById('image-upload-modal').style.display = 'none';
         document.getElementById('upload-images-form').reset();
     }
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('upload-images-form').onsubmit = function(e) {
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('upload-images-form').onsubmit = function (e) {
             e.preventDefault();
             const formData = new FormData();
             formData.append('id', document.getElementById('upload-target-id').value);
             formData.append('type', document.getElementById('upload-target-type').value);
             const fileInput = document.getElementById('image-files');
             for (let i = 0; i < fileInput.files.length; i++) formData.append('images', fileInput.files[i]);
-            fetch('/api/upload-gis-images/', { method:'POST', body:formData })
+            fetch('/api/upload-gis-images/', { method: 'POST', body: formData })
                 .then(res => res.json())
-                .then(data => { if(data.success) { alert('Tải ảnh thành công!'); location.reload(); } else alert('Lỗi: ' + data.message); })
+                .then(data => { if (data.success) { alert('Tải ảnh thành công!'); location.reload(); } else alert('Lỗi: ' + data.message); })
                 .catch(() => alert('Đã xảy ra lỗi khi tải lên!'));
         };
     });

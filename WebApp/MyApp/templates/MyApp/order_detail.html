@@ -127,7 +127,7 @@
             <div style="margin-bottom: 25px;">
                 <div class="info-label" style="margin-bottom: 10px;">Trạng thái hiện tại:</div>
                 <div style="padding: 15px; border-radius: 12px; text-align: center; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
-                    {% if order.TrangThai == 'Mới' %}background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
+                    {% if order.TrangThai == 'Đang giao' %}background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
                     {% elif order.TrangThai == 'Đã hoàn thành' %}background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0;
                     {% elif order.TrangThai == 'Đã hủy' %}background: #fef2f2; color: #991b1b; border: 1px solid #fecaca;
                     {% else %}background: #fffbeb; color: #92400e; border: 1px solid #fef3c7;{% endif %}">
@@ -139,11 +139,11 @@
                 {% csrf_token %}
                 <div class="info-label" style="margin-bottom: 10px;">Cập nhật trạng thái mới:</div>
                 <select name="status" class="status-picker">
-                    <option value="Mới" {% if order.TrangThai == 'Mới' %}selected{% endif %}>Mới</option>
                     <option value="Đang xử lý" {% if order.TrangThai == 'Đang xử lý' %}selected{% endif %}>Đang xử lý</option>
                     <option value="Đang giao" {% if order.TrangThai == 'Đang giao' %}selected{% endif %}>Đang giao</option>
                     <option value="Đã hoàn thành" {% if order.TrangThai == 'Đã hoàn thành' %}selected{% endif %}>Đã hoàn thành</option>
                     <option value="Đã hủy" {% if order.TrangThai == 'Đã hủy' %}selected{% endif %}>Đã hủy</option>
+                    <option value="Đã trả hàng" {% if order.TrangThai == 'Đã trả hàng' %}selected{% endif %}>Đã trả hàng</option>
                 </select>
                 <button type="submit" class="btn-update">CẬP NHẬT TRẠNG THÁI</button>
             </form>

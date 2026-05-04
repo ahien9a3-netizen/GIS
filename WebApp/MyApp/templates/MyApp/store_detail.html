@@ -468,31 +468,99 @@
         });
 
         // --- Mini Map Logic ---
-        {% if store.geom %}
-        var lat = {{ store.geom.y }};
-        var lng = {{ store.geom.x }};
-        var map = L.map('mini-map', {
-            zoomControl: false,
-            attributionControl: false,
-            scrollWheelZoom: false,
-            dragging: false
-        }).setView([lat, lng], 16);
+        function initMiniMap() {
+            const mapContainer = document.getElementById('mini-map');
+            
+            if (!mapContainer) {
+                console.error('Mini map container not found');
+                return;
+            }
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; CartoDB'
-    }).addTo(map);
+            {% if store.geom %}
+            try {
+                {% load l10n %}
+                var lat = {{ store.geom.y|unlocalize }};
+                var lng = {{ store.geom.x|unlocalize }};
 
-    var customIcon = L.divIcon({
-        className: 'custom-div-icon',
-        html: "<div style='background-color:var(--accent-color); width:20px; height:20px; border-radius:50%; border:4px solid white; box-shadow:0 0 10px rgba(0,0,0,0.3);'></div>",
-        iconSize: [20, 20],
-        iconAnchor: [10, 10]
-    });
+                console.log('Initializing mini map at:', lat, lng);
 
-    L.marker([lat, lng], { icon: customIcon }).addTo(map);
-    {% else %}
-    document.getElementById('mini-map').innerHTML = "<div style='height:100%; display:flex; align-items:center; justify-content:center; background:#f1f5f9; color:#94a3b8;'>Không có dữ liệu bản đồ</div>";
-    {% endif %}
+                // Ensure container has dimensions before initializing map
+                mapContainer.style.width = '100%';
+                mapContainer.style.height = '100%';
+                mapContainer.style.minHeight = '250px';
+
+                var map = L.map('mini-map', {
+                    zoomControl: false,
+                    attributionControl: false,
+                    scrollWheelZoom: false,
+                    dragging: false
+                });
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                // Determine color and icon based on store type (same as main GIS map)
+                let color = '#3b82f6'; 
+                let icon = 'fa-store';
+                const type = '{{ store.Loai|escapejs }}';
+                
+                if (type === 'Tiện Lợi') { 
+                    color = '#3b82f6'; 
+                    icon = 'fa-cart-shopping'; 
+                } else if (type === 'Gia Dụng') { 
+                    color = '#0d9488'; 
+                    icon = 'fa-house-chimney'; 
+                } else if (type === 'Điện Tử') { 
+                    color = '#f59e0b'; 
+                    icon = 'fa-bolt'; 
+                }
+
+                // Create custom divIcon (same style as main GIS map)
+                var customIcon = L.divIcon({ 
+                    className: 'custom-marker', 
+                    html: `<div style="background: ${color}; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3);"><i class="fa-solid ${icon}"></i></div>`, 
+                    iconSize: [30, 30] 
+                });
+
+                var marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+                
+                // Add a popup with store info
+                marker.bindPopup(`
+                    <div style="padding: 8px; min-width: 200px;">
+                        <div style="font-weight: 800; font-size: 1rem; margin-bottom: 4px;">{{ store.Ten|escapejs }}</div>
+                        <div style="font-size: 0.85rem; color: #64748b;">
+                            <i class="fa-solid fa-tag" style="color: ${color}; margin-right: 4px;"></i>{{ store.Loai|escapejs }}
+                        </div>
+                        <div style="font-size: 0.85rem; color: #475569; margin-top: 6px;">
+                            <i class="fa-solid fa-location-dot" style="margin-right: 4px;"></i>{{ store.DiaChi|default:"Chưa có địa chỉ"|escapejs }}
+                        </div>
+                    </div>
+                `);
+
+                // Set view and invalidate size
+                map.setView([lat, lng], 16);
+
+                // Force map to re-render multiple times to fix layout issues
+                setTimeout(function() {
+                    map.invalidateSize();
+                    console.log('Map invalidated');
+                }, 100);
+                setTimeout(function() {
+                    map.invalidateSize();
+                }, 500);
+
+            } catch (error) {
+                console.error('Error initializing mini map:', error);
+                mapContainer.innerHTML = "<div style='height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#f1f5f9; color:#94a3b8;'><i class='fa-solid fa-triangle-exclamation fa-2x' style='margin-bottom:0.5rem;'></i><span>Lỗi tải bản đồ</span></div>";
+            }
+            {% else %}
+            mapContainer.innerHTML = "<div style='height:100%; display:flex; align-items:center; justify-content:center; background:#f1f5f9; color:#94a3b8;'><i class='fa-solid fa-map-location-dot fa-2x' style='margin-right:0.5rem;'></i> Không có dữ liệu bản đồ</div>";
+            {% endif %}
+        }
+
+        // Initialize map
+        initMiniMap();
     });
 </script>
 {% endblock %}

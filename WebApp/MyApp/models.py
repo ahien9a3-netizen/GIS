@@ -79,8 +79,11 @@ class Kho(models.Model):
         return f"{self.MaKho} - {self.Ten}"
 
     def clean(self):
-        # Kiểm tra khoảng cách tối thiểu 2 mét (xấp xỉ 0.00002 độ)
-        min_dist = 0.00002
+        # Kiểm tra khoảng cách tối thiểu 11 mét (xấp xỉ 0.0001 độ)
+        if not self.geom:
+            return
+            
+        min_dist = 0.0001
         
         # Kiểm tra với các kho khác
         other_wh = Kho.objects.exclude(MaKho=self.MaKho).filter(geom__dwithin=(self.geom, min_dist))
@@ -107,7 +110,7 @@ class CuaHang(models.Model):
         ('Vô hiệu hóa', 'Vô hiệu hóa'),
     ]
     
-    MaCH = models.CharField(max_length=20, primary_key=True, db_column='mach')
+    MaCH = models.CharField(max_length=20, primary_key=True, db_column='mach', error_messages={'unique': 'Mã cửa hàng này đã tồn tại.'})
     Ten = models.CharField(max_length=255, db_column='ten')
     Loai = models.CharField(max_length=50, choices=LOAI_CHOICES, db_column='loai')
     Icon = models.CharField(max_length=20, blank=True, null=True, db_column='icon')
@@ -130,8 +133,11 @@ class CuaHang(models.Model):
         return f"{self.MaCH} - {self.Ten}"
 
     def clean(self):
-        # Kiểm tra khoảng cách tối thiểu 2 mét (xấp xỉ 0.00002 độ)
-        min_dist = 0.00002
+        # Kiểm tra khoảng cách tối thiểu 11 mét (xấp xỉ 0.0001 độ)
+        if not self.geom:
+            return
+            
+        min_dist = 0.0001
         
         # Kiểm tra với các cửa hàng khác
         other_st = CuaHang.objects.exclude(MaCH=self.MaCH).filter(geom__dwithin=(self.geom, min_dist))
@@ -151,7 +157,6 @@ class NhanVien(models.Model):
         ('Admin', 'Admin'),
         ('Nhân Viên', 'Nhân Viên'),
         ('Kế Toán', 'Kế Toán'),
-        ('User', 'User'),
     ]
     
     
@@ -252,7 +257,7 @@ class NhapKhoChiTiet(models.Model):
 #  YÊU CẦU XUẤT KHO 
 class YeuCauXuatKho(models.Model):
     TRANG_THAI_CHOICES = [
-        ('Mới', 'Mới'),
+        ('Đang xử lý', 'Đang xử lý'),
         ('Đã xuất', 'Đã xuất'),
         ('Đã hủy', 'Đã hủy'),
     ]
@@ -269,7 +274,7 @@ class YeuCauXuatKho(models.Model):
     Ngay = models.DateField(auto_now_add=True, db_column='ngay', verbose_name="Ngày xuất")
     LyDo = models.CharField(max_length=50, choices=LY_DO_CHOICES, default='Bán hàng', db_column='lydo', verbose_name="Lý do xuất")
     DonHang = models.ForeignKey('DonHang', on_delete=models.SET_NULL, null=True, blank=True, db_column='madh', verbose_name="Đơn hàng liên kết")
-    TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, default='Mới', db_column='trangthai', verbose_name="Trạng thái")
+    TrangThai = models.CharField(max_length=50, choices=TRANG_THAI_CHOICES, default='Đang xử lý', db_column='trangthai', verbose_name="Trạng thái")
     GhiChu = models.TextField(blank=True, null=True, db_column='ghichu', verbose_name="Ghi chú")
     MaNV = models.ForeignKey('NhanVien', on_delete=models.CASCADE, db_column='manv', verbose_name="Nhân viên thực hiện")
 
@@ -347,9 +352,27 @@ class Store(models.Model):
         verbose_name = "Cửa hàng"
         verbose_name_plural = "Danh sách cửa hàng"
 
+class KhachHang(models.Model):
+    MaKH = models.CharField(max_length=20, primary_key=True, db_column='makh')
+    Ten = models.CharField(max_length=255, db_column='ten')
+    SDT = models.CharField(max_length=20, blank=True, null=True, db_column='sdt')
+    Email = models.EmailField(max_length=255, blank=True, null=True, db_column='email', unique=True)
+    MatKhau = models.TextField(db_column='matkhau')
+    NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao', null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'khachhang'
+        verbose_name = "Khách hàng"
+        verbose_name_plural = "Danh sách khách hàng"
+
+    def __str__(self):
+        return f"{self.MaKH} - {self.Ten}"
+
 # GIỎ HÀNG
 class GioHang(models.Model):
     NguoiDung = models.OneToOneField(NhanVien, on_delete=models.CASCADE, related_name='gio_hang', db_column='manv', null=True, blank=True)
+    KhachHang = models.OneToOneField(KhachHang, on_delete=models.CASCADE, related_name='gio_hang', db_column='makh', null=True, blank=True)
     SessionID = models.CharField(max_length=255, null=True, blank=True, db_column='session_id') # Cho khách vãng lai
     NgayTao = models.DateTimeField(auto_now_add=True, db_column='ngaytao')
     NgayCapNhat = models.DateTimeField(auto_now=True, db_column='ngaycapnhat')
@@ -390,6 +413,7 @@ class DonHang(models.Model):
 
     MaDH = models.CharField(max_length=20, primary_key=True, db_column='madh')
     NguoiDung = models.ForeignKey(NhanVien, on_delete=models.SET_NULL, null=True, blank=True, db_column='manv')
+    KhachHang = models.ForeignKey(KhachHang, on_delete=models.SET_NULL, null=True, blank=True, db_column='makh')
     
     # Thông tin nhận hàng (để linh hoạt nếu người nhận khác người đặt)
     TenNguoiNhan = models.CharField(max_length=255, db_column='tennguoinhan')
@@ -425,7 +449,6 @@ class ChiTietDonHang(models.Model):
 
 class YeuCauTraHang(models.Model):
     TRANG_THAI_CHOICES = [
-        ('Mới', 'Mới'),
         ('Đang xử lý', 'Đang xử lý'),
         ('Đã hoàn tiền', 'Đã hoàn tiền'),
         ('Từ chối', 'Từ chối'),
@@ -442,7 +465,7 @@ class YeuCauTraHang(models.Model):
     AnhMinhChung = models.ImageField(upload_to='returns/proof/', null=True, blank=True, verbose_name="Ảnh minh chứng")
     GhiChuAdmin = models.TextField(null=True, blank=True, verbose_name="Ghi chú của Admin")
     SoTienHoan = models.DecimalField(max_digits=15, decimal_places=0, default=0, verbose_name="Số tiền hoàn lại")
-    TrangThai = models.CharField(max_length=20, choices=TRANG_THAI_CHOICES, default='Mới', verbose_name="Trạng thái")
+    TrangThai = models.CharField(max_length=20, choices=TRANG_THAI_CHOICES, default='Đang xử lý', verbose_name="Trạng thái")
     NgayTao = models.DateTimeField(auto_now_add=True, verbose_name="Ngày yêu cầu")
     NgayXuLy = models.DateTimeField(null=True, blank=True, verbose_name="Ngày xử lý")
 
