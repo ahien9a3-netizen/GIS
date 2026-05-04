@@ -1,3 +1,4 @@
+anaconda
 Django==6.0.1
 django-ckeditor==6.5.1
 openpyxl==3.10.10
